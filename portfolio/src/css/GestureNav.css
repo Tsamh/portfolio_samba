@@ -62,6 +62,12 @@
   to   { transform: translateY(0) scale(1); opacity: 1; }
 }
 
+/* The dialog is focused programmatically when it opens, so it should not
+   draw a focus ring around the whole panel. Its buttons keep theirs. */
+.gesture-modal:focus {
+  outline: none;
+}
+
 .gesture-title {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1.9rem;

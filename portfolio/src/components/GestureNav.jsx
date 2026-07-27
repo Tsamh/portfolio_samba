@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import '../css/GestureNav.css';
 
 /* idle → intro → loading → active, with error reachable from loading */
@@ -7,6 +7,9 @@ const INTRO = 'intro';
 const LOADING = 'loading';
 const ACTIVE = 'active';
 const ERROR = 'error';
+
+const FOCUSABLE =
+  'button:not([disabled]), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 const GESTURES = [
   { icon: '🖐', title: 'Show Hand', text: 'Show your palm to move the cursor around the page' },
@@ -35,7 +38,47 @@ export default function GestureNav() {
   const [status, setStatus] = useState(IDLE);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const modalRef = useRef(null);
+  const returnFocusRef = useRef(null);
+
   const modalOpen = status === INTRO || status === LOADING || status === ERROR;
+
+  /* Move focus into the dialog on open and hand it back on close, so someone
+     working without a mouse lands in the modal rather than behind it. */
+  useEffect(() => {
+    if (!modalOpen) return;
+    returnFocusRef.current = document.activeElement;
+    modalRef.current?.focus();
+    return () => {
+      const previous = returnFocusRef.current;
+      returnFocusRef.current = null;
+      if (previous && typeof previous.focus === 'function') previous.focus();
+    };
+  }, [modalOpen]);
+
+  /* Keep Tab inside the dialog; otherwise it walks the navbar underneath. */
+  useEffect(() => {
+    if (!modalOpen) return;
+    const onKey = (e) => {
+      if (e.key !== 'Tab') return;
+      const focusable = modalRef.current?.querySelectorAll(FOCUSABLE);
+      if (!focusable?.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey && (active === first || active === modalRef.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [modalOpen]);
 
   useEffect(() => {
     if (!modalOpen) return;
@@ -69,8 +112,16 @@ export default function GestureNav() {
 
       {modalOpen && (
         <div className="gesture-overlay" onClick={() => setStatus(IDLE)}>
-          <div className="gesture-modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="gesture-title">Navigate with your hand</h2>
+          <div
+            ref={modalRef}
+            className="gesture-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="gesture-title"
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="gesture-title" id="gesture-title">Navigate with your hand</h2>
             <p className="gesture-subtitle">
               Point your webcam at yourself and drive the whole site without touching anything.
             </p>
