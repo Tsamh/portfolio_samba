@@ -64,6 +64,7 @@ export default function GestureNav() {
   const engineRef     = useRef(null);
   const dispatcherRef = useRef(null);
   const landmarksRef  = useRef(null);
+  const sessionRef    = useRef(0);
 
   /**
    * Runs up to 60 times a second. The cursor is positioned by writing to the
@@ -102,6 +103,11 @@ export default function GestureNav() {
   const modalOpen = status === INTRO || status === LOADING || status === ERROR;
 
   const stop = useCallback(() => {
+    // Bump the generation first. Start-up is several seconds of awaits, and
+    // this is what tells one already in flight that it has been abandoned:
+    // it will release what it acquired instead of storing it in the refs.
+    sessionRef.current += 1;
+
     trackerRef.current?.stop();
     trackerRef.current = null;
 
@@ -118,8 +124,33 @@ export default function GestureNav() {
     landmarksRef.current = null;
   }, []);
 
+  /* Every way out of the feature goes through here, so no exit can forget to
+     release the camera. Safe to call when nothing is running. */
+  const close = useCallback(() => {
+    stop();
+    setStatus(IDLE);
+  }, [stop]);
+
   const handleEnable = useCallback(async () => {
+    const session = sessionRef.current;
     setStatus(LOADING);
+
+    let stream = null;
+    let tracker = null;
+
+    /* Release whatever this attempt got hold of. Used when it is abandoned
+       mid-flight, where the refs were never populated and stop() would have
+       nothing to find. */
+    const discard = () => {
+      tracker?.stop();
+      stream?.getTracks().forEach((track) => track.stop());
+      if (videoRef.current && videoRef.current.srcObject === stream) {
+        videoRef.current.srcObject = null;
+      }
+    };
+
+    const abandoned = () => sessionRef.current !== session;
+
     try {
       if (!navigator.mediaDevices?.getUserMedia) {
         const err = new Error('insecure context');
@@ -127,19 +158,24 @@ export default function GestureNav() {
         throw err;
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({
+      stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user', width: 640, height: 480 },
       });
-      streamRef.current = stream;
+      if (abandoned()) return discard();
 
       const video = videoRef.current;
       video.srcObject = stream;
       await video.play();
+      if (abandoned()) return discard();
 
-      trackerRef.current = await createHandTracker();
+      tracker = await createHandTracker();
+      if (abandoned()) return discard();
+
+      streamRef.current = stream;
+      trackerRef.current = tracker;
       engineRef.current = createEngine();
       dispatcherRef.current = createDispatcher();
-      trackerRef.current.start(video, onFrame, (err) => {
+      tracker.start(video, onFrame, (err) => {
         // The tracker has already stopped its own loop by the time this runs.
         stop();
         setErrorMessage(describeError(err));
@@ -148,6 +184,10 @@ export default function GestureNav() {
 
       setStatus(ACTIVE);
     } catch (err) {
+      discard();
+      // Someone else already tore the session down and may have started a new
+      // one; reporting this failure would clobber it.
+      if (abandoned()) return;
       stop();
       setErrorMessage(describeError(err));
       setStatus(ERROR);
@@ -155,13 +195,9 @@ export default function GestureNav() {
   }, [onFrame, stop]);
 
   const handleFabClick = useCallback(() => {
-    if (status === ACTIVE) {
-      stop();
-      setStatus(IDLE);
-    } else {
-      setStatus(INTRO);
-    }
-  }, [status, stop]);
+    if (status === IDLE) setStatus(INTRO);
+    else close();
+  }, [status, close]);
 
   /* Move focus into the dialog on open and hand it back on close, so someone
      working without a mouse lands in the modal rather than behind it. */
@@ -214,17 +250,16 @@ export default function GestureNav() {
     return () => window.removeEventListener('keydown', onKey);
   }, [modalOpen]);
 
-  /* Escape closes the modal, and also exits an active session. */
+  /* Escape closes the modal, and also exits an active session. It routes
+     through close() so pressing it mid-load releases the camera too. */
   useEffect(() => {
     if (!modalOpen && status !== ACTIVE) return;
     const onKey = (e) => {
-      if (e.key !== 'Escape') return;
-      if (status === ACTIVE) stop();
-      setStatus(IDLE);
+      if (e.key === 'Escape') close();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [modalOpen, status, stop]);
+  }, [modalOpen, status, close]);
 
   /* A hidden tab should not be running hand detection — but the session is
      only paused, not torn down, so switching back resumes immediately. */
@@ -258,7 +293,7 @@ export default function GestureNav() {
       </button>
 
       {modalOpen && (
-        <div className="gesture-overlay" onClick={() => setStatus(IDLE)}>
+        <div className="gesture-overlay" onClick={close}>
           <div
             ref={modalRef}
             className="gesture-modal"
@@ -294,7 +329,7 @@ export default function GestureNav() {
             {status === ERROR && <p className="gesture-error">{errorMessage}</p>}
 
             <div className="gesture-actions">
-              <button className="gesture-btn ghost" onClick={() => setStatus(IDLE)}>
+              <button className="gesture-btn ghost" onClick={close}>
                 Cancel
               </button>
               <button
