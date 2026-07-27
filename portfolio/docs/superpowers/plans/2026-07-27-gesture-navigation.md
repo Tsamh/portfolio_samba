@@ -900,20 +900,30 @@ Expected: four files — `vision_wasm_internal.js`, `vision_wasm_internal.wasm`,
 
 - [ ] **Step 3: Download the model**
 
+**Use Node, not `curl`.** On this machine Avast intercepts TLS (`SSLKEYLOGFILE`
+points at `aswMonFltProxy`), and `curl` rejects its root certificate with error 35.
+Node trusts it through the system store, which is why `npm` works. The URL has been
+confirmed live from Node: HTTP 200, `content-length: 7819105`.
+
 ```bash
 mkdir -p public/models
-curl -L -o public/models/hand_landmarker.task \
-  "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task"
-ls -la public/models/hand_landmarker.task
+node -e "
+const https = require('https');
+const fs = require('fs');
+const url = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+https.get(url, (res) => {
+  if (res.statusCode !== 200) { console.error('HTTP ' + res.statusCode); process.exit(1); }
+  const out = fs.createWriteStream('public/models/hand_landmarker.task');
+  res.pipe(out);
+  out.on('finish', () => console.log('saved', fs.statSync('public/models/hand_landmarker.task').size, 'bytes'));
+}).on('error', (e) => { console.error(e.message); process.exit(1); });
+"
 ```
 
-Expected: a file of roughly 7–8 MB. If `curl` fails with a connection or TLS error, the sandbox is blocking outbound HTTPS — rerun it outside the sandbox, or use PowerShell:
-
-```powershell
-Invoke-WebRequest -Uri "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task" -OutFile "public/models/hand_landmarker.task"
-```
-
-Verify the size is in the megabytes, not a few hundred bytes — a tiny file means an error page was saved instead of the model. If the URL 404s, find the current one under "HandLandmarker → Models" in the MediaPipe solutions documentation.
+Expected: `saved 7819105 bytes`. Verify the size is in the megabytes, not a few
+hundred bytes — a tiny file means an error page was saved instead of the model. If the
+URL 404s, find the current one under "HandLandmarker → Models" in the MediaPipe
+solutions documentation.
 
 - [ ] **Step 4: Write the tracker**
 
