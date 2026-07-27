@@ -875,10 +875,11 @@ git commit -m "Add synthetic DOM event dispatch for gesture input"
 **Interfaces:**
 - Consumes: nothing from earlier tasks.
 - Produces: `createHandTracker() -> Promise<{ start, stop, setPaused }>`
-  - `start(videoElement, onFrame)` — begins a `requestAnimationFrame` loop.
+  - `start(videoElement, onFrame, onError?)` — begins a `requestAnimationFrame` loop. Throws if called after `stop()`; a stopped tracker cannot be restarted.
   - `onFrame(landmarks | null, timestampMs)` — `landmarks` is the 21-point array for the first detected hand, matching what `createEngine().update()` expects.
+  - `onError(err)` — called once if detection fails on `MAX_CONSECUTIVE_ERRORS` frames in a row, after the loop has already stopped itself. This is the escape hatch that keeps a permanently broken detector from spinning silently.
   - `setPaused(boolean)` — suspends detection while keeping the landmarker and the MediaStream alive, so a paused session can resume instantly.
-  - `stop()` — cancels the loop and closes the landmarker. It does **not** stop the MediaStream; `GestureNav` owns that.
+  - `stop()` — cancels the loop and closes the landmarker. Idempotent. It does **not** stop the MediaStream; `GestureNav` owns that.
 
 - [ ] **Step 1: Install MediaPipe**
 
@@ -896,7 +897,7 @@ cp node_modules/@mediapipe/tasks-vision/wasm/* public/mediapipe/wasm/
 ls -la public/mediapipe/wasm/
 ```
 
-Expected: four files — `vision_wasm_internal.js`, `vision_wasm_internal.wasm`, `vision_wasm_nosimd_internal.js`, `vision_wasm_nosimd_internal.wasm`. If the `wasm` directory is not at that path, locate it with `ls node_modules/@mediapipe/tasks-vision/` and copy from wherever it actually lives.
+Expected: six files in version 0.10.35 — `vision_wasm_internal`, `vision_wasm_module_internal`, and `vision_wasm_nosimd_internal`, each as a `.js`/`.wasm` pair, totalling roughly 33 MB. Copy whatever the package ships; the runtime picks the variant that matches the browser. If the `wasm` directory is not at that path, locate it with `ls node_modules/@mediapipe/tasks-vision/` and copy from wherever it actually lives.
 
 - [ ] **Step 3: Download the model**
 
@@ -962,12 +963,22 @@ export async function createHandTracker() {
     });
   }
 
+  // A short streak of failures is dropped frames; a detector that fails on
+  // every frame is broken, and spinning on it forever would leave gesture mode
+  // looking active with a frozen cursor and nothing to explain why.
+  const MAX_CONSECUTIVE_ERRORS = 30; // roughly half a second at 60 fps
+
   let rafId = null;
   let running = false;
   let paused = false;
+  let closed = false;
   let lastVideoTime = -1;
+  let consecutiveErrors = 0;
 
-  function start(video, onFrame) {
+  function start(video, onFrame, onError) {
+    if (closed) {
+      throw new Error('this hand tracker was stopped and cannot be restarted');
+    }
     running = true;
 
     const loop = () => {
@@ -982,14 +993,25 @@ export async function createHandTracker() {
       if (video.currentTime === lastVideoTime) return;
       lastVideoTime = video.currentTime;
 
+      // One reading, used for both the detector and the consumer, so the
+      // landmarks and the timestamp the engine reasons about describe the
+      // same instant.
+      const timestampMs = performance.now();
+
       let result;
       try {
-        result = landmarker.detectForVideo(video, performance.now());
-      } catch {
-        return; // a dropped frame is not worth tearing the session down
+        result = landmarker.detectForVideo(video, timestampMs);
+        consecutiveErrors = 0;
+      } catch (err) {
+        consecutiveErrors += 1;
+        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          stop();
+          onError?.(err);
+        }
+        return;
       }
 
-      onFrame(result?.landmarks?.[0] ?? null, performance.now());
+      onFrame(result?.landmarks?.[0] ?? null, timestampMs);
     };
 
     rafId = requestAnimationFrame(loop);
@@ -1009,6 +1031,11 @@ export async function createHandTracker() {
     paused = false;
     if (rafId !== null) cancelAnimationFrame(rafId);
     rafId = null;
+
+    // Closing a MediaPipe landmarker twice is a hard crash, and this runs from
+    // several exit paths — the button, Escape, and component teardown.
+    if (closed) return;
+    closed = true;
     landmarker.close();
   }
 
@@ -1514,7 +1541,12 @@ Replace both placeholder functions with:
       trackerRef.current = await createHandTracker();
       engineRef.current = createEngine();
       dispatcherRef.current = createDispatcher();
-      trackerRef.current.start(video, onFrame);
+      trackerRef.current.start(video, onFrame, (err) => {
+        // The tracker has already stopped its own loop by the time this runs.
+        stop();
+        setErrorMessage(describeError(err));
+        setStatus(ERROR);
+      });
 
       setStatus(ACTIVE);
     } catch (err) {
