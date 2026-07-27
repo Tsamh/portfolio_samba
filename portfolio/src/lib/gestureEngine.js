@@ -62,6 +62,15 @@ export function handScale(landmarks) {
   return Math.max(distance(landmarks[WRIST], landmarks[MIDDLE_MCP]), EPSILON);
 }
 
+/**
+ * Distance between thumb tip and index tip, divided by hand size.
+ * Dividing by hand size is what makes a single threshold work whether the
+ * visitor is leaning into the camera or sitting back from it.
+ */
+export function pinchRatio(landmarks) {
+  return distance(landmarks[THUMB_TIP], landmarks[INDEX_TIP]) / handScale(landmarks);
+}
+
 export function mapToViewport(point, viewport, cfg = DEFAULTS) {
   const span = cfg.activeMax - cfg.activeMin;
   const mirroredX = 1 - point.x; // the webcam image is a mirror

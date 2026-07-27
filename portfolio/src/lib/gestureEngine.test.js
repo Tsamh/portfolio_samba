@@ -5,6 +5,7 @@ import {
   handScale,
   mapToViewport,
   smoothStep,
+  pinchRatio,
 } from './gestureEngine';
 
 /**
@@ -96,5 +97,28 @@ describe('smoothStep', () => {
     const slow = smoothStep({ x: 0, y: 0 }, { x: 2, y: 0 }, DEFAULTS);
     const fast = smoothStep({ x: 0, y: 0 }, { x: 200, y: 0 }, DEFAULTS);
     expect(slow.x / 2).toBeLessThan(fast.x / 200); // fraction travelled
+  });
+});
+
+describe('pinchRatio', () => {
+  it('reports the gap between thumb and index as a fraction of hand size', () => {
+    expect(pinchRatio(makeHand({ pinchGap: 0.3 }))).toBeCloseTo(0.3, 6);
+  });
+
+  it('is invariant to how far the hand is from the camera', () => {
+    const near = pinchRatio(makeHand({ scale: 0.4, pinchGap: 0.25 }));
+    const far  = pinchRatio(makeHand({ scale: 0.1, pinchGap: 0.25 }));
+    expect(near).toBeCloseTo(far, 6);
+  });
+
+  it('is invariant to where the hand sits in the frame', () => {
+    const left  = pinchRatio(makeHand({ cx: 0.25, cy: 0.3, pinchGap: 0.25 }));
+    const right = pinchRatio(makeHand({ cx: 0.75, cy: 0.7, pinchGap: 0.25 }));
+    expect(left).toBeCloseTo(right, 6);
+  });
+
+  it('crosses the close threshold only for a tight pinch', () => {
+    expect(pinchRatio(makeHand({ pinchGap: 0.2 }))).toBeLessThan(DEFAULTS.pinchClose);
+    expect(pinchRatio(makeHand({ pinchGap: 0.8 }))).toBeGreaterThan(DEFAULTS.pinchOpen);
   });
 });
