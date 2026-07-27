@@ -65,6 +65,9 @@ function findScrollable(start) {
 
 export function createDispatcher() {
   let hovered = null;
+  let dragScroller = null;
+  let lastX = 0;
+  let lastY = 0;
 
   function elementAt(x, y) {
     return document.elementFromPoint(x, y);
@@ -88,6 +91,8 @@ export function createDispatcher() {
   }
 
   function moveTo(x, y) {
+    lastX = x;
+    lastY = y;
     const el = elementAt(x, y);
     if (!el) {
       setHovered(null, x, y);
@@ -100,6 +105,8 @@ export function createDispatcher() {
   }
 
   function clickAt(x, y) {
+    lastX = x;
+    lastY = y;
     const el = elementAt(x, y);
     if (!el) return;
     setHovered(el, x, y);
@@ -124,26 +131,42 @@ export function createDispatcher() {
     const el = elementAt(x, y);
     if (!el) return;
 
-    const wheel = new WheelEvent('wheel', {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      clientX: x,
-      clientY: y,
-      deltaY,
-      deltaMode: 0,
+    // The app's own wheel handler still needs this: it is what runs the
+    // page-to-page transitions. We just cannot learn anything from the
+    // return value, because React binds wheel passively at its root and
+    // preventDefault() there never sets the event's canceled flag.
+    el.dispatchEvent(
+      new WheelEvent('wheel', {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        clientX: x,
+        clientY: y,
+        deltaY,
+        deltaMode: 0,
+      })
+    );
+
+    // Latch the scroller for the whole drag. Re-resolving it every frame
+    // would hand the rest of the gesture to whichever page slid in behind
+    // the cursor, leaving the new page already scrolled.
+    if (!dragScroller) dragScroller = findScrollable(el);
+    if (!dragScroller) return;
+
+    // Synthetic events never trigger native scrolling, so the movement has
+    // to be applied by hand. 'instant' matters: .page-scroll sets
+    // scroll-behavior: smooth, and the scrollTop setter honours it, so a
+    // plain assignment would start a fresh animation on every frame and the
+    // deltas would fight each other.
+    dragScroller.scrollTo({
+      top: dragScroller.scrollTop + deltaY,
+      behavior: 'instant',
     });
-    el.dispatchEvent(wheel);
+  }
 
-    // The app's own wheel handler calls preventDefault() when it decides to
-    // run a page transition. Deferring to that flag lets this module follow
-    // the app's decision without duplicating the logic behind it.
-    if (wheel.defaultPrevented) return;
-
-    // Synthetic events never trigger the browser's native scrolling, so the
-    // in-page case has to be applied by hand.
-    const scroller = findScrollable(el);
-    if (scroller) scroller.scrollTop += deltaY;
+  /** Called when a pinch-drag ends, so the next one re-resolves its target. */
+  function endDrag() {
+    dragScroller = null;
   }
 
   function isClickable(el) {
@@ -151,11 +174,11 @@ export function createDispatcher() {
   }
 
   function clear() {
-    if (hovered) {
-      hovered.removeAttribute('data-gesture-hover');
-      hovered = null;
-    }
+    // Release the hover properly rather than just forgetting it, or whatever
+    // opened on mouseenter — the Contact dropdown, for one — stays open.
+    setHovered(null, lastX, lastY);
+    dragScroller = null;
   }
 
-  return { moveTo, clickAt, scrollAt, isClickable, clear };
+  return { moveTo, clickAt, scrollAt, isClickable, clear, endDrag };
 }

@@ -63,8 +63,10 @@
 }
 
 /* The dialog is focused programmatically when it opens, so it should not
-   draw a focus ring around the whole panel. Its buttons keep theirs. */
-.gesture-modal:focus {
+   draw a focus ring around the whole panel in that case. A keyboard user
+   who tabs back into it should still see one, so this only suppresses the
+   plain, non-:focus-visible match. Its buttons keep their own ring. */
+.gesture-modal:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -204,6 +206,11 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
+  /* Otherwise this fixed block is hit-testable, and the gesture cursor
+     drifting over it resolves to the canvas instead of the page beneath —
+     findScrollable then falls back to a scrollingElement that never
+     scrolls, and the gesture silently stops doing anything. */
+  pointer-events: none;
 }
 
 .gesture-preview canvas {
@@ -225,6 +232,9 @@
   border: 1px solid var(--line);
   border-radius: 6px;
   cursor: pointer;
+  /* The collapse button must stay clickable even though its parent
+     .gesture-preview opts out of hit-testing. */
+  pointer-events: auto;
 }
 
 .gesture-preview-toggle:hover { color: var(--text); }

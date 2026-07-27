@@ -66,6 +66,7 @@ export default function GestureNav() {
   const dispatcherRef = useRef(null);
   const landmarksRef  = useRef(null);
   const sessionRef    = useRef(0);
+  const wasPinchingRef = useRef(false);
 
   /**
    * Runs up to 60 times a second. The cursor is positioned by writing to the
@@ -93,6 +94,11 @@ export default function GestureNav() {
 
     const target = dispatcher.moveTo(cursor.x, cursor.y);
     if (node) node.classList.toggle('over-target', dispatcher.isClickable(target));
+
+    // Tell the dispatcher a drag finished so the next one re-resolves which
+    // element it scrolls.
+    if (wasPinchingRef.current && !pinching) dispatcher.endDrag();
+    wasPinchingRef.current = pinching;
 
     if (action?.type === 'click') dispatcher.clickAt(action.x, action.y);
     else if (action?.type === 'scroll') dispatcher.scrollAt(cursor.x, cursor.y, action.deltaY);
@@ -123,6 +129,7 @@ export default function GestureNav() {
     dispatcherRef.current = null;
     engineRef.current = null;
     landmarksRef.current = null;
+    wasPinchingRef.current = false;
   }, []);
 
   /* Every way out of the feature goes through here, so no exit can forget to
@@ -163,6 +170,20 @@ export default function GestureNav() {
         video: { facingMode: 'user', width: 640, height: 480 },
       });
       if (abandoned()) return discard();
+
+      // A revoked permission or an unplugged webcam ends the track. The
+      // detection loop cannot notice: the video's currentTime simply stops
+      // advancing, which is indistinguishable from a still hand.
+      const onDeviceLost = () => {
+        stop();
+        setErrorMessage(
+          'The camera was disconnected, or its permission was revoked. Reconnect it and try again.'
+        );
+        setStatus(ERROR);
+      };
+      stream.getTracks().forEach((track) => {
+        track.addEventListener('ended', onDeviceLost);
+      });
 
       const video = videoRef.current;
       video.srcObject = stream;
