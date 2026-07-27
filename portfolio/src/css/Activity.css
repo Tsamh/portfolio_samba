@@ -1,0 +1,253 @@
+/* ─── ACTIVITY ROW (Extra & Random pages) ────────────────────── */
+.activity-row {
+  max-width: 1050px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+.activity-row.reverse .activity-text     { order: 2; }
+.activity-row.reverse .activity-media    { order: 1; }
+
+.activity-media {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.activity-hint {
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.activity-text h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.activity-text p {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text-soft);
+  font-weight: 300;
+  margin-bottom: 1rem;
+}
+
+.activity-count {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* ── creative hover container (from assets/ref) ── */
+.clip-container {
+  position: relative;
+  width: 100%;
+  align-self: stretch;
+  aspect-ratio: 8 / 5;
+  background: #222;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+}
+
+.clip {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: clip-path 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: clip-path;
+  cursor: pointer;
+  outline: none;
+}
+
+/* The three slices tile the whole box with a small overlap — at every
+   instant of the transition the container is fully covered, so the empty
+   placeholder can never flash through. */
+.clip1 { clip-path: polygon(0 0, 46% 0, 39% 100%, 0 100%); }
+.clip2 { clip-path: polygon(19% 0, 87% 0, 64% 100%, 33% 100%); }
+.clip3 { clip-path: polygon(82% 0, 100% 0, 100% 100%, 63% 100%); }
+
+/* Only the hovered slice changes: it grows to fill the box, on top of the
+   other two which stay exactly where they are underneath. */
+.clip.active {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  z-index: 3;
+}
+
+.clip:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+@media (max-width: 800px) {
+  .activity-row {
+    grid-template-columns: 1fr;
+    gap: 1.8rem;
+  }
+
+  .activity-row.reverse .activity-text  { order: 1; }
+  .activity-row.reverse .activity-media { order: 0; }
+}
+
+/* touch devices have no hover — keep the three slices readable */
+@media (hover: none) {
+  .clip { transition: none; }
+  .clip.active { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+}
+
+/* ─── LIGHTBOX ───────────────────────────────────────────────── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.lb-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: min(880px, 82vw);
+}
+
+.lb-image {
+  max-width: 100%;
+  max-height: 58vh;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  user-select: none;
+}
+
+.lb-caption {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  color: #fff;
+}
+
+.lb-caption span {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.55);
+  margin-left: 0.8rem;
+}
+
+/* thumbnail strip */
+.lb-thumbs {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.lb-thumbs img {
+  width: 72px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.45;
+  border: 2px solid transparent;
+  transition: opacity 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.lb-thumbs img:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+}
+
+.lb-thumbs img.active {
+  opacity: 1;
+  border-color: rgb(220, 38, 38);
+}
+
+/* arrows */
+.lb-arrow {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.lb-arrow:hover {
+  border-color: rgb(220, 38, 38);
+  background: rgba(220, 38, 38, 0.15);
+}
+
+/* close button hugs the image corner without covering it */
+.lb-close {
+  position: absolute;
+  top: -2.4rem;
+  right: -0.4rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.lb-close:hover {
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+@media (max-width: 700px) {
+  .lb-arrow { display: none; } /* swipe/thumbs on mobile */
+
+  .lightbox { padding: 1rem; }
+
+  .lb-main { max-width: 100%; gap: 0.8rem; }
+
+  .lb-image { max-height: 52vh; }
+
+  .lb-caption { font-size: 1.05rem; }
+
+  .lb-thumbs {
+    gap: 0.4rem;
+    max-width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.3rem;
+  }
+
+  .lb-thumbs img { width: 56px; height: 40px; flex: 0 0 auto; }
+
+  .lb-close { top: -2rem; right: 0; font-size: 1.6rem; }
+}
+
+@media (max-width: 900px) {
+  .activity-text h2 { font-size: 1.9rem; }
+  .activity-text p  { font-size: 0.9rem; line-height: 1.7; }
+}
+
+@media (max-width: 460px) {
+  .activity-row { gap: 1.4rem; }
+  .clip-container { aspect-ratio: 4 / 3; }
+  .activity-hint { letter-spacing: 0.18em; }
+}

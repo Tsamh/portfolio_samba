@@ -1,0 +1,60 @@
+/* ─── QUOTES PANEL ───────────────────────────────────────────── */
+/*
+  The 3D page now sits at left: 28vw (right edge ≈ 28vw + ~40vw*cos28°*0.62 ≈ 50vw).
+  The nav list is at right: 10vw (= left: 90vw - width).
+  Free gap ≈ 50vw → 80vw. Centre-point ≈ 15vw from right = right: 20vw.
+*/
+.quotes-panel {
+  position: fixed;
+  right: 22vw;          /* sits left of the nav list */
+  top: 50%;
+  transform: translateY(-50%) translateX(20px);
+  width: 260px;
+  z-index: 98;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease 0.35s, transform 0.5s ease 0.35s;
+}
+
+.quotes-panel.visible {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ── decorative "//" ── */
+.quotes-deco {
+  font-family: 'Bebas Neue', monospace;
+  font-size: 1.8rem;
+  color: var(--text);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.9rem;
+  line-height: 1;
+}
+
+/* ── quote text ── */
+.quotes-text {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.75;
+  font-weight: 300;
+  margin: 0 0 0.8rem;
+  border: none;
+  padding: 0;
+  transition: opacity 0.35s ease;
+}
+
+.quotes-text.fade { opacity: 0; }
+
+/* ── author ── */
+.quotes-author {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(220, 38, 38, 0.9);
+  font-style: normal;
+  transition: opacity 0.35s ease;
+}
+
+.quotes-author.fade { opacity: 0; }

@@ -1,0 +1,87 @@
+/* ─── THEME VARIABLES ────────────────────────────────────────── */
+/* Light by default — dark via [data-theme="dark"] on <html>. */
+:root {
+  --bg: #f6f6f4;
+  --bg-alt: #ececea;
+  --surface: #ffffff;
+  --text: #141414;
+  --text-soft: rgba(0, 0, 0, 0.65);
+  --text-faint: rgba(0, 0, 0, 0.45);
+  --line: rgba(0, 0, 0, 0.1);
+  --accent: rgb(220, 38, 38);
+  --nav-fg: #141414;
+  --nav-fg-soft: rgba(0, 0, 0, 0.35);
+  --nav-bg: rgba(246, 246, 244, 0.72);
+  --logo-filter: brightness(0);
+}
+
+[data-theme='dark'] {
+  --bg: #1a1a1a;
+  --bg-alt: #212121;
+  --surface: #2a2a2a;
+  --text: #ffffff;
+  --text-soft: rgba(255, 255, 255, 0.65);
+  --text-faint: rgba(255, 255, 255, 0.45);
+  --line: rgba(255, 255, 255, 0.08);
+  --accent: rgb(220, 38, 38);
+  --nav-fg: #ffffff;
+  --nav-fg-soft: rgba(255, 255, 255, 0.35);
+  --nav-bg: rgba(26, 26, 26, 0.6);
+  --logo-filter: brightness(0) invert(1);
+}
+
+/* ─── RESET & BASE ───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+  overflow: hidden;
+  background-color: var(--bg-alt);
+  font-family: 'Inter', sans-serif;
+}
+
+/* ─── SMOOTH THEME SWITCH ────────────────────────────────────── */
+/* NOTE: .nav-link is excluded — it manages its own transitions
+   (transform hover) and a global one makes it stutter. */
+body,
+.content-section,
+.card,
+.contact-link-card,
+.availability {
+  transition:
+    background-color 0.45s ease,
+    color 0.45s ease,
+    border-color 0.45s ease;
+}
+
+/* ─── PAGE TRANSITION ANIMATION ─────────────────────────────── */
+@keyframes slide {
+  0%   { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* ─── SCROLLBAR ──────────────────────────────────────────────── */
+.page-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-faint) transparent;
+}
+
+.page-scroll::-webkit-scrollbar        { width: 4px; }
+.page-scroll::-webkit-scrollbar-track  { background: transparent; }
+.page-scroll::-webkit-scrollbar-thumb  { background: var(--accent); border-radius: 2px; }

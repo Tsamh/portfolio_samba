@@ -1,0 +1,91 @@
+/* ─── CONTACT BUTTON WRAPPER ─────────────────────────────────── */
+.contact-btn-wrap {
+  position: relative;
+  display: inline-block;
+  justify-self: end;   /* right column of navbar grid */
+}
+
+/* ─── MAIN BUTTON ────────────────────────────────────────────── */
+.contact-btn {
+  opacity: 1;
+  color: var(--nav-fg);
+  border: 2px solid var(--nav-fg);
+  background: transparent;
+  padding: 0.45rem 1.1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.45s ease;
+  white-space: nowrap;
+}
+
+.contact-btn:hover,
+.contact-btn-wrap:hover .contact-btn {
+  background: var(--nav-fg);
+  color: var(--bg);
+}
+
+/* ─── DROPDOWN ───────────────────────────────────────────────── */
+.contact-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding-top: 6px;   /* invisible bridge — keeps hover active */
+  background: transparent;
+  min-width: 160px;
+
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.contact-dropdown-inner {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.contact-dropdown.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+/* ─── DROPDOWN ITEMS ─────────────────────────────────────────── */
+.contact-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.contact-dropdown-item:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.contact-dropdown-item + .contact-dropdown-item {
+  border-top: 1px solid var(--line);
+}
+
+.dropdown-icon {
+  font-size: 0.85rem;
+  width: 18px;
+  text-align: center;
+  font-style: normal;
+  font-weight: 700;
+}

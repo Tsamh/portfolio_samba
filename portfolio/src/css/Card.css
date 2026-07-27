@@ -1,0 +1,32 @@
+/* ─── CARD ───────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1.8rem;
+  transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.45s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.card-tag {
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  color: var(--text);
+  margin: 0.6rem 0 0.4rem;
+}
+
+.card p {
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  font-weight: 300;
+}

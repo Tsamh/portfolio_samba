@@ -1,0 +1,145 @@
+/* ─── TERMINAL OVERLAY ───────────────────────────────────────── */
+.terminal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: term-fade 0.25s ease;
+}
+
+@keyframes term-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.terminal-window {
+  width: min(720px, 92vw);
+  height: min(480px, 80vh);
+  display: flex;
+  flex-direction: column;
+  background: #0d1117;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  animation: term-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes term-pop {
+  from { transform: translateY(24px) scale(0.97); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #161b22;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.t-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.t-dot.red    { background: #ff5f56; cursor: pointer; }
+.t-dot.yellow { background: #ffbd2e; }
+.t-dot.green  { background: #27c93f; }
+
+.terminal-title {
+  margin-left: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.08em;
+}
+
+.terminal-body {
+  flex: 1;
+  padding: 14px 16px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #c9d1d9;
+  cursor: text;
+}
+
+.terminal-body::-webkit-scrollbar       { width: 6px; }
+.terminal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+.terminal-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-prompt {
+  color: #27c93f;
+  white-space: nowrap;
+}
+
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #c9d1d9;
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  caret-color: #27c93f;
+}
+
+/* ─── TERMINAL NAVBAR BUTTON ─────────────────────────────────── */
+.terminal-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* keyboard combo, revealed on hover */
+.terminal-combo {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--nav-fg);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.terminal-wrap:hover .terminal-combo {
+  opacity: 0.75;
+  transform: translateX(-50%) translateY(0);
+}
+
+.terminal-btn {
+  padding: 0.32rem 0.6rem;
+  border: 1px solid var(--nav-fg-soft);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--nav-fg);
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  /* no color change on hover */
+}

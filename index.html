@@ -1,0 +1,157 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Me</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="toggle-btn active">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </nav>
+
+    <!-- Overlay cliquable pour fermer le menu -->
+    <div class="menu-close-overlay"></div>
+
+    <ul class="nav-list">
+      <li class="link" data-index="0">Home</li>
+      <li class="link" data-index="1">Project</li>
+      <li class="link" data-index="2">About</li>
+    </ul>
+
+    <!-- Conteneur principal scrollable -->
+    <div class="page-container">
+      <span class="overlay"></span>
+
+      <!-- PAGE HOME -->
+      <section class="page home active">
+        <div class="page-scroll">
+          <div class="hero-section">
+            <h1 class="title">Home</h1>
+            <p class="subtitle">Welcome to S's world</p>
+          </div>
+          <div class="content-section alt">
+            <div class="content-block">
+              <h2>Latest Work</h2>
+              <p>A selection of recent projects spanning web design, interactive experiences, and digital art direction. Each piece reflects a commitment to craft and intentionality.</p>
+            </div>
+            <div class="cards-grid">
+              <div class="card"><span class="card-tag">2024</span><h3>Brand Identity</h3><p>Visual system for a tech startup</p></div>
+              <div class="card"><span class="card-tag">2024</span><h3>Web App</h3><p>Dashboard for real-time analytics</p></div>
+              <div class="card"><span class="card-tag">2023</span><h3>Motion Design</h3><p>Animated campaign for a music label</p></div>
+            </div>
+          </div>
+          <div class="content-section">
+            <div class="content-block centered">
+              <h2>Philosophy</h2>
+              <p>Design is not decoration. It's the bridge between idea and experience — built with intention, executed with precision, and felt in the details nobody notices but everyone feels.</p>
+            </div>
+          </div>
+          <div class="content-section alt">
+            <div class="stats-row">
+              <div class="stat"><span class="stat-num">47</span><span class="stat-label">Projects</span></div>
+              <div class="stat"><span class="stat-num">12</span><span class="stat-label">Years</span></div>
+              <div class="stat"><span class="stat-num">30+</span><span class="stat-label">Clients</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE PROJECT -->
+      <section class="page project">
+        <div class="page-scroll">
+          <div class="hero-section">
+            <h1 class="title">Projects</h1>
+            <p class="subtitle">Selected works & experiments</p>
+          </div>
+          <div class="content-section alt">
+            <div class="project-list">
+              <div class="project-item">
+                <div class="project-meta"><span>01</span><span>2024</span></div>
+                <h3>Parallax Portfolio</h3>
+                <p>A depth-driven showcase using layered scroll animations and WebGL for an immersive browsing experience.</p>
+                <div class="tags"><span>WebGL</span><span>GSAP</span><span>Three.js</span></div>
+              </div>
+              <div class="project-item">
+                <div class="project-meta"><span>02</span><span>2024</span></div>
+                <h3>Real-time Dashboard</h3>
+                <p>Live data visualization platform built with React and D3, processing thousands of events per second.</p>
+                <div class="tags"><span>React</span><span>D3</span><span>WebSocket</span></div>
+              </div>
+              <div class="project-item">
+                <div class="project-meta"><span>03</span><span>2023</span></div>
+                <h3>E-commerce Redesign</h3>
+                <p>Complete UX overhaul for a fashion brand — conversion rate increased by 34% post-launch.</p>
+                <div class="tags"><span>Figma</span><span>Next.js</span><span>Shopify</span></div>
+              </div>
+              <div class="project-item">
+                <div class="project-meta"><span>04</span><span>2023</span></div>
+                <h3>Generative Art Tool</h3>
+                <p>Browser-based creative tool for generating parametric patterns, exportable as SVG or canvas.</p>
+                <div class="tags"><span>Canvas API</span><span>Vanilla JS</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE ABOUT -->
+      <section class="page about">
+        <div class="page-scroll">
+          <div class="hero-section">
+            <h1 class="title">Frontend Developer</h1>
+            <p class="subtitle">Building the visible layer of the web</p>
+          </div>
+          <div class="content-section alt">
+            <div class="about-grid">
+              <div class="about-text">
+                <h2>Hello.</h2>
+                <p>I'm a frontend developer with a designer's eye. I care deeply about the intersection of code and aesthetics — where performance meets beauty and interaction meets meaning.</p>
+                <p>Based in Paris, working globally. Available for freelance, full-time, and collaborations that push creative boundaries.</p>
+              </div>
+              <div class="skills-list">
+                <h3>Skills</h3>
+                <ul>
+                  <li>HTML / CSS / JavaScript</li>
+                  <li>React / Next.js / Vue</li>
+                  <li>GSAP / Three.js / WebGL</li>
+                  <li>Figma / Motion Design</li>
+                  <li>TypeScript / Node.js</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="content-section">
+            <div class="content-block centered">
+              <h2>Experience</h2>
+              <div class="timeline">
+                <div class="timeline-item"><span class="timeline-year">2022–now</span><div><strong>Senior Frontend Dev</strong> — Studio Lumière, Paris</div></div>
+                <div class="timeline-item"><span class="timeline-year">2019–2022</span><div><strong>Frontend Engineer</strong> — Agence Numérique, Lyon</div></div>
+                <div class="timeline-item"><span class="timeline-year">2017–2019</span><div><strong>Web Designer</strong> — Freelance</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="content-section alt">
+            <div class="contact-block">
+              <h2>Get in touch</h2>
+              <p>hello@example.com</p>
+              <div class="social-links">
+                <span>GitHub</span>
+                <span>LinkedIn</span>
+                <span>Dribbble</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+/* ─── PROJECT ITEM ───────────────────────────────────────────── */
+.project-item {
+  padding: 2.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: padding-left 0.3s ease;
+}
+
+.project-item:hover {
+  padding-left: 1rem;
+}
+
+.project-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: rgb(212, 64, 101);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.8rem;
+}
+
+.project-item h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  color: #fff;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.6rem;
+}
+
+.project-item p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 300;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.tags {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.tags span {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid rgba(212, 64, 101, 0.4);
+  border-radius: 20px;
+  color: rgba(212, 64, 101, 0.8);
+}

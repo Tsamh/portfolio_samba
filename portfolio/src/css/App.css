@@ -1,0 +1,97 @@
+/* ─── CLICK-OUTSIDE OVERLAY ──────────────────────────────────── */
+.menu-close-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  cursor: pointer;
+}
+
+/* ─── PAGE CONTAINER  (3-D flip on menu open) ───────────────── */
+.page-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition:
+    transform 1s cubic-bezier(0.77, 0, 0.18, 1),
+    left      1s cubic-bezier(0.50, 0, 0.18, 1);
+  left: 0;
+  transform-origin: left center;
+}
+
+.page-container.active {
+  left: 11vw;
+  transform: rotateY(45deg) scale(0.62);
+}
+
+/* ─── CLICK SLIDE OVERLAY ────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  bottom: 0;
+  left: -100%;
+  height: 100%;
+  width: 100%;
+  background: var(--bg-alt);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ─── PAGES BASE ─────────────────────────────────────────────── */
+.page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  /* No transition here — click nav is covered by the overlay,
+     scroll nav uses explicit keyframe animations below.
+     Removing the transition prevents the double-animation on scroll. */
+}
+
+.page.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ─── SCROLL-BASED ENTER ANIMATIONS ─────────────────────────── */
+/*
+  Applied on the newly-active page via:
+    .page-container[data-scroll-dir="down"] .page.active
+    .page-container[data-scroll-dir="up"]   .page.active
+
+  The exiting page simply fades out via the normal opacity transition.
+  The entering page slides in from the correct direction.
+*/
+
+@keyframes enterFromBelow {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes enterFromAbove {
+  from { opacity: 0; transform: translateY(-40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Override the default opacity transition with a keyed animation */
+.page-container[data-scroll-dir="down"] .page.active {
+  animation: enterFromBelow 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition: none;
+}
+
+.page-container[data-scroll-dir="up"] .page.active {
+  animation: enterFromAbove 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition: none;
+}
+
+/* ─── INTERNAL SCROLL ────────────────────────────────────────── */
+.page-scroll {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}

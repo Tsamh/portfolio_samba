@@ -1,0 +1,207 @@
+/* ─── INTERACTIVE AVATAR ─────────────────────────────────────── */
+.avatar-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* idle breathing / head tilt */
+.avatar-bob {
+  animation: avatar-breathe 4.2s ease-in-out infinite;
+  transition: rotate 0.4s ease-out, translate 0.4s ease-out;
+}
+
+@keyframes avatar-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-8px) scale(1.008); }
+}
+
+.avatar-box {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.avatar-img {
+  height: min(66vh, 620px);
+  max-width: 100%;
+  width: auto;
+  display: block;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .avatar-img { height: min(44vh, 380px); }
+  .avatar-note { width: min(200px, 60vw); }
+  .avatar-bubble { min-width: 150px; font-size: 0.8rem; left: 68%; }
+}
+
+@media (max-height: 620px) {
+  .avatar-img { height: min(52vh, 320px); }
+}
+
+/* ── live eyes ──
+   No border-radius / overflow:hidden on purpose: the mask is a soft radial
+   gradient (set inline in Avatar.jsx), so there is no hard circle edge around
+   the pupils, and the pupil is never clipped mid-move. Its travel is capped
+   in % so it always stays inside the mask. */
+.avatar-eye {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.avatar-pupil-move {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.avatar-pupil {
+  width: 42%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #1d130d;
+  position: relative;
+  transition: transform 0.09s ease-in;
+}
+
+.avatar-pupil::after {
+  content: '';
+  position: absolute;
+  top: 16%;
+  right: 16%;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.avatar-eye.blink .avatar-pupil {
+  transform: scaleY(0.08) scaleX(1.35) !important;
+}
+
+/* ── pocket easter egg ── */
+.avatar-pocket-zone {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 5;
+}
+
+/* clipping slot — the paper rises out of it */
+.avatar-paper-slot {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  height: 14%;
+  overflow: hidden;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.avatar-paper {
+  width: 78%;
+  height: 92%;
+  background: #fdfbf3;
+  border: 1.5px solid #2b2018;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(101%);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* peeks out a bit more at each click */
+.avatar-paper.stage-1 { transform: translateY(72%); }
+.avatar-paper.stage-2 { transform: translateY(38%); }
+
+/* fully out — readable note */
+.avatar-note {
+  position: absolute;
+  transform: translate(-50%, -112%) rotate(-5deg);
+  width: 240px;
+  padding: 1rem 1.1rem;
+  background: #fdfbf3;
+  border: 1.5px solid #2b2018;
+  border-radius: 4px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 6;
+  animation: note-pop 0.45s cubic-bezier(0.22, 1.4, 0.36, 1);
+  line-height: 1.5;
+}
+
+@keyframes note-pop {
+  from { transform: translate(-50%, -60%) rotate(3deg) scale(0.4); opacity: 0; }
+  to   { transform: translate(-50%, -112%) rotate(-5deg) scale(1); opacity: 1; }
+}
+
+.avatar-note p {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: #2b2018;
+  text-align: center;
+}
+
+/* ── speech bubble ── */
+.avatar-bubble {
+  position: absolute;
+  top: 6%;
+  left: 78%;
+  min-width: 190px;
+  padding: 0.9rem 1.1rem;
+  background: #fff;
+  border: 2px solid #1d130d;
+  border-radius: 14px;
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: #1d130d;
+  text-align: center;
+  animation: bubble-pop 0.5s cubic-bezier(0.22, 1.4, 0.36, 1);
+  z-index: 6;
+}
+
+.avatar-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 22%;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-right: 2px solid #1d130d;
+  border-bottom: 2px solid #1d130d;
+  transform: rotate(45deg);
+}
+
+@keyframes bubble-pop {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.avatar-bubble .wave {
+  display: inline-block;
+  animation: wave-hand 1.4s ease-in-out infinite;
+  transform-origin: 70% 70%;
+  font-size: 1.2rem;
+}
+
+@keyframes wave-hand {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(18deg); }
+  50%       { transform: rotate(-8deg); }
+  75%       { transform: rotate(14deg); }
+}
