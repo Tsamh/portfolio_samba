@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createEngine } from '../lib/gestureEngine';
 import { createDispatcher } from '../lib/gestureDispatch';
 import { createHandTracker } from '../lib/handTracker';
+import GesturePreview from './GesturePreview';
 import '../css/GestureNav.css';
 
 /* idle → intro → loading → active, with error reachable from loading */
@@ -282,6 +283,9 @@ export default function GestureNav() {
       <video ref={videoRef} className="gesture-video" muted playsInline />
 
       {status === ACTIVE && <div ref={cursorRef} className="gesture-cursor" />}
+      {status === ACTIVE && (
+        <GesturePreview videoRef={videoRef} landmarksRef={landmarksRef} />
+      )}
 
       <button
         className={`gesture-fab${status === ACTIVE ? ' active' : ''}`}

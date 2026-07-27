@@ -193,3 +193,42 @@
   height: 20px;
   background: var(--accent);
 }
+
+/* ─── CAMERA PREVIEW ─────────────────────────────────────────── */
+.gesture-preview {
+  position: fixed;
+  right: 24px;
+  bottom: 92px;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.gesture-preview canvas {
+  display: block;
+  width: 192px;
+  height: 144px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.gesture-preview-toggle {
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  font-family: inherit;
+  color: var(--text-soft);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.gesture-preview-toggle:hover { color: var(--text); }
+
+@media (max-width: 900px), (pointer: coarse) {
+  .gesture-preview { display: none; }
+}
