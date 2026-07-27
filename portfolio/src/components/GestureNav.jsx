@@ -90,15 +90,17 @@ export default function GestureNav() {
       node.classList.toggle('pinching', pinching);
     }
 
+    // Update the drag mirror before the no-hand return. The engine resets its
+    // own pinch state on exactly the frames this return discards, so leaving
+    // it below would let a momentary tracking dropout strand the latched
+    // scroller and hand the next drag to the wrong element.
+    if (wasPinchingRef.current && !pinching) dispatcher.endDrag();
+    wasPinchingRef.current = pinching;
+
     if (!hand || !cursor) return;
 
     const target = dispatcher.moveTo(cursor.x, cursor.y);
     if (node) node.classList.toggle('over-target', dispatcher.isClickable(target));
-
-    // Tell the dispatcher a drag finished so the next one re-resolves which
-    // element it scrolls.
-    if (wasPinchingRef.current && !pinching) dispatcher.endDrag();
-    wasPinchingRef.current = pinching;
 
     if (action?.type === 'click') dispatcher.clickAt(action.x, action.y);
     else if (action?.type === 'scroll') dispatcher.scrollAt(cursor.x, cursor.y, action.deltaY);
@@ -175,6 +177,9 @@ export default function GestureNav() {
       // detection loop cannot notice: the video's currentTime simply stops
       // advancing, which is indistinguishable from a still hand.
       const onDeviceLost = () => {
+        // A cancelled attempt can still be holding tracks; do not let its
+        // device loss tear down whatever session is live now.
+        if (abandoned()) return;
         stop();
         setErrorMessage(
           'The camera was disconnected, or its permission was revoked. Reconnect it and try again.'
@@ -289,7 +294,11 @@ export default function GestureNav() {
     if (status !== ACTIVE) return;
     const onVisibility = () => {
       trackerRef.current?.setPaused(document.hidden);
-      if (document.hidden) engineRef.current?.reset();
+      if (document.hidden) {
+        engineRef.current?.reset();
+        dispatcherRef.current?.endDrag();
+        wasPinchingRef.current = false;
+      }
     };
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);

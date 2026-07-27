@@ -202,12 +202,11 @@ describe('createEngine', () => {
     }
 
     // The frame that first admits the drag must scroll by that frame's own
-    // movement, not by everything banked since the pinch closed.
+    // movement, not by everything banked since the pinch closed. Smoothing is
+    // still ramping up here, so this frame is if anything slightly smaller
+    // than the steady state; the defect made it ~57% larger.
     expect(deltas.length).toBeGreaterThan(1);
-    // The first and last frame differ because the cursor smoothing is still
-    // ramping up, not because movement got banked: 1.15 is that ramp's
-    // headroom. Tightening this to a plain <= would make the test flaky.
-    expect(deltas[0]).toBeLessThanOrEqual(deltas[deltas.length - 1] * 1.15);
+    expect(deltas[0]).toBeLessThanOrEqual(deltas[deltas.length - 1]);
   });
 
   it('scrolls the other way when the hand moves down', () => {

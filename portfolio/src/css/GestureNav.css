@@ -62,10 +62,9 @@
   to   { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-/* The dialog is focused programmatically when it opens, so it should not
-   draw a focus ring around the whole panel in that case. A keyboard user
-   who tabs back into it should still see one, so this only suppresses the
-   plain, non-:focus-visible match. Its buttons keep their own ring. */
+/* The dialog is focused programmatically when it opens. Suppress the ring for
+   that, but keep it when the visitor opened the dialog from the keyboard —
+   :focus-visible still matches a programmatic focus in that case. */
 .gesture-modal:focus:not(:focus-visible) {
   outline: none;
 }
