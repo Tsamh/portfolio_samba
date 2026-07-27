@@ -465,6 +465,23 @@ describe('createEngine', () => {
     expect(e.update(makeHand({ ...OPEN, cy: 0.26 }), 400, VP).action).toBe(null);
   });
 
+  it('does not dump accumulated movement into the first scroll frame', () => {
+    const e = createEngine();
+    e.update(makeHand({ ...OPEN, cy: 0.5 }), 0, VP);
+    e.update(makeHand({ ...SHUT, cy: 0.5 }), 16, VP);
+
+    const deltas = [];
+    for (let i = 1; i <= 12; i++) {
+      const out = e.update(makeHand({ ...SHUT, cy: 0.5 - i * 0.02 }), 16 + i * 16, VP);
+      if (out.action?.type === 'scroll') deltas.push(out.action.deltaY);
+    }
+
+    // The frame that first admits the drag must scroll by that frame's own
+    // movement, not by everything banked since the pinch closed.
+    expect(deltas.length).toBeGreaterThan(1);
+    expect(deltas[0]).toBeLessThanOrEqual(deltas[deltas.length - 1] * 1.15);
+  });
+
   it('scrolls the other way when the hand moves down', () => {
     const e = createEngine();
     e.update(makeHand({ ...OPEN, cy: 0.5 }), 0, VP);
@@ -577,12 +594,19 @@ export function createEngine(userCfg = {}) {
       if (!dragging && (heldMs > cfg.clickMaxMs || movedPx > cfg.clickMaxPx)) {
         dragging = true;
       }
-      if (dragging) {
-        const dy = cursor.y - lastDragY;
-        lastDragY = cursor.y;
-        // Touch-style mapping: dragging the hand up pulls the page up,
-        // which means scrolling down — a positive wheel deltaY.
-        if (dy !== 0) action = { type: 'scroll', deltaY: -dy * cfg.scrollGain };
+
+      // The reference advances on every held frame, not only while dragging.
+      // Left frozen at the pinch position, the first frame after the drag is
+      // recognised would dump all the movement that led up to it in one jolt.
+      // The travel that is dropped here is the arbitration dead band — the
+      // same slop a touchscreen discards before it admits a drag.
+      const dy = cursor.y - lastDragY;
+      lastDragY = cursor.y;
+
+      // Touch-style mapping: dragging the hand up pulls the page up,
+      // which means scrolling down — a positive wheel deltaY.
+      if (dragging && dy !== 0) {
+        action = { type: 'scroll', deltaY: -dy * cfg.scrollGain };
       }
     } else if (wasPinching && !pinching) {
       const heldMs = timestampMs - pinchStart.t;
@@ -605,7 +629,7 @@ export function createEngine(userCfg = {}) {
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `npm test`
-Expected: PASS — 24 tests passing.
+Expected: PASS — 25 tests passing.
 
 - [ ] **Step 5: Commit**
 
@@ -828,7 +852,7 @@ Expected: the dropdown opens on step 1, the site navigates to Contact on step 2,
 - [ ] **Step 3: Run the existing tests to confirm nothing regressed**
 
 Run: `npm test`
-Expected: PASS — 24 tests, unchanged.
+Expected: PASS — 25 tests, unchanged.
 
 - [ ] **Step 4: Commit**
 
@@ -1608,7 +1632,7 @@ Expected, in order:
 - [ ] **Step 9: Confirm the unit tests still pass**
 
 Run: `npm test`
-Expected: PASS — 24 tests.
+Expected: PASS — 25 tests.
 
 - [ ] **Step 10: Commit**
 
@@ -1851,7 +1875,7 @@ With gesture mode never enabled, check that mouse and wheel navigation, the them
 - [ ] **Step 4: Run the unit tests**
 
 Run: `npm test`
-Expected: PASS — 24 tests.
+Expected: PASS — 25 tests.
 
 - [ ] **Step 5: Add a README note**
 
