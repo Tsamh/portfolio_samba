@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { createEngine } from '../lib/gestureEngine';
+import { createDispatcher } from '../lib/gestureDispatch';
+import { createHandTracker } from '../lib/handTracker';
 import '../css/GestureNav.css';
 
 /* idle → intro → loading → active, with error reachable from loading */
@@ -16,6 +19,22 @@ const GESTURES = [
   { icon: '👌', title: 'Quick pinch', text: 'Pinch your thumb and index finger to click on elements' },
   { icon: '👌', title: 'Pinch & Drag', text: 'Pinch and drag up or down to scroll' },
 ];
+
+function describeError(err) {
+  if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') {
+    return 'Camera access was blocked. Allow it for this site in your browser settings (the icon at the left of the address bar), then try again.';
+  }
+  if (err?.name === 'NotFoundError' || err?.name === 'DevicesNotFoundError') {
+    return 'No camera found. Plug one in and try again.';
+  }
+  if (err?.name === 'NotReadableError') {
+    return 'The camera is already in use by another application. Close it and try again.';
+  }
+  if (err?.name === 'InsecureContext') {
+    return 'Camera access needs a secure connection. Open this site over https, or on localhost.';
+  }
+  return 'Hand tracking failed to start. Reload the page and try again.';
+}
 
 function CameraIcon() {
   return (
@@ -38,10 +57,111 @@ export default function GestureNav() {
   const [status, setStatus] = useState(IDLE);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const videoRef      = useRef(null);
+  const cursorRef     = useRef(null);
+  const streamRef     = useRef(null);
+  const trackerRef    = useRef(null);
+  const engineRef     = useRef(null);
+  const dispatcherRef = useRef(null);
+  const landmarksRef  = useRef(null);
+
+  /**
+   * Runs up to 60 times a second. The cursor is positioned by writing to the
+   * DOM node directly — routing this through React state would re-render the
+   * whole page on every frame.
+   */
+  const onFrame = useCallback((landmarks, timestampMs) => {
+    landmarksRef.current = landmarks;
+
+    const engine = engineRef.current;
+    const dispatcher = dispatcherRef.current;
+    if (!engine || !dispatcher) return;
+
+    const viewport = { width: window.innerWidth, height: window.innerHeight };
+    const { cursor, pinching, hand, action } = engine.update(landmarks, timestampMs, viewport);
+
+    const node = cursorRef.current;
+    if (node && cursor) {
+      node.style.transform = `translate3d(${cursor.x}px, ${cursor.y}px, 0) translate(-50%, -50%)`;
+      node.classList.toggle('visible', hand);
+      node.classList.toggle('pinching', pinching);
+    }
+
+    if (!hand || !cursor) return;
+
+    const target = dispatcher.moveTo(cursor.x, cursor.y);
+    if (node) node.classList.toggle('over-target', dispatcher.isClickable(target));
+
+    if (action?.type === 'click') dispatcher.clickAt(action.x, action.y);
+    else if (action?.type === 'scroll') dispatcher.scrollAt(cursor.x, cursor.y, action.deltaY);
+  }, []);
+
   const modalRef = useRef(null);
   const returnFocusRef = useRef(null);
 
   const modalOpen = status === INTRO || status === LOADING || status === ERROR;
+
+  const stop = useCallback(() => {
+    trackerRef.current?.stop();
+    trackerRef.current = null;
+
+    // Releasing every track is what actually turns the camera light off —
+    // the part of the privacy promise a visitor can verify for themselves.
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+
+    if (videoRef.current) videoRef.current.srcObject = null;
+
+    dispatcherRef.current?.clear();
+    dispatcherRef.current = null;
+    engineRef.current = null;
+    landmarksRef.current = null;
+  }, []);
+
+  const handleEnable = useCallback(async () => {
+    setStatus(LOADING);
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        const err = new Error('insecure context');
+        err.name = 'InsecureContext';
+        throw err;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: 640, height: 480 },
+      });
+      streamRef.current = stream;
+
+      const video = videoRef.current;
+      video.srcObject = stream;
+      await video.play();
+
+      trackerRef.current = await createHandTracker();
+      engineRef.current = createEngine();
+      dispatcherRef.current = createDispatcher();
+      trackerRef.current.start(video, onFrame, (err) => {
+        // The tracker has already stopped its own loop by the time this runs.
+        stop();
+        setErrorMessage(describeError(err));
+        setStatus(ERROR);
+      });
+
+      setStatus(ACTIVE);
+    } catch (err) {
+      stop();
+      setErrorMessage(describeError(err));
+      setStatus(ERROR);
+    }
+  }, [onFrame, stop]);
+
+  const handleFabClick = useCallback(() => {
+    if (status === ACTIVE) {
+      stop();
+      setStatus(IDLE);
+    } else {
+      setStatus(INTRO);
+    }
+  }, [status, stop]);
 
   /* Move focus into the dialog on open and hand it back on close, so someone
      working without a mouse lands in the modal rather than behind it. */
@@ -94,27 +214,40 @@ export default function GestureNav() {
     return () => window.removeEventListener('keydown', onKey);
   }, [modalOpen]);
 
+  /* Escape closes the modal, and also exits an active session. */
   useEffect(() => {
-    if (!modalOpen) return;
+    if (!modalOpen && status !== ACTIVE) return;
     const onKey = (e) => {
-      if (e.key === 'Escape') setStatus(IDLE);
+      if (e.key !== 'Escape') return;
+      if (status === ACTIVE) stop();
+      setStatus(IDLE);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [modalOpen]);
+  }, [modalOpen, status, stop]);
 
-  /* Replaced in Task 7 by the real camera + tracking start-up. */
-  function handleEnable() {
-    setStatus(LOADING);
-  }
+  /* A hidden tab should not be running hand detection — but the session is
+     only paused, not torn down, so switching back resumes immediately. */
+  useEffect(() => {
+    if (status !== ACTIVE) return;
+    const onVisibility = () => {
+      trackerRef.current?.setPaused(document.hidden);
+      if (document.hidden) engineRef.current?.reset();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [status]);
 
-  function handleFabClick() {
-    if (status === ACTIVE) setStatus(IDLE);
-    else setStatus(INTRO);
-  }
+  /* Never leave the camera running if this component goes away. */
+  useEffect(() => stop, [stop]);
 
   return (
     <>
+      {/* Never displayed: it only exists to give MediaPipe frames to read. */}
+      <video ref={videoRef} className="gesture-video" muted playsInline />
+
+      {status === ACTIVE && <div ref={cursorRef} className="gesture-cursor" />}
+
       <button
         className={`gesture-fab${status === ACTIVE ? ' active' : ''}`}
         onClick={handleFabClick}

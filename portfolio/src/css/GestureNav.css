@@ -153,3 +153,43 @@
   border: 1px solid transparent;
   color: #fff;
 }
+
+/* ─── HIDDEN CAMERA FEED ─────────────────────────────────────── */
+/* Kept in the layout but invisible: a display:none video stops
+   producing frames in some browsers. */
+.gesture-video {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+}
+
+/* ─── GESTURE CURSOR ─────────────────────────────────────────── */
+.gesture-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.14);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, width 0.12s ease, height 0.12s ease,
+              background-color 0.12s ease;
+  will-change: transform;
+}
+
+.gesture-cursor.visible     { opacity: 1; }
+.gesture-cursor.over-target { width: 46px; height: 46px; background: rgba(220, 38, 38, 0.24); }
+
+.gesture-cursor.pinching {
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+}
