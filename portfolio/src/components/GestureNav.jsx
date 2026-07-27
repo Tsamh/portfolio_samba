@@ -61,14 +61,28 @@ export default function GestureNav() {
     if (!modalOpen) return;
     const onKey = (e) => {
       if (e.key !== 'Tab') return;
-      const focusable = modalRef.current?.querySelectorAll(FOCUSABLE);
-      if (!focusable?.length) return;
+      const modal = modalRef.current;
+      if (!modal) return;
+
+      const focusable = modal.querySelectorAll(FOCUSABLE);
+      if (!focusable.length) return;
 
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       const active = document.activeElement;
 
-      if (e.shiftKey && (active === first || active === modalRef.current)) {
+      // Focus can drop out of the dialog without anyone pressing a key:
+      // disabling the button that held it — which is exactly what happens
+      // when "Enable camera" enters the loading state — hands focus to
+      // <body>. Pull anything outside the panel back in before the boundary
+      // checks below, which only recognise elements they can name.
+      if (!modal.contains(active)) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+        return;
+      }
+
+      if (e.shiftKey && (active === first || active === modal)) {
         e.preventDefault();
         last.focus();
       } else if (!e.shiftKey && active === last) {
