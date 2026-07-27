@@ -92,3 +92,82 @@ export function smoothStep(prev, next, cfg = DEFAULTS) {
     y: prev.y + (next.y - prev.y) * alpha,
   };
 }
+
+/**
+ * Per-frame gesture state machine.
+ *
+ * The interesting decision is click-versus-drag. Both start as a pinch, so
+ * the engine waits: a pinch that is released quickly and barely moved is a
+ * click; one that outlives `clickMaxMs` or travels past `clickMaxPx` becomes
+ * a drag, and is then committed to scrolling — releasing it emits nothing.
+ */
+export function createEngine(userCfg = {}) {
+  const cfg = { ...DEFAULTS, ...userCfg };
+
+  let cursor = null;
+  let pinching = false;
+  let pinchStart = null;
+  let dragging = false;
+  let lastDragY = 0;
+
+  function reset() {
+    pinching = false;
+    pinchStart = null;
+    dragging = false;
+  }
+
+  function update(landmarks, timestampMs, viewport) {
+    if (!landmarks || landmarks.length === 0) {
+      // Losing the hand mid-pinch must not leave a phantom drag running,
+      // nor fire a click when the hand comes back.
+      reset();
+      return { cursor, pinching: false, hand: false, action: null };
+    }
+
+    const target = mapToViewport(palmCenter(landmarks), viewport, cfg);
+    cursor = smoothStep(cursor, target, cfg);
+
+    const ratio = pinchRatio(landmarks);
+    const wasPinching = pinching;
+    if (pinching) {
+      if (ratio > cfg.pinchOpen) pinching = false;
+    } else if (ratio < cfg.pinchClose) {
+      pinching = true;
+    }
+
+    let action = null;
+
+    if (!wasPinching && pinching) {
+      pinchStart = { t: timestampMs, x: cursor.x, y: cursor.y };
+      dragging = false;
+      lastDragY = cursor.y;
+    } else if (wasPinching && pinching) {
+      const heldMs = timestampMs - pinchStart.t;
+      const movedPx = Math.hypot(cursor.x - pinchStart.x, cursor.y - pinchStart.y);
+
+      if (!dragging && (heldMs > cfg.clickMaxMs || movedPx > cfg.clickMaxPx)) {
+        dragging = true;
+      }
+      if (dragging) {
+        const dy = cursor.y - lastDragY;
+        lastDragY = cursor.y;
+        // Touch-style mapping: dragging the hand up pulls the page up,
+        // which means scrolling down — a positive wheel deltaY.
+        if (dy !== 0) action = { type: 'scroll', deltaY: -dy * cfg.scrollGain };
+      }
+    } else if (wasPinching && !pinching) {
+      const heldMs = timestampMs - pinchStart.t;
+      const movedPx = Math.hypot(cursor.x - pinchStart.x, cursor.y - pinchStart.y);
+
+      if (!dragging && heldMs <= cfg.clickMaxMs && movedPx <= cfg.clickMaxPx) {
+        action = { type: 'click', x: cursor.x, y: cursor.y };
+      }
+      pinchStart = null;
+      dragging = false;
+    }
+
+    return { cursor, pinching, hand: true, action };
+  }
+
+  return { update, reset };
+}

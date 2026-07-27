@@ -6,6 +6,7 @@ import {
   mapToViewport,
   smoothStep,
   pinchRatio,
+  createEngine,
 } from './gestureEngine';
 
 /**
@@ -120,5 +121,117 @@ describe('pinchRatio', () => {
   it('crosses the close threshold only for a tight pinch', () => {
     expect(pinchRatio(makeHand({ pinchGap: 0.2 }))).toBeLessThan(DEFAULTS.pinchClose);
     expect(pinchRatio(makeHand({ pinchGap: 0.8 }))).toBeGreaterThan(DEFAULTS.pinchOpen);
+  });
+});
+
+describe('createEngine', () => {
+  const OPEN = { pinchGap: 0.9 };
+  const SHUT = { pinchGap: 0.2 };
+
+  it('reports no hand and emits no action when the hand is absent', () => {
+    const e = createEngine();
+    const out = e.update(null, 0, VP);
+    expect(out.hand).toBe(false);
+    expect(out.action).toBe(null);
+    expect(out.pinching).toBe(false);
+  });
+
+  it('holds pinch state through the dead band', () => {
+    const e = createEngine();
+    e.update(makeHand(OPEN), 0, VP);
+
+    // close it
+    expect(e.update(makeHand(SHUT), 16, VP).pinching).toBe(true);
+
+    // ratios inside the dead band must not re-open it
+    expect(e.update(makeHand({ pinchGap: 0.4 }), 32, VP).pinching).toBe(true);
+    expect(e.update(makeHand({ pinchGap: 0.49 }), 48, VP).pinching).toBe(true);
+
+    // only crossing pinchOpen releases it
+    expect(e.update(makeHand({ pinchGap: 0.55 }), 64, VP).pinching).toBe(false);
+  });
+
+  it('emits a click for a quick, still pinch', () => {
+    const e = createEngine();
+    e.update(makeHand(OPEN), 0, VP);
+    e.update(makeHand(SHUT), 100, VP);
+    const out = e.update(makeHand(OPEN), 300, VP); // 200 ms, no movement
+
+    expect(out.action.type).toBe('click');
+    expect(typeof out.action.x).toBe('number');
+    expect(typeof out.action.y).toBe('number');
+  });
+
+  it('does not emit a click when the pinch is held too long', () => {
+    const e = createEngine();
+    e.update(makeHand(OPEN), 0, VP);
+    e.update(makeHand(SHUT), 0, VP);
+    e.update(makeHand(SHUT), 500, VP); // past clickMaxMs -> becomes a drag
+    const out = e.update(makeHand(OPEN), 600, VP);
+
+    expect(out.action).toBe(null);
+  });
+
+  it('emits scroll deltas while dragging, and no click on release', () => {
+    const e = createEngine();
+    e.update(makeHand({ ...OPEN, cy: 0.5 }), 0, VP);
+    e.update(makeHand({ ...SHUT, cy: 0.5 }), 16, VP);
+
+    // move the hand far enough to turn the pinch into a drag
+    let out;
+    for (let i = 1; i <= 12; i++) {
+      out = e.update(makeHand({ ...SHUT, cy: 0.5 - i * 0.02 }), 16 + i * 16, VP);
+    }
+    expect(out.action.type).toBe('scroll');
+
+    // hand moving up must scroll the page down: positive wheel deltaY
+    expect(out.action.deltaY).toBeGreaterThan(0);
+
+    expect(e.update(makeHand({ ...OPEN, cy: 0.26 }), 400, VP).action).toBe(null);
+  });
+
+  it('scrolls the other way when the hand moves down', () => {
+    const e = createEngine();
+    e.update(makeHand({ ...OPEN, cy: 0.5 }), 0, VP);
+    e.update(makeHand({ ...SHUT, cy: 0.5 }), 16, VP);
+
+    let out;
+    for (let i = 1; i <= 12; i++) {
+      out = e.update(makeHand({ ...SHUT, cy: 0.5 + i * 0.02 }), 16 + i * 16, VP);
+    }
+    expect(out.action.deltaY).toBeLessThan(0);
+  });
+
+  it('treats a pinch that moves a long way as a drag, not a click', () => {
+    const e = createEngine();
+    e.update(makeHand({ ...OPEN, cx: 0.5 }), 0, VP);
+    e.update(makeHand({ ...SHUT, cx: 0.5 }), 0, VP);
+    e.update(makeHand({ ...SHUT, cx: 0.2 }), 100, VP); // big jump, still quick
+    const out = e.update(makeHand({ ...OPEN, cx: 0.2 }), 150, VP);
+
+    expect(out.action).toBe(null);
+  });
+
+  it('drops the pinch when the hand disappears mid-gesture', () => {
+    const e = createEngine();
+    e.update(makeHand(OPEN), 0, VP);
+    e.update(makeHand(SHUT), 16, VP);
+
+    expect(e.update(null, 32, VP).pinching).toBe(false);
+
+    // the hand coming back open must not fire a stale click
+    expect(e.update(makeHand(OPEN), 48, VP).action).toBe(null);
+  });
+
+  it('keeps the cursor inside the viewport', () => {
+    const e = createEngine();
+    for (let i = 0; i < 30; i++) {
+      e.update(makeHand({ cx: 0.02, cy: 0.98, ...OPEN }), i * 16, VP);
+    }
+    const { cursor } = e.update(makeHand({ cx: 0.02, cy: 0.98, ...OPEN }), 999, VP);
+    expect(cursor.x).toBeGreaterThanOrEqual(0);
+    expect(cursor.x).toBeLessThanOrEqual(VP.width);
+    expect(cursor.y).toBeGreaterThanOrEqual(0);
+    expect(cursor.y).toBeLessThanOrEqual(VP.height);
   });
 });
