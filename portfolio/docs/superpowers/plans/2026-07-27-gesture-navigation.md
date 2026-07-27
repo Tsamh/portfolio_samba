@@ -1571,6 +1571,16 @@ Inside `GestureNav`, immediately after the `useState` declarations, add:
 
 - [ ] **Step 4: Replace `handleEnable` and `handleFabClick` with the real lifecycle**
 
+**Placement matters.** Task 6 declared these as hoisted `function` declarations sitting
+below the effects. They become `const … = useCallback(…)`, which are *not* hoisted, and
+Step 5's effects list `stop` in their dependency arrays. Left below those effects, `stop`
+would be read in its temporal dead zone and the component would throw `ReferenceError`
+on its first render.
+
+So place all three — `stop`, `handleEnable`, `handleFabClick` — **above** the three
+effects and below the `onFrame` callback from Step 3. Task 6's focus-management and
+Tab-trap effects stay exactly where they are, after them.
+
 Replace both placeholder functions with:
 
 ```jsx
