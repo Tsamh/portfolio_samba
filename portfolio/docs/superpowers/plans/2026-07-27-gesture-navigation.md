@@ -1040,7 +1040,7 @@ tracker.stop();
 video.srcObject.getTracks().forEach((t) => t.stop());
 ```
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 cd c:/Users/samba/Documents/DIT/3.0/me
@@ -1878,16 +1878,32 @@ npm run preview
 
 Open the printed URL and run the full pass: enable gestures, move the cursor, pinch a nav link, pinch-drag to scroll through to the next page, collapse and restore the preview, exit with `Escape`, and confirm the camera light goes out.
 
-- [ ] **Step 3: Confirm the site is untouched for everyone else**
+- [ ] **Step 3: Record which MediaPipe assets are actually fetched**
+
+`public/mediapipe/wasm/` holds six files totalling ~33 MB, because that is what the
+package ships and copying the superset was the safe default. Only some of them are
+requested at runtime — which ones depends on whether the browser reports WASM SIMD
+support.
+
+With the preview server running, open DevTools → Network, filter on `mediapipe`, and
+start gesture mode. Write down every file actually requested and its status.
+
+Expected: the model plus **one** `vision_wasm_*` pair. Any file that is never requested
+on any browser you test is a candidate for deletion, which would take roughly 11 MB
+out of the repository per unused pair. Report the list rather than deleting anything
+here — removing an asset that a different browser or CPU would have asked for breaks
+hand tracking for that visitor, so the decision needs the evidence first.
+
+- [ ] **Step 4: Confirm the site is untouched for everyone else**
 
 With gesture mode never enabled, check that mouse and wheel navigation, the theme toggle, the terminal (`Ctrl + Alt + T`), the contact dropdown, and the project carousel all behave exactly as before. The gesture layer must be inert until the button is pressed.
 
-- [ ] **Step 4: Run the unit tests**
+- [ ] **Step 5: Run the unit tests**
 
 Run: `npm test`
 Expected: PASS — 25 tests.
 
-- [ ] **Step 5: Add a README note**
+- [ ] **Step 6: Add a README note**
 
 Add this section to `README.md`, near the other feature descriptions:
 
@@ -1907,7 +1923,7 @@ The MediaPipe runtime lives in `public/mediapipe/wasm/` and the model in
 is loaded on demand so visitors who never press the button never download it.
 ```
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 cd c:/Users/samba/Documents/DIT/3.0/me
