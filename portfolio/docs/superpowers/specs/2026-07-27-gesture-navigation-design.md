@@ -50,7 +50,7 @@ webcam frame
   -> handTracker (MediaPipe HandLandmarker, rAF loop)
   -> 21 normalized landmarks
   -> gestureEngine  (pure: smoothing, pinch state machine, click/drag arbitration)
-  -> { cursor: {x, y}, event: null | 'click' | 'scroll', deltaY }
+  -> { cursor: {x, y} | null, pinching, hand, action }
   -> gestureDispatch (elementFromPoint + synthetic DOM events)
   -> the portfolio reacts as if a mouse did it
 ```
@@ -61,27 +61,45 @@ landmarks plus a timestamp and returns the next state. This is what makes it tes
 ### Module contracts
 
 **`handTracker.js`**
-- `createHandTracker()` -> `{ start(video, onFrame), stop() }`
+- `createHandTracker()` -> `Promise<{ start, stop, setPaused }>`
 - Lazily `import()`s `@mediapipe/tasks-vision`, resolves the WASM fileset from
   `/mediapipe/wasm`, loads the model from `/models/hand_landmarker.task`.
-- Configured for one hand, `runningMode: 'VIDEO'`.
+- Configured for one hand, `runningMode: 'VIDEO'`, GPU delegate falling back to CPU.
+- `start(video, onFrame, onError?)` — begins the frame loop. Throws if called after
+  `stop()`; a stopped tracker cannot be restarted.
 - `onFrame(landmarks | null, timestampMs)` is called once per animation frame.
-- `stop()` closes the landmarker and cancels the loop. It does not own the MediaStream:
-  `GestureNav` acquires the stream, passes the `<video>` element in, and is solely
-  responsible for stopping the tracks. Keeping ownership in one place is what
-  guarantees the camera is released on every exit path.
+- `onError(err)` fires once, after the loop has already stopped itself, when detection
+  has failed on `MAX_CONSECUTIVE_ERRORS` frames in a row. Without it a permanently
+  broken detector would spin silently behind a frozen cursor.
+- `setPaused(boolean)` suspends detection while keeping the landmarker and the stream
+  alive, so a session hidden in a background tab resumes instantly.
+- `stop()` closes the landmarker and cancels the loop, and is idempotent — closing a
+  MediaPipe landmarker twice is a hard crash and several exit paths reach it. It does
+  not own the MediaStream: `GestureNav` acquires the stream, passes the `<video>`
+  element in, and is solely responsible for stopping the tracks. Keeping ownership in
+  one place is what guarantees the camera is released on every exit path.
 
 **`gestureEngine.js`** — pure, no imports
-- `createEngine(config)` -> `{ update(landmarks, timestampMs, viewport) }`
-- `update` returns `{ cursor, pinching, action }` where `action` is `null`,
-  `{ type: 'click' }`, or `{ type: 'scroll', deltaY }`.
+- `createEngine(config)` -> `{ update, reset }`
+- `update(landmarks, timestampMs, viewport)` returns `{ cursor, pinching, hand, action }`.
+  `cursor` is `{x, y}` in viewport pixels, or `null` before the first hand is seen.
+  `hand` is false when no hand is visible, which is what drives the cursor's fade.
+  `action` is `null`, `{ type: 'click', x, y }`, or `{ type: 'scroll', deltaY }`.
+- `reset()` clears pinch and drag state without touching the cursor. `update` calls it
+  itself whenever the hand disappears.
 
 **`gestureDispatch.js`**
-- `moveTo(x, y)` — tracks the element under the cursor, fires `pointermove` /
-  `mousemove`, plus `mouseover`/`mouseout` and `mouseenter`/`mouseleave` when the
-  target changes.
+- `createDispatcher()` -> `{ moveTo, clickAt, scrollAt, isClickable, endDrag, clear }`
+- `moveTo(x, y)` — tracks the element under the cursor and returns it, fires
+  `pointermove` / `mousemove`, plus `mouseover`/`mouseout` and
+  `mouseenter`/`mouseleave` when the target changes.
 - `clickAt(x, y)` — fires `pointerdown`, `mousedown`, `mouseup`, `pointerup`, `click`.
 - `scrollAt(x, y, deltaY)` — see below.
+- `isClickable(el)` — whether the element sits inside something clickable; drives the
+  cursor growing over targets.
+- `endDrag()` — called when a pinch releases, so the next drag re-resolves its target.
+- `clear()` — releases hover state properly, firing `mouseout`/`mouseleave` rather than
+  merely forgetting the element, and drops the latched scroller.
 
 ## Gesture detection
 
@@ -107,16 +125,23 @@ edge. The gesture layer must not reimplement that.
 `scrollAt` therefore:
 
 1. Dispatches a `WheelEvent` with `bubbles: true, cancelable: true` on the element under
-   the cursor. React's root listener delivers it to `handleWheel`.
-2. Reads `event.defaultPrevented` afterwards.
-   - **True** — the app called `preventDefault()` and is running a page transition.
-     Do nothing else.
-   - **False** — no page change. Walk up to the nearest scrollable ancestor and apply
-     `scrollTop += deltaY` manually.
+   the cursor. React's root listener delivers it to `handleWheel`, which runs the page
+   transition when it decides one is due.
+2. Applies the movement itself, because synthetic events never trigger the browser's
+   native scrolling — using `scrollTo({ behavior: 'instant' })` rather than assigning
+   `scrollTop`, since `.page-scroll` sets `scroll-behavior: smooth` and the `scrollTop`
+   setter honours it, which would restart an animation on every frame.
+3. Resolves the scrollable element **once per drag** and keeps applying to that same
+   element until the pinch releases.
 
-Step 2's manual scroll is required because synthetic (untrusted) events do not trigger
-the browser's default scrolling behavior. Reading `defaultPrevented` lets the gesture
-layer follow the app's decision without knowing how that decision is made.
+Step 3 is what an earlier draft got wrong, and it is worth recording why. The original
+design asked the app what it had done by reading `defaultPrevented` after dispatch. That
+cannot work: React binds `wheel` at its root container as a **passive** listener, so
+`handleWheel`'s `preventDefault()` never sets the event's canceled flag and the check is
+always false. Re-resolving `elementFromPoint` every frame then handed the rest of a drag
+to whichever page slid in behind the cursor, so a transition left the incoming page
+already scrolled. Latching one scroller for the life of the gesture — which is also what
+a touchscreen does — removes the need to interrogate the app at all.
 
 ## Lifecycle
 
