@@ -148,12 +148,19 @@ export function createEngine(userCfg = {}) {
       if (!dragging && (heldMs > cfg.clickMaxMs || movedPx > cfg.clickMaxPx)) {
         dragging = true;
       }
-      if (dragging) {
-        const dy = cursor.y - lastDragY;
-        lastDragY = cursor.y;
-        // Touch-style mapping: dragging the hand up pulls the page up,
-        // which means scrolling down — a positive wheel deltaY.
-        if (dy !== 0) action = { type: 'scroll', deltaY: -dy * cfg.scrollGain };
+
+      // The reference advances on every held frame, not only while dragging.
+      // Left frozen at the pinch position, the first frame after the drag is
+      // recognised would dump all the movement that led up to it in one jolt.
+      // The travel that is dropped here is the arbitration dead band — the
+      // same slop a touchscreen discards before it admits a drag.
+      const dy = cursor.y - lastDragY;
+      lastDragY = cursor.y;
+
+      // Touch-style mapping: dragging the hand up pulls the page up,
+      // which means scrolling down — a positive wheel deltaY.
+      if (dragging && dy !== 0) {
+        action = { type: 'scroll', deltaY: -dy * cfg.scrollGain };
       }
     } else if (wasPinching && !pinching) {
       const heldMs = timestampMs - pinchStart.t;

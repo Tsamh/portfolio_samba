@@ -190,6 +190,23 @@ describe('createEngine', () => {
     expect(e.update(makeHand({ ...OPEN, cy: 0.26 }), 400, VP).action).toBe(null);
   });
 
+  it('does not dump accumulated movement into the first scroll frame', () => {
+    const e = createEngine();
+    e.update(makeHand({ ...OPEN, cy: 0.5 }), 0, VP);
+    e.update(makeHand({ ...SHUT, cy: 0.5 }), 16, VP);
+
+    const deltas = [];
+    for (let i = 1; i <= 12; i++) {
+      const out = e.update(makeHand({ ...SHUT, cy: 0.5 - i * 0.02 }), 16 + i * 16, VP);
+      if (out.action?.type === 'scroll') deltas.push(out.action.deltaY);
+    }
+
+    // The frame that first admits the drag must scroll by that frame's own
+    // movement, not by everything banked since the pinch closed.
+    expect(deltas.length).toBeGreaterThan(1);
+    expect(deltas[0]).toBeLessThanOrEqual(deltas[deltas.length - 1] * 1.15);
+  });
+
   it('scrolls the other way when the hand moves down', () => {
     const e = createEngine();
     e.update(makeHand({ ...OPEN, cy: 0.5 }), 0, VP);
