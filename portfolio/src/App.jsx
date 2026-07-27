@@ -7,6 +7,7 @@ import ContactButton  from './components/ContactButton';
 import ThemeToggle    from './components/ThemeToggle';
 import Terminal       from './components/Terminal';
 import Outro          from './components/Outro';
+import GestureNav     from './components/GestureNav';
 import Home           from './pages/Home';
 import Projects       from './pages/Projects';
 import Extra          from './pages/Extra';
@@ -120,6 +121,9 @@ export default function App() {
         theme={theme}
         setTheme={setTheme}
       />
+
+      {/* ── GESTURE NAVIGATION (camera button + overlay) ── */}
+      {introComplete && <GestureNav />}
 
       {/* ── OUTRO overlay (scrolled past the last page) ── */}
       {outroOpen && (
