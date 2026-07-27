@@ -2073,7 +2073,9 @@ Expected: PASS — 25 tests.
 
 - [ ] **Step 6: Add a README note**
 
-Add this section to `README.md`, near the other feature descriptions:
+`README.md` is written in French, without accents, and every section opens with a
+`Fichiers :` line listing the files involved. Match that convention. Place the new
+section after "Terminal de navigation" and add the matching table-of-contents entry.
 
 ```markdown
 ## Hand-gesture navigation

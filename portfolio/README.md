@@ -18,7 +18,7 @@ Ce document explique, fonctionnalite par fonctionnalite, comment le site est con
 10. [Effet machine a ecrire (About)](#effet-machine-a-ecrire-about)
 11. [Theme clair / sombre](#theme-clair--sombre)
 12. [Terminal de navigation](#terminal-de-navigation)
-13. [Hand-gesture navigation](#hand-gesture-navigation)
+13. [Navigation aux gestes de la main](#navigation-aux-gestes-de-la-main)
 14. [Animations d'apparition des sections](#animations-dapparition-des-sections)
 15. [Page Contact](#page-contact)
 16. [Personnalisation rapide](#personnalisation-rapide)
@@ -157,19 +157,17 @@ Fichiers : `components/Terminal.jsx`, `css/Terminal.css`
 
 Bouton `>_` dans la navbar (entre le logo et le menu) — survoler le bouton affiche le raccourci clavier, et la combinaison Ctrl + Alt + T ouvre ou ferme le terminal depuis n'importe ou. Ouvre une fenetre de terminal simulee : un tableau de lignes (`lines`) fait office d'ecran, un champ texte fait office de prompt. Chaque commande est un `case` d'un `switch` : `ls`, `cd <page>`, `theme`, `whoami`, `clear`, `exit`... La navigation appelle simplement `goTo(index)` du hook central. Echap ou le point rouge ferment la fenetre.
 
-## Hand-gesture navigation
+## Navigation aux gestes de la main
 
-Press the camera button in the bottom-right corner to drive the site with
-your hand: show your palm to move the cursor, pinch to click, pinch and drag
-to scroll.
+Fichiers : `components/GestureNav.jsx`, `components/GesturePreview.jsx`, `lib/gestureEngine.js`, `lib/gestureDispatch.js`, `lib/handTracker.js`, `css/GestureNav.css`
 
-Hand detection runs entirely in the browser through MediaPipe. The video is
-never uploaded, recorded, or sent anywhere, and the camera is released the
-moment you exit.
+Bouton camera en bas a droite. Il ouvre une modale qui explique les trois gestes puis demande l'acces a la camera. Une fois le mode actif, la paume deplace un curseur a l'ecran, un pincement bref clique, et un pincement maintenu puis glisse fait defiler la page. Une vignette repliable montre le flux et le squelette de la main detectee. Le bouton est masque sous 900 px et sur ecran tactile.
 
-The MediaPipe runtime lives in `public/mediapipe/wasm/` and the model in
-`public/models/hand_landmarker.task`. Both are self-hosted, and the library
-is loaded on demand so visitors who never press the button never download it.
+La detection tourne entierement dans le navigateur via MediaPipe. La video n'est ni envoyee, ni enregistree, ni stockee nulle part, et tous les tracks du flux sont liberes des la sortie : le voyant de la camera s'eteint, ce qui rend la promesse verifiable.
+
+Le principe interne : `gestureEngine.js` transforme les 21 points de la main en position de curseur et en actions (clic, defilement) — c'est du calcul pur, sans DOM ni camera, et c'est le seul module couvert par des tests unitaires. `gestureDispatch.js` rejoue ensuite ces actions sous forme de vrais evenements DOM sur l'element vise. Le reste du site n'a donc rien eu a changer : tout ce qui repondait deja a la souris repond a la main, y compris le passage d'une page a l'autre.
+
+Le runtime MediaPipe est auto-heberge dans `public/mediapipe/wasm/` et le modele dans `public/models/hand_landmarker.task`. La bibliotheque est chargee a la demande : un visiteur qui n'appuie jamais sur le bouton ne la telecharge pas.
 
 ## Animations d'apparition des sections
 
