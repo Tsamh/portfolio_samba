@@ -251,15 +251,33 @@ Dans le menu (`NavList.jsx`), la page courante est en rouge, encadree seulement 
 
 ## Publication (GitHub Pages)
 
-Fichiers : `.github/workflows/pages.yml`, `vite.config.js`, `public/404.html`
+Fichiers : `.github/workflows/ci.yml`, `scripts/deploy.mjs`, `vite.config.js`, `public/404.html`
 
-Le depot est prive ; seul le site construit est publie. Un push sur `main` declenche le workflow : `npm ci`, `npm test`, puis `npm run build` depuis le dossier `portfolio/`, et l'artefact `portfolio/dist` part vers GitHub Pages.
+Deux depots :
 
-Deux variables pilotent ce build :
+| Depot | Visibilite | Contenu |
+| --- | --- | --- |
+| `Tsamh/portfolio` | prive | le code source (ce depot) |
+| `Tsamh/Tsamh.github.io` | public | uniquement le `dist/` construit, servi par Pages sur `https://tsamh.github.io/` |
 
-- `BASE_PATH=/portfolio/` : GitHub Pages sert le site depuis `https://<compte>.github.io/portfolio/`. `vite.config.js` reprend cette valeur dans `base`, et `lib/handTracker.js` prefixe les chemins du modele MediaPipe avec `import.meta.env.BASE_URL`. Sans variable, `base` reste `/` : le `npm run dev` local ne change pas.
+Le plan GitHub gratuit ne sert pas Pages depuis un depot prive. La source reste donc privee et seul le site construit est publie : le depot public ne contient rien de plus que ce que le navigateur telecharge deja.
+
+Publier depuis la machine :
+
+```
+cd portfolio
+npm run deploy
+```
+
+Le script reconstruit le site, ajoute un `.nojekyll` et force-push `dist/` sur la branche `main` du depot public.
+
+Publier automatiquement a chaque push : creer un jeton personnel a portee fine avec `Contents: read and write` sur `Tsamh.github.io`, puis l'enregistrer dans `Tsamh/portfolio` sous **Settings > Secrets and variables > Actions** au nom de `DEPLOY_TOKEN`. Le workflow `ci.yml` lance alors les tests, le build et la publication. Sans ce secret il s'arrete apres le build, ce qui reste une verification utile.
+
+Deux variables pilotent le build :
+
 - `VITE_SOON=1` : active le plugin `comingSoon()` de `vite.config.js`. Il intercepte les imports de `content/extra` et `content/random` et les remplace par `export default []`. Les deux modules ne sont donc jamais analyses : ni les textes, ni les photos ne se retrouvent dans `dist/`. Les pages recoivent un tableau vide et affichent `components/ComingSoon.jsx` a la place de leurs rangees, le hero et la navigation restant intacts.
+- `BASE_PATH` : prefixe des URLs quand le site n'est pas a la racine du domaine (ex. `/portfolio/`). `vite.config.js` le reprend dans `base`, et `lib/handTracker.js` prefixe les chemins du modele MediaPipe avec `import.meta.env.BASE_URL`. Sur `tsamh.github.io` le site est a la racine : la variable n'est pas utilisee, et `npm run dev` garde `/`.
 
-Pour publier les vraies pages Extra et Random : retirer les deux dossiers de photos du `.gitignore`, les commiter, et supprimer `VITE_SOON` du workflow.
+Pour publier les vraies pages Extra et Random : retirer les deux dossiers de photos du `.gitignore`, les commiter, et supprimer `VITE_SOON` de `ci.yml` et de `scripts/deploy.mjs`.
 
 `public/404.html` est servi par GitHub Pages pour toute adresse inconnue ; il redirige vers `<base>#/404`, ou l'application affiche sa propre page 404.

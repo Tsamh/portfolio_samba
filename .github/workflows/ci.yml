@@ -1,0 +1,57 @@
+# Tests and builds the site on every push, then publishes the result.
+#
+# The free plan does not serve GitHub Pages from a private repository, so the
+# source stays here and only the built site is pushed to the public
+# Tsamh.github.io repository, which is what Pages serves.
+#
+# The publish step is off until a DEPLOY_TOKEN secret exists: a fine-grained
+# personal access token with "Contents: read and write" on Tsamh.github.io.
+# Without it the workflow still runs the tests and the build.
+# `npm run deploy` does the same thing from the machine, no token needed.
+name: CI & publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+    defaults:
+      run:
+        working-directory: portfolio
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: portfolio/package-lock.json
+
+      - run: npm ci
+      - run: npm test
+
+      # VITE_SOON keeps the Extra and Random pages as placeholders: their
+      # photos are not in this repository and their write-ups stay out of the
+      # bundle. BASE_PATH is left alone — the public site is served from the
+      # domain root.
+      - run: npm run build
+        env:
+          VITE_SOON: '1'
+
+      - name: Publish to the public site repository
+        if: env.DEPLOY_TOKEN != ''
+        working-directory: portfolio/dist
+        run: |
+          touch .nojekyll
+          git init -q -b main
+          git config user.name  "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Publish ${GITHUB_SHA::7}"
+          git push --force --quiet \
+            "https://x-access-token:${DEPLOY_TOKEN}@github.com/Tsamh/Tsamh.github.io.git" main
