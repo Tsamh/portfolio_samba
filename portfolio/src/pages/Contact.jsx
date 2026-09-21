@@ -1,9 +1,8 @@
 import { useEffect, useRef } from 'react';
 import Reveal from '../components/Reveal';
-import AvatarScene from '../components/AvatarScene';
+import LordIcon from '../components/LordIcon';
+import { EMAIL, SOCIALS } from '../lib/links';
 import '../css/pages.css';
-
-const EMAIL = 'tsambahama@gmail.com';
 
 const META = [
   { label: 'Location',  value: 'Dakar, Sénégal' },
@@ -15,8 +14,9 @@ const META = [
 export default function Contact() {
   const voidRef = useRef(null);
 
-  /* Entering the black void (85% visible) smoothly opens the outro —
-     no need to fight the scroll to reach the exact bottom. */
+  /* Entering the black void (60% visible) smoothly opens the outro —
+     no need to fight the scroll to reach the exact bottom, which is
+     especially tedious with a thumb. */
   useEffect(() => {
     const el = voidRef.current;
     if (!el) return;
@@ -24,11 +24,11 @@ export default function Contact() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         const pageActive = el.closest('.page')?.classList.contains('active');
-        if (pageActive && entry.intersectionRatio >= 0.85) {
+        if (pageActive && entry.intersectionRatio >= 0.6) {
           window.dispatchEvent(new Event('portfolio:outro'));
         }
       },
-      { threshold: [0.85] }
+      { threshold: [0.6] }
     );
 
     observer.observe(el);
@@ -37,11 +37,6 @@ export default function Contact() {
 
   return (
     <>
-      <div className="hero-section hero-contact">
-        <h1 className="title">Contact</h1>
-        <p className="subtitle">Let's build something together</p>
-      </div>
-
       {/* ── Big statement + CTA ── */}
       <section className="content-section alt">
         <Reveal from="left">
@@ -51,12 +46,12 @@ export default function Contact() {
             Let's make it <span className="accent">intelligent</span>.
           </h2>
           <p>
-            AI systems, data platforms, cloud infrastructure or fullstack apps —
+            AI systems, data platforms, cloud infrastructure or fullstack apps:
             whether you have a precise brief or just an idea, my inbox is open.
           </p>
           <div className="contact-cta-row">
             <a href={`mailto:${EMAIL}`} className="contact-cta-btn">
-              Say hello →
+              Say hello
             </a>
             <span className="availability">
               <span className="availability-text">
@@ -74,39 +69,22 @@ export default function Contact() {
         <div className="contact-main">
 
           <div className="contact-links">
-            <a href={`mailto:${EMAIL}`} className="contact-link-card">
-              <span className="contact-link-icon">✉</span>
-              <span>
-                <span className="contact-link-label">Email</span>
-                <span className="contact-link-value">{EMAIL}</span>
-              </span>
-            </a>
-
-            <a
-              href="https://linkedin.com/in/yourhandle"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="contact-link-card"
-            >
-              <span className="contact-link-icon">in</span>
-              <span>
-                <span className="contact-link-label">LinkedIn</span>
-                <span className="contact-link-value">/in/yourhandle</span>
-              </span>
-            </a>
-
-            <a
-              href="https://github.com/yourhandle"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="contact-link-card"
-            >
-              <span className="contact-link-icon">&lt;/&gt;</span>
-              <span>
-                <span className="contact-link-label">GitHub</span>
-                <span className="contact-link-value">github.com/yourhandle</span>
-              </span>
-            </a>
+            {SOCIALS.map(({ icon, label, value, href }) => (
+              <a
+                key={label}
+                href={href}
+                className="contact-link-card"
+                {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                <span className="contact-link-icon">
+                  <LordIcon name={icon} size={40} />
+                </span>
+                <span>
+                  <span className="contact-link-label">{label}</span>
+                  <span className="contact-link-value">{value}</span>
+                </span>
+              </a>
+            ))}
           </div>
 
           <div className="contact-meta">
@@ -117,7 +95,7 @@ export default function Contact() {
               </div>
             ))}
             <p className="contact-meta-note">
-              Based in Dakar — working globally. Open to remote, on-site and
+              Based in Dakar, working globally. Open to remote, on-site and
               hybrid setups.
             </p>
           </div>
@@ -133,10 +111,6 @@ export default function Contact() {
             <span className="big-cta-text">Let's work together</span>
           </a>
         </Reveal>
-      </section>
-
-      <section className="content-section">
-        <AvatarScene variant="contact" />
       </section>
 
       {/* ── Black void before leaving the head (outro) ── */}

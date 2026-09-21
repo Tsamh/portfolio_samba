@@ -1,0 +1,306 @@
+/* ─── CERTIFICATES ───────────────────────────────────────────── */
+.certs {
+  width: 100%;
+  padding: 5rem 3rem 6rem;
+  background: var(--bg-alt);
+  color: var(--text);
+}
+
+.certs-head {
+  text-align: center;
+  margin-bottom: 2.6rem;
+}
+
+.certs-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.certs-sub {
+  margin-top: 0.7rem;
+  font-size: 0.9rem;
+  color: var(--text-soft);
+}
+
+.certs-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.4rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.cert-card {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1),
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.cert-card:hover,
+.cert-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 14px 30px rgba(220, 38, 38, 0.18);
+  outline: none;
+}
+
+.cert-media {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--bg-alt);
+}
+
+.cert-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.cert-card:hover .cert-media img { transform: scale(1.05); }
+
+.cert-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+.cert-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+}
+
+.cert-meta {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.cert-note {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+
+/* ── AWS training badges, laid out like Credly shows them ── */
+.certs-badges {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.2rem;
+  max-width: 1100px;
+  margin: 0 auto 3rem;
+}
+
+.certs-badges li,
+.certs-grid li { position: relative; }
+
+/* open the source, without swallowing the click on the card */
+.card-link {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-alt);
+  transition: border-color 0.25s ease, transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.card-link:hover,
+.card-link:focus-visible {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.badge-card {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  /* the bottom padding leaves room for the corner link button */
+  padding: 1.3rem 1.2rem 3.4rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1),
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.badge-card:hover,
+.badge-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 14px 30px rgba(220, 38, 38, 0.18);
+  outline: none;
+}
+
+.badge-media {
+  align-self: center;
+  width: 108px;
+  height: 108px;
+  margin-bottom: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* the badge PNG has a white ground: keep it on a white tile */
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.badge-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.badge-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--accent);
+}
+
+.badge-issuer,
+.badge-date {
+  font-size: 0.76rem;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+.badge-date { font-size: 0.72rem; }
+
+/* ── attestations ── */
+.certs-subtitle {
+  max-width: 1100px;
+  margin: 0 auto 1.2rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  font-size: 1.6rem;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+/* ── lightbox ── */
+.cert-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  animation: cert-fade 0.25s ease;
+}
+
+@keyframes cert-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cert-figure {
+  max-width: min(1000px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  animation: cert-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cert-pop {
+  from { transform: scale(0.96); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.cert-figure img {
+  width: 100%;
+  max-height: 78vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.cert-figure figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  text-align: center;
+  color: #fff;
+}
+
+.cert-figure figcaption strong {
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  font-size: 1.3rem;
+  letter-spacing: 0.05em;
+}
+
+.cert-figure figcaption span {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.cert-lightbox-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.25s ease, transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.cert-lightbox-close:hover { border-color: var(--accent); transform: rotate(90deg); }
+
+@media (max-width: 760px) {
+  .certs { padding: 3.4rem 1.4rem 4rem; }
+  .certs-grid { gap: 1rem; }
+  .cert-lightbox { padding: 12px; }
+}

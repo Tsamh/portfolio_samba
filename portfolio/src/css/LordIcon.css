@@ -1,0 +1,29 @@
+/* ─── LORDICON ───────────────────────────────────────────────── */
+.lord-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  line-height: 0;
+  transition: transform 0.35s cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.lord-icon img {
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+
+/* dark theme: flip lightness, keep hues — the dark outline turns light and
+   the light fills turn dark, so the icon still reads on a dark ground */
+[data-theme='dark'] .lord-icon {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* shared hover: a small playful tilt, like the logo and theme toggle */
+a:hover .lord-icon,
+button:hover .lord-icon {
+  transform: rotate(-10deg) scale(1.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lord-icon { transition: none; }
+}

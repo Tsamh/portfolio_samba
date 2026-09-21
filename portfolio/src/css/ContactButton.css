@@ -9,11 +9,11 @@
 .contact-btn {
   opacity: 1;
   color: var(--nav-fg);
-  border: 2px solid var(--nav-fg);
+  border: 1.5px solid var(--nav-fg);
   background: transparent;
-  padding: 0.45rem 1.1rem;
+  padding: 0.32rem 0.8rem;
   font-family: 'Inter', sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -23,8 +23,17 @@
   white-space: nowrap;
 }
 
-.contact-btn:hover,
-.contact-btn-wrap:hover .contact-btn {
+/* hover only where there is a real pointer: on a touch screen the state
+   stuck after tapping Contact. A long press sets .open instead. */
+@media (hover: hover) {
+  .contact-btn:hover,
+  .contact-btn-wrap:hover .contact-btn {
+    background: var(--nav-fg);
+    color: var(--bg);
+  }
+}
+
+.contact-btn-wrap.open .contact-btn {
   background: var(--nav-fg);
   color: var(--bg);
 }
@@ -58,6 +67,9 @@
   pointer-events: all;
 }
 
+/* black & white, like the icons on Home and Contact */
+.dropdown-icon img { filter: grayscale(1) contrast(3); }
+
 /* ─── DROPDOWN ITEMS ─────────────────────────────────────────── */
 .contact-dropdown-item {
   display: flex;
@@ -83,9 +95,9 @@
 }
 
 .dropdown-icon {
-  font-size: 0.85rem;
-  width: 18px;
-  text-align: center;
-  font-style: normal;
-  font-weight: 700;
+  margin: -4px 0;   /* the icon is taller than the text line */
+}
+
+@media (max-width: 820px) {
+  .contact-btn { padding: 0.24rem 0.5rem; font-size: 0.54rem; letter-spacing: 0.1em; }
 }

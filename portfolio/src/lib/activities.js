@@ -1,14 +1,21 @@
 /**
  * Automatic image loading for the Extra and Random activity pages.
  *
- * Drop photos in src/assets/extra/ or src/assets/random/ — they are
- * picked up automatically, no code change needed:
- * - files sharing a prefix belong to the same activity
- *   (indabax_1.jpg, indabax_2.jpg → activity slug "indabax")
- * - a brand new prefix creates a new activity row automatically
- *   (title generated from the file name, placeholder description)
- * - every gallery is padded to at least 5 photos with placeholders
+ * One folder per activity: src/assets/extra/<slug>/ or
+ * src/assets/random/<slug>/. Every photo inside is picked up automatically,
+ * no code change needed; files loose at the root of extra/ or random/ are
+ * ignored.
+ * - the folder name is the activity slug (separators ignored, so
+ *   "graduation_25" and "graduation25" are the same activity)
+ * - a folder with no matching definition creates a new activity row
+ *   (title generated from the folder name, placeholder description)
+ * - galleries shorter than 5 photos are completed with the definition's
+ *   `stock` photos, then with neutral placeholders
  */
+
+/** free Unsplash photo by its image id ("1597914377769-db5167cb0221") */
+export const unsplash = (id) =>
+  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=900&q=80`;
 
 /** placeholders used to reach the 5-photo minimum */
 export const pad = (slug, n) =>
@@ -21,14 +28,14 @@ export const pad = (slug, n) =>
     and "graduation_25_2.jpg" land in the SAME group ("graduation25") */
 export const normalize = (s) => s.replace(/[_-]+/g, '').toLowerCase();
 
-/** group a Vite import.meta.glob result by filename prefix */
+/** group a Vite import.meta.glob result (…/<folder>/<file>) by folder name */
 export function loadGroups(glob) {
   const groups = {};
   Object.entries(glob)
     .sort(([a], [b]) => a.localeCompare(b))
     .forEach(([path, src]) => {
-      const name = path.split('/').pop().replace(/\.[^.]+$/, '');
-      const slug = normalize(name.replace(/[_-]?\d+$/, ''));
+      const parts = path.split('/');
+      const slug = normalize(parts[parts.length - 2]);
       (groups[slug] = groups[slug] || []).push(src);
     });
   return groups;
@@ -36,16 +43,17 @@ export function loadGroups(glob) {
 
 /**
  * Merge activity definitions with the local image groups.
- * @param {Array}  defs   - [{ slug, title, desc, stock?: string[] }]
+ * @param {Array}  defs   - [{ slug, aliases?: string[], title, desc, stock?: string[] }]
+ *                          aliases: other folder names that belong to this activity
  * @param {Object} groups - result of loadGroups()
  */
 export function withImages(defs, groups) {
   const used = new Set();
 
   const list = defs.map((d) => {
-    const key = normalize(d.slug);
-    used.add(key);
-    const local = groups[key] || [];
+    const keys = [d.slug, ...(d.aliases || [])].map(normalize);
+    keys.forEach((k) => used.add(k));
+    const local = keys.flatMap((k) => groups[k] || []);
     const stock = d.stock || [];
     const images = [...local, ...stock];
     return { ...d, images: [...images, ...pad(d.slug, 5 - images.length)] };
@@ -59,7 +67,7 @@ export function withImages(defs, groups) {
       title: slug
         .replace(/[-_]+/g, ' ')
         .replace(/\b\w/g, (c) => c.toUpperCase()),
-      desc: ['Fresh photos just landed in the folder — story coming soon.'],
+      desc: ['Fresh photos just landed in the folder, story coming soon.'],
       images: [...imgs, ...pad(slug, 5 - imgs.length)],
     });
   });

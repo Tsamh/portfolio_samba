@@ -1,0 +1,68 @@
+/* ─── EASTER EGG NOTIFICATION ────────────────────────────────── */
+.egg-toast {
+  position: fixed;
+  top: calc(52px + 14px);
+  left: 50%;
+  z-index: 350;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  animation: egg-in 0.45s cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.egg-toast.leaving { animation: egg-out 0.4s ease forwards; }
+
+@keyframes egg-in {
+  from { opacity: 0; transform: translate(-50%, -14px) scale(0.94); }
+  to   { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes egg-out {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to   { opacity: 0; transform: translate(-50%, -10px); }
+}
+
+.egg-toast-count {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.egg-toast-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.egg-toast-text strong {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.egg-toast-label {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+@media (max-width: 560px) {
+  .egg-toast {
+    top: calc(48px + 10px);
+    max-width: calc(100vw - 24px);
+    padding: 8px 12px;
+  }
+  .egg-toast-label { font-size: 0.72rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .egg-toast, .egg-toast.leaving { animation-duration: 0.01ms; }
+}

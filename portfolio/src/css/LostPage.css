@@ -1,0 +1,115 @@
+/* ─── 404 / LOST PAGE ────────────────────────────────────────── */
+.lost {
+  position: fixed;
+  inset: 0;
+  z-index: 340;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: var(--bg);
+  color: var(--text);
+  animation: lost-in 0.35s ease;
+}
+
+@keyframes lost-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.lost-code {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(4rem, 14vw, 8rem);
+  line-height: 0.85;
+  color: var(--accent);
+}
+
+.lost-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  letter-spacing: 0.04em;
+}
+
+.lost-text {
+  max-width: 420px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+/* ── the game board ── */
+.lost-game {
+  position: relative;
+  width: min(720px, 92vw);
+  margin-top: 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-alt);
+  overflow: hidden;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.lost-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 1;
+}
+
+.lost-score {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.lost-score span {
+  margin-left: 0.6rem;
+  color: var(--text-faint);
+  font-size: 0.72rem;
+}
+
+.lost-over {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lost-btn {
+  margin-top: 1.4rem;
+  padding: 0.6rem 1.3rem;
+  border: 1.5px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1.4, 0.36, 1),
+    border-color 0.28s ease,
+    letter-spacing 0.28s ease;
+}
+
+.lost-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  letter-spacing: 0.24em;
+}

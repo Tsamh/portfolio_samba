@@ -2,7 +2,7 @@
 .gesture-fab {
   position: fixed;
   right: 24px;
-  bottom: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   z-index: 150;
   width: 52px;
   height: 52px;
@@ -21,9 +21,13 @@
 .gesture-fab:hover  { transform: translateY(-2px) scale(1.05); }
 .gesture-fab.active { background: var(--accent); color: #fff; border-color: transparent; }
 
-/* Hand tracking on the phone that is doing the tracking is not a use case. */
-@media (max-width: 900px), (pointer: coarse) {
-  .gesture-fab { display: none; }
+@media (max-width: 760px) {
+  .gesture-fab {
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 46px;
+    height: 46px;
+  }
 }
 
 /* ─── INSTRUCTIONS MODAL ─────────────────────────────────────── */
@@ -96,7 +100,18 @@
   font-size: 0.9rem;
 }
 
-.gesture-emoji { font-size: 1.4rem; line-height: 1.2; }
+.gesture-icon {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-alt);
+  color: var(--accent);
+}
 
 .gesture-desc {
   display: block;
@@ -112,6 +127,13 @@
   font-size: 0.82rem;
   line-height: 1.5;
   color: var(--text-soft);
+}
+
+.gesture-privacy-icon {
+  display: inline-flex;
+  vertical-align: -3px;
+  margin-right: 6px;
+  color: var(--text);
 }
 
 .gesture-error {
@@ -238,6 +260,10 @@
 
 .gesture-preview-toggle:hover { color: var(--text); }
 
-@media (max-width: 900px), (pointer: coarse) {
-  .gesture-preview { display: none; }
+@media (max-width: 760px) {
+  .gesture-preview {
+    right: 16px;
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+  }
+  .gesture-preview canvas { width: 128px; height: 96px; }
 }

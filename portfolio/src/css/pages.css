@@ -1,4 +1,18 @@
 /* ─── HERO SECTION ───────────────────────────────────────────── */
+/* phones: show the whole photo instead of cropping it (the first layer is
+   the dark gradient, it keeps covering the section) */
+@media (max-width: 760px) {
+  .hero-home,
+  .hero-social,
+  .hero-fun,
+  .hero-contact {
+    background-size: cover, contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #0d0d0d;
+  }
+}
+
 .hero-section {
   width: 100%;
   height: 100vh;
@@ -16,17 +30,121 @@
     url(https://images.unsplash.com/photo-1469474968028-56623f02e42e?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=80&auto=format&fit=crop&w=1174);
 }
 
-.hero-project {
-  /* code on screen — speaks for the page */
-  background-image:
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.7)),
-    url(https://images.unsplash.com/photo-1461749280684-dccba630e2f6?crop=entropy&cs=tinysrgb&fm=jpg&q=80&auto=format&fit=crop&w=1170);
+/* Home: plain ground, typed roles on the left, chibi on the right.
+   White in light theme, black in dark theme. */
+.hero-about {
+  flex-direction: row;
+  gap: clamp(2rem, 6vw, 6rem);
+  padding: 0 3rem;
+  background: #fff;
 }
 
-.hero-about {
-  background-image:
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6)),
-    url(https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?crop=entropy&cs=tinysrgb&fm=jpg&ixlib=rb-1.2.1&q=80&auto=format&fit=crop&w=1170);
+.hero-about-text {
+  /* fixed width: the typing effect must not push the chibi around */
+  width: min(560px, 48vw);
+}
+
+.hero-about .title {
+  color: #111;
+  text-shadow: none;
+  text-align: left;
+  /* keep the blinking cursor on the same line as the longest roles */
+  white-space: nowrap;
+  font-size: clamp(2.4rem, 6.4vw, 5.6rem);
+}
+
+.hero-about .subtitle {
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+}
+
+[data-theme='dark'] .hero-about { background: #000; }
+[data-theme='dark'] .hero-about .title { color: #fff; }
+[data-theme='dark'] .hero-about .subtitle { color: rgba(255, 255, 255, 0.65); }
+
+/* ── See CV ── */
+.see-cv-btn {
+  margin-top: 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.3rem;
+  border: 1.5px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  color: #111;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1.4, 0.36, 1),
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    letter-spacing 0.28s ease;
+}
+
+.see-cv-btn:hover,
+.see-cv-btn:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  letter-spacing: 0.24em;
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.22);
+  outline: none;
+}
+
+/* ── chibi + social icons under it ── */
+.hero-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.hero-socials {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.hero-link {
+  display: inline-flex;
+  color: #111;
+  border-radius: 8px;
+  transition: transform 0.28s cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.hero-link:hover { transform: translateY(-3px); }
+
+/* black & white: no brand blue next to the monochrome hero */
+.hero-link img {
+  filter: grayscale(1) contrast(3);
+}
+
+/* black outlines of the chibi would vanish on the dark hero */
+[data-theme='dark'] .hero-chibi {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.75));
+}
+
+[data-theme='dark'] .see-cv-btn { color: #fff; }
+
+.hero-chibi {
+  height: min(58vh, 480px);
+  width: auto;
+  user-select: none;
+  pointer-events: none;
+  animation: chibi-float 4.5s ease-in-out infinite;
+}
+
+@keyframes chibi-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-chibi { animation: none; }
 }
 
 .hero-social {
@@ -35,16 +153,18 @@
     url(https://images.unsplash.com/photo-1511632765486-a01980e01a18?crop=entropy&cs=tinysrgb&fm=jpg&q=80&auto=format&fit=crop&w=1170);
 }
 
+/* Random: colourful consoles and figures, like the page itself */
 .hero-fun {
   background-image:
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6)),
-    url(https://images.unsplash.com/photo-1511512578047-dfb367046420?crop=entropy&cs=tinysrgb&fm=jpg&q=80&auto=format&fit=crop&w=1171);
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.65)),
+    url(https://images.unsplash.com/photo-1665041982909-8a86864a1e49?fm=jpg&q=80&auto=format&fit=crop&w=1600);
 }
 
+/* Contact: a neon "hello" on a wall */
 .hero-contact {
   background-image:
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7)),
-    url(https://images.unsplash.com/photo-1516321318423-f06f85e504b3?crop=entropy&cs=tinysrgb&fm=jpg&q=80&auto=format&fit=crop&w=1170);
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.7)),
+    url(https://images.unsplash.com/photo-1520453803296-c39eabe2dab4?fm=jpg&q=80&auto=format&fit=crop&w=1600);
 }
 
 .title {
@@ -90,54 +210,6 @@
 
 .content-section.alt {
   background: var(--bg-alt);
-}
-
-/* Full-bleed section hosting the 3D carousel (always dark) */
-.carousel-section {
-  width: 100%;
-  padding: 0;
-  background: #000;
-  display: flex;
-  align-items: stretch;
-}
-
-/* Side lanes — wheel events here scroll the page, not the carousel */
-.carousel-side {
-  flex: 0 0 9%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.scroll-lane {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  opacity: 0.55;
-}
-
-.scroll-chevron {
-  width: 14px;
-  height: 14px;
-  border-right: 2px solid rgba(255, 255, 255, 0.8);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
-  transform: rotate(45deg);
-  animation: chevron-drop 1.8s ease-in-out infinite;
-}
-
-.scroll-chevron:nth-child(2) {
-  animation-delay: 0.25s;
-  opacity: 0.6;
-}
-
-@keyframes chevron-drop {
-  0%, 100% { transform: rotate(45deg) translate(0, 0);     opacity: 0.9; }
-  50%       { transform: rotate(45deg) translate(5px, 5px); opacity: 0.4; }
-}
-
-@media (max-width: 760px) {
-  .carousel-side { flex-basis: 12%; }
 }
 
 .content-block {
@@ -262,6 +334,61 @@
   .about-grid { grid-template-columns: 1fr; gap: 2rem; }
 }
 
+/* the typed words are red, "Engineer" keeps the title colour */
+.title-typed { color: var(--accent); }
+
+/* the stars are placed against the whole section, not the text block */
+.about-section { position: relative; }
+
+/* spans the whole section: two stars in the left margin, the big one
+   against the right edge of the screen */
+.about-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.about-star {
+  position: absolute;
+  display: block;
+  animation: about-star-spin 14s linear infinite;
+}
+
+.about-star svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.about-star.s0 { top: 7%;    left: calc(50% - 620px); }
+/* the big one sits on the right edge of the screen */
+.about-star.s1 { top: 50%;   right: 3vw; margin-top: -56px; animation-duration: 18s; animation-direction: reverse; }
+.about-star.s2 { bottom: 6%; left: calc(50% - 590px); animation-duration: 11s; }
+
+@keyframes about-star-spin {
+  to { rotate: 360deg; }
+}
+
+/* narrow screens: no margin left, so they move to the right edge and sit
+   behind the text (which is raised above them) */
+@media (max-width: 1150px) {
+  .about-stars {
+    z-index: 0;
+    opacity: 0.85;
+  }
+
+  .about-star.s0 { width: 44px !important; height: 44px !important; left: auto; right: 6px; }
+  .about-star.s1 { width: 64px !important; height: 64px !important; left: auto; right: 2px; margin-top: -32px; }
+  .about-star.s2 { width: 30px !important; height: 30px !important; left: auto; right: 10px; }
+
+  .about-grid { position: relative; z-index: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-star { animation: none; }
+}
+
 .about-text h2 {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 3rem;
@@ -285,104 +412,62 @@
   margin-bottom: 1rem;
 }
 
-.skills-list ul {
+.skills-logos {
   list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 1rem 0.6rem;
+}
+
+.skill-logo {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: default;
 }
 
-.skills-list li {
-  font-size: 0.9rem;
-  color: var(--text-soft);
-  padding-left: 1.5rem;
-  position: relative;
-  font-weight: 300;
-}
-
-.skills-list li::before {
-  content: '—';
-  position: absolute;
-  left: 0;
-  color: var(--accent);
-}
-
-/* ─── TIMELINE ───────────────────────────────────────────────── */
-.timeline {
+/* white tile: every official logo stays legible in both themes */
+.skill-logo-tile {
+  width: 54px;
+  height: 54px;
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 2rem;
-  text-align: left;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.timeline-item {
-  display: flex;
-  gap: 2rem;
-  align-items: flex-start;
-}
-
-.timeline-year {
-  font-size: 0.75rem;
-  color: var(--accent);
-  letter-spacing: 0.15em;
-  white-space: nowrap;
-  padding-top: 0.15rem;
-  min-width: 90px;
-}
-
-.timeline-item div {
-  font-size: 0.9rem;
-  color: var(--text-soft);
-  font-weight: 300;
-  line-height: 1.6;
-}
-
-.timeline-item strong {
-  color: var(--text);
-  font-weight: 600;
-}
-
-/* ─── CONTACT ────────────────────────────────────────────────── */
-.contact-block {
-  text-align: center;
-}
-
-.contact-block h2 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2.5rem;
-  color: var(--text);
-  letter-spacing: 0.05em;
-  margin-bottom: 0.8rem;
-}
-
-.contact-block p {
-  font-size: 1.1rem;
-  color: var(--text-faint);
-  margin-bottom: 2rem;
-}
-
-.social-links {
-  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 2rem;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.32s cubic-bezier(0.22, 1.4, 0.36, 1),
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
 }
 
-.social-links span {
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  cursor: pointer;
-  transition: color 0.3s ease;
+.skill-logo-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
 }
 
-.social-links span:hover {
-  color: var(--accent);
+.skill-logo:hover .skill-logo-tile {
+  transform: translateY(-3px) rotate(-6deg);
+  border-color: var(--accent);
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.2);
 }
+
+.skill-logo-name {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+  text-align: center;
+  line-height: 1.3;
+  transition: color 0.25s ease;
+}
+
+.skill-logo:hover .skill-logo-name { color: var(--accent); }
 
 /* ─── CONTACT PAGE ───────────────────────────────────────────── */
 .contact-main {
@@ -438,13 +523,13 @@
 }
 
 .contact-link-icon {
-  font-size: 1.1rem;
-  color: var(--accent);
-  width: 28px;
-  text-align: center;
-  font-weight: 700;
+  display: flex;
+  color: var(--text);
   flex-shrink: 0;
 }
+
+/* black & white, like the icons on Home */
+.contact-link-icon img { filter: grayscale(1) contrast(3); }
 
 .contact-link-label {
   font-size: 0.7rem;
@@ -462,7 +547,7 @@
   display: block;
 }
 
-.contact-link-card span:not(.contact-link-icon) {
+.contact-link-card > span:not(.contact-link-icon) {
   display: flex;
   flex-direction: column;
 }
@@ -576,6 +661,12 @@
   font-weight: 300;
 }
 
+.contact-meta-note a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* ── contact: giant closing CTA ── */
 .big-cta {
   display: block;
@@ -656,10 +747,18 @@
     text-align: center;
   }
 
+  /* Home: chibi above the typed roles */
+  .hero-about {
+    flex-direction: column-reverse;
+    gap: 1.2rem;
+  }
+  .hero-about-text { width: 100%; text-align: center; }
+  .hero-about .title { text-align: center; }
+  .hero-chibi { height: min(40svh, 330px); }
+
   .content-section { padding: 3.2rem 1.4rem; }
 
-  .content-block h2,
-  .contact-block h2 { font-size: 2rem; }
+  .content-block h2 { font-size: 2rem; }
 
   .content-block p { font-size: 0.94rem; }
 
@@ -667,15 +766,6 @@
   .stat-num { font-size: 3rem; }
 
   .feature-img img { height: 220px; }
-
-  .timeline-item {
-    flex-direction: column;
-    gap: 0.3rem;
-  }
-
-  .timeline-year { min-width: 0; }
-
-  .social-links { gap: 1.2rem; flex-wrap: wrap; }
 
   .contact-cta-row { gap: 1rem; }
 

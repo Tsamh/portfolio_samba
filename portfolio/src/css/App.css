@@ -18,9 +18,17 @@
   transform-origin: left center;
 }
 
+/* lifted so the tilted page sits just under the navbar */
 .page-container.active {
   left: 11vw;
-  transform: rotateY(45deg) scale(0.62);
+  transform: translateY(-6vh) rotateY(45deg) scale(0.62);
+}
+
+/* phones: lift the tilted page so the quote under it has room */
+@media (max-width: 760px) {
+  .page-container.active {
+    transform: translateY(-9vh) rotateY(45deg) scale(0.62);
+  }
 }
 
 /* ─── CLICK SLIDE OVERLAY ────────────────────────────────────── */
@@ -94,4 +102,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
+  /* no pull-to-refresh / bounce: the edge swipe changes page instead */
+  overscroll-behavior: contain;
 }

@@ -2,18 +2,18 @@ import logoSrc from '../assets/s.png';
 import '../css/Navbar.css';
 
 /**
- * Fixed top navbar — 5-column grid, fully transparent:
- *  [logo]  [terminal]  [burger]  [theme toggle]  [rightSlot]
- *  terminal sits midway logo↔burger, toggle midway burger↔rightSlot.
+ * Fixed top navbar — 3-column grid:
+ *  [logo]  [burger]  [theme toggle · rightSlot]
+ * The burger stays centred; the terminal lives in a floating button
+ * at the bottom-left (see Terminal).
  *
  * @param {boolean}   menuOpen
  * @param {function}  onToggle     - burger click
  * @param {function}  onLogoClick  - navigate to Home
- * @param {function}  onTerminal   - open the terminal overlay
  * @param {ReactNode} themeToggle  - theme switch node
  * @param {ReactNode} rightSlot    - right column (ContactButton)
  */
-export default function Navbar({ menuOpen, onToggle, onLogoClick, onTerminal, themeToggle, rightSlot }) {
+export default function Navbar({ menuOpen, onToggle, onLogoClick, themeToggle, rightSlot }) {
   return (
     <nav className="navbar">
 
@@ -22,21 +22,7 @@ export default function Navbar({ menuOpen, onToggle, onLogoClick, onTerminal, th
         <img src={logoSrc} alt="SAMBA" className="navbar-logo-img" />
       </div>
 
-      {/* ── 2: terminal (midway logo ↔ burger) ── */}
-      <div className="navbar-slot">
-        <span className="terminal-wrap">
-          <button
-            className="terminal-btn"
-            onClick={onTerminal}
-            aria-label="Open terminal (Ctrl + Alt + T)"
-          >
-            &gt;_
-          </button>
-          <span className="terminal-combo">(Ctrl + Alt + T)</span>
-        </span>
-      </div>
-
-      {/* ── 3: burger ── */}
+      {/* ── 2: burger ── */}
       <div className="navbar-center">
         <div
           className={`toggle-btn${menuOpen ? ' open' : ''}`}
@@ -49,13 +35,9 @@ export default function Navbar({ menuOpen, onToggle, onLogoClick, onTerminal, th
         </div>
       </div>
 
-      {/* ── 4: theme toggle (midway burger ↔ contact) ── */}
-      <div className="navbar-slot">
-        {themeToggle}
-      </div>
-
-      {/* ── 5: right slot ── */}
+      {/* ── 3: theme toggle + right slot ── */}
       <div className="navbar-right">
+        {themeToggle}
         {rightSlot}
       </div>
     </nav>

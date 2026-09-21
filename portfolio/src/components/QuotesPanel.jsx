@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { EGGS, EGG_TOTAL, foundEggs } from '../lib/eggs';
 import '../css/QuotesPanel.css';
 
 const FALLBACK_QUOTES = [
@@ -52,14 +53,36 @@ export default function QuotesPanel({ visible }) {
     return () => clearInterval(interval);
   }, [visible]);
 
+  /* easter egg counter, refreshed whenever one is found */
+  const [found, setFound] = useState(foundEggs);
+
+  useEffect(() => {
+    const refresh = () => setFound(foundEggs());
+    window.addEventListener('portfolio:egg', refresh);
+    return () => window.removeEventListener('portfolio:egg', refresh);
+  }, []);
+
+  useEffect(() => {
+    if (visible) setFound(foundEggs());
+  }, [visible]);
+
   return (
     <div className={`quotes-panel${visible ? ' visible' : ''}`}>
+      <div className="quotes-eggs">
+        <span className="quotes-eggs-count">
+          Easter eggs <strong>{found.length}/{EGG_TOTAL}</strong>
+        </span>
+        {/* only the ones already found are named */}
+        {found.map((id) => (
+          <span key={id} className="quotes-egg">{EGGS[id]}</span>
+        ))}
+      </div>
       <div className="quotes-deco">{ '//' }</div>
       <blockquote className={`quotes-text${fading ? ' fade' : ''}`}>
         "{quote.text}"
       </blockquote>
       <cite className={`quotes-author${fading ? ' fade' : ''}`}>
-        — {quote.author}
+        {quote.author}
       </cite>
     </div>
   );

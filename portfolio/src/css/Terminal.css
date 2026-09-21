@@ -1,68 +1,128 @@
-/* ─── TERMINAL OVERLAY ───────────────────────────────────────── */
-.terminal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: term-fade 0.25s ease;
-}
-
-@keyframes term-fade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
+/* ─── TERMINAL WINDOW ────────────────────────────────────────── */
+/* Docked above its button in the bottom-left corner — the mirror of the
+   camera button and preview on the right. No backdrop: the site stays
+   usable while the terminal is open. */
 .terminal-window {
-  width: min(720px, 92vw);
-  height: min(480px, 80vh);
+  --t-header-h: 38px;
+  --t-fab: 52px;
+  --t-gap: 24px;
+  --t-bottom: calc(var(--t-gap) + var(--t-fab) + 14px + env(safe-area-inset-bottom, 0px));
+
+  position: fixed;
+  left: var(--t-gap);
+  bottom: var(--t-bottom);
+  z-index: 140;
+  width: min(580px, calc(100vw - 2 * var(--t-gap)));
+  height: min(380px, calc(100dvh - var(--t-bottom) - 72px));
   display: flex;
   flex-direction: column;
   background: #0d1117;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 10px;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
   overflow: hidden;
-  animation: term-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  /* shrinks into / grows out of the centre of the >_ button */
+  transform-origin: calc(var(--t-fab) / 2) calc(100% + 14px + var(--t-fab) / 2);
+  animation: term-pop 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.26s ease,
+    visibility 0s linear 0s;
+}
+
+/* tucked behind the >_ button */
+.terminal-window.minimized {
+  transform: scale(0.04);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.34s cubic-bezier(0.55, 0, 0.8, 0.2),
+    opacity 0.26s ease 0.08s,
+    visibility 0s linear 0.34s;
+}
+
+/* filling the space between the navbar and the button */
+.terminal-window.maximized {
+  width: calc(100vw - 2 * var(--t-gap));
+  height: calc(100dvh - var(--t-bottom) - 72px);
 }
 
 @keyframes term-pop {
-  from { transform: translateY(24px) scale(0.97); opacity: 0; }
-  to   { transform: translateY(0) scale(1); opacity: 1; }
+  from { transform: scale(0.04); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
 }
 
 .terminal-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  height: var(--t-header-h);
+  flex: 0 0 var(--t-header-h);
+  padding: 0 12px 0 14px;
   background: #161b22;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  user-select: none;
 }
-
-.t-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.t-dot.red    { background: #ff5f56; cursor: pointer; }
-.t-dot.yellow { background: #ffbd2e; }
-.t-dot.green  { background: #27c93f; }
 
 .terminal-title {
-  margin-left: 10px;
   font-family: 'Courier New', monospace;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.55);
   letter-spacing: 0.08em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── window controls: squares, on the RIGHT ── */
+.terminal-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.t-btn {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;          /* square, not round */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.62);
+  transition: transform 0.18s cubic-bezier(0.22, 1.4, 0.36, 1), filter 0.18s ease;
+}
+
+.t-btn.yellow { background: #ffbd2e; }
+.t-btn.green  { background: #27c93f; }
+.t-btn.red    { background: #ff5f56; }
+
+.t-btn:hover,
+.t-btn:focus-visible {
+  transform: translateY(-1px) scale(1.15);
+  filter: brightness(1.12);
+  outline: none;
+}
+
+.t-btn:active { transform: scale(0.9); }
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-window,
+  .terminal-window.minimized,
+  .t-btn { transition-duration: 0.01ms; transition-delay: 0s; animation: none; }
 }
 
 .terminal-body {
   flex: 1;
+  min-height: 0;              /* lets the body collapse fully when minimised */
   padding: 14px 16px;
   overflow-y: auto;
   font-family: 'Courier New', monospace;
@@ -70,6 +130,7 @@
   line-height: 1.55;
   color: #c9d1d9;
   cursor: text;
+  transition: opacity 0.2s ease;
 }
 
 .terminal-body::-webkit-scrollbar       { width: 6px; }
@@ -79,6 +140,31 @@
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+/* the command list: names in yellow, aligned in a column */
+.t-name {
+  display: inline-block;
+  min-width: 9.5em;
+  padding-left: 2ch;
+  color: #e3b341;
+}
+
+/* framed title: a CSS border, so it never depends on how the font draws
+   box characters (the right bar used to sit off on both PC and phones) */
+.terminal-banner {
+  display: inline-block;
+  margin-bottom: 0.6rem;
+  padding: 0.35rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 4px;
+  color: #c9d1d9;
+  letter-spacing: 0.06em;
+}
+
+/* tones set in Terminal.jsx */
+.terminal-line.cmd { color: #79c0ff; }   /* the command that was typed */
+.terminal-line.err { color: #ff7b72; }   /* errors, unknown commands */
+.terminal-line.ok  { color: #27c93f; }   /* confirmations */
 
 .terminal-input-row {
   display: flex;
@@ -102,44 +188,143 @@
   caret-color: #27c93f;
 }
 
-/* ─── TERMINAL NAVBAR BUTTON ─────────────────────────────────── */
-.terminal-wrap {
-  position: relative;
+/* ─── TERMINAL BUTTON (bottom-left) ─────────────────────────── */
+.terminal-fab-wrap {
+  position: fixed;
+  left: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index: 150;
   display: inline-flex;
   align-items: center;
 }
 
-/* keyboard combo, revealed on hover */
-.terminal-combo {
+/* ── tooltip (to the right of the button) ── */
+.terminal-tip {
   position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%) translateY(-4px);
-  font-family: 'Courier New', monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  color: var(--nav-fg);
+  left: calc(100% + 12px);
+  top: 50%;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   white-space: nowrap;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
   opacity: 0;
+  transform: translateY(-50%) translateX(-5px) scale(0.94);
+  transform-origin: left center;
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 1.5, 0.36, 1);
 }
 
-.terminal-wrap:hover .terminal-combo {
-  opacity: 0.75;
-  transform: translateX(-50%) translateY(0);
+/* little arrow pointing back at the button */
+.terminal-tip::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: var(--text);
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 1px;
 }
 
-.terminal-btn {
-  padding: 0.32rem 0.6rem;
-  border: 1px solid var(--nav-fg-soft);
-  border-radius: 5px;
-  background: transparent;
-  color: var(--nav-fg);
+.terminal-tip-combo {
   font-family: 'Courier New', monospace;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  opacity: 0.65;
+}
+
+.terminal-fab-wrap:hover .terminal-tip,
+.terminal-fab:focus-visible ~ .terminal-tip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0) scale(1);
+}
+
+/* ── button — same shape as the camera button on the right ── */
+.terminal-fab {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text);
   cursor: pointer;
-  /* no color change on hover */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s ease, background-color 0.25s ease, color 0.25s ease;
+}
+
+.terminal-fab:hover,
+.terminal-fab:focus-visible {
+  transform: translateY(-2px) scale(1.05);
+  outline: none;
+}
+
+.terminal-fab:active { transform: scale(0.94); }
+
+.terminal-fab-icon {
+  width: 34px;
+  height: 34px;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* open: red ring instead of the old dark fill, so the icon stays readable */
+.terminal-fab.open { border-color: var(--accent); box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25); }
+
+/* a minimised session is waiting inside the button */
+.terminal-fab.tucked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #27c93f;
+  border: 2px solid var(--bg);
+}
+
+/* touch screens: no hover, no keyboard shortcut */
+@media (hover: none) {
+  .terminal-tip { display: none; }
+}
+
+@media (max-width: 760px) {
+  .terminal-fab-wrap { left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+  .terminal-fab { width: 46px; height: 46px; }
+  .terminal-fab-icon { width: 30px; height: 30px; }
+
+  .terminal-window {
+    --t-fab: 46px;
+    --t-gap: 16px;
+  }
+  .terminal-body,
+  .terminal-input { font-size: 0.74rem; }
+
+  .t-name { min-width: 8em; padding-left: 1ch; }
+  .terminal-banner { padding: 0.3rem 0.7rem; letter-spacing: 0.02em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-fab,
+  .terminal-tip { transition-duration: 0.01ms; }
+  .terminal-fab:hover { transform: none; }
 }

@@ -12,7 +12,7 @@ export default function TypingText({
   words = [],
   typeSpeed = 90,
   deleteSpeed = 45,
-  pause = 1800,
+  pause = 3000,
 }) {
   const [wordIndex, setWordIndex] = useState(0);
   const [text, setText] = useState('');

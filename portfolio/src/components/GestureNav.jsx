@@ -3,6 +3,8 @@ import { createEngine } from '../lib/gestureEngine';
 import { createDispatcher } from '../lib/gestureDispatch';
 import { createHandTracker } from '../lib/handTracker';
 import GesturePreview from './GesturePreview';
+import LordIcon from './LordIcon';
+import { useBackClose } from '../hooks/useBackClose';
 import '../css/GestureNav.css';
 
 /* idle → intro → loading → active, with error reachable from loading */
@@ -15,10 +17,56 @@ const ERROR = 'error';
 const FOCUSABLE =
   'button:not([disabled]), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
+/* Line icons (24×24, stroke = currentColor) for the instructions modal. */
+const ICONS = {
+  // open palm
+  hand: (
+    <>
+      <path d="M18 11V6a2 2 0 0 0-4 0" />
+      <path d="M14 10V4a2 2 0 0 0-4 0v2" />
+      <path d="M10 10.5V6a2 2 0 0 0-4 0v8" />
+      <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-6-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.83L7 15" />
+    </>
+  ),
+  // thumb and index meeting, with a small click burst
+  pinch: (
+    <>
+      <path d="M5 21c0-6 2.5-10 7-11.5" />
+      <path d="M19 21c0-6-2.5-10-7-11.5" />
+      <circle cx="12" cy="9.5" r="1.2" />
+      <path d="M12 2.5v2.5M7 4.5l1.5 2M17 4.5l-1.5 2" />
+    </>
+  ),
+  // pinch held while moving up or down
+  drag: (
+    <>
+      <path d="M12 3v18" />
+      <path d="m8 7 4-4 4 4" />
+      <path d="m8 17 4 4 4-4" />
+      <circle cx="12" cy="12" r="2.2" />
+    </>
+  ),
+  lock: (
+    <>
+      <rect x="4" y="11" width="16" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </>
+  ),
+};
+
+function GestureIcon({ name, size = 26 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor"
+         strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {ICONS[name]}
+    </svg>
+  );
+}
+
 const GESTURES = [
-  { icon: '🖐', title: 'Show Hand', text: 'Show your palm to move the cursor around the page' },
-  { icon: '👌', title: 'Quick pinch', text: 'Pinch your thumb and index finger to click on elements' },
-  { icon: '👌', title: 'Pinch & Drag', text: 'Pinch and drag up or down to scroll' },
+  { icon: 'hand',  title: 'Show Hand', text: 'Show your palm to move the cursor around the page' },
+  { icon: 'pinch', title: 'Quick pinch', text: 'Pinch your thumb and index finger to click on elements' },
+  { icon: 'drag',  title: 'Pinch & Drag', text: 'Pinch and drag up or down to scroll' },
 ];
 
 function describeError(err) {
@@ -35,23 +83,6 @@ function describeError(err) {
     return 'Camera access needs a secure connection. Open this site over https, or on localhost.';
   }
   return 'Hand tracking failed to start. Reload the page and try again.';
-}
-
-function CameraIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-      <circle cx="12" cy="13" r="4" />
-    </svg>
-  );
-}
-
-function StopIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="6" y="6" width="12" height="12" rx="2" />
-    </svg>
-  );
 }
 
 export default function GestureNav() {
@@ -226,6 +257,8 @@ export default function GestureNav() {
     else close();
   }, [status, close]);
 
+  useBackClose(modalOpen, close);
+
   /* Move focus into the dialog on open and hand it back on close, so someone
      working without a mouse lands in the modal rather than behind it. */
   useEffect(() => {
@@ -323,7 +356,7 @@ export default function GestureNav() {
         aria-label={status === ACTIVE ? 'Stop hand navigation' : 'Navigate with hand gestures'}
         title={status === ACTIVE ? 'Stop hand navigation' : 'Navigate with hand gestures'}
       >
-        {status === ACTIVE ? <StopIcon /> : <CameraIcon />}
+        <LordIcon name="camera" size={32} />
       </button>
 
       {modalOpen && (
@@ -345,7 +378,7 @@ export default function GestureNav() {
             <ul className="gesture-list">
               {GESTURES.map((g) => (
                 <li key={g.title} className="gesture-item">
-                  <span className="gesture-emoji" aria-hidden="true">{g.icon}</span>
+                  <span className="gesture-icon"><GestureIcon name={g.icon} /></span>
                   <span>
                     <strong>{g.title}</strong>
                     <span className="gesture-desc">{g.text}</span>
@@ -355,7 +388,8 @@ export default function GestureNav() {
             </ul>
 
             <p className="gesture-privacy">
-              🔒 <strong>No spying, promise.</strong> The video never leaves your browser — no
+              <span className="gesture-privacy-icon"><GestureIcon name="lock" size={16} /></span>
+              <strong>No spying, promise.</strong> The video never leaves your browser: no
               upload, no recording, no server, no secret folder of your face. It all runs
               locally, and the camera shuts off the moment you exit. I'm a developer, not the NSA.
             </p>

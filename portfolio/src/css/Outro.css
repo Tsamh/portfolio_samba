@@ -1,4 +1,4 @@
-/* ─── INTRO / OUTRO OVERLAY ──────────────────────────────────── */
+/* ─── OUTRO OVERLAY ──────────────────────────────────── */
 .intro-overlay {
   position: fixed;
   inset: 0;
@@ -32,75 +32,10 @@
   align-items: center;
 }
 
-/* ── layout: avatar left, title on its right ── */
-.intro-layout {
-  display: flex;
-  align-items: center;
-  gap: clamp(2rem, 6vw, 6rem);
-}
-
-.intro-side-title {
-  display: flex;
-  flex-direction: column;
-  line-height: 0.9;
-}
-
-.ist-line {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(3.5rem, 9vw, 8rem);
-  letter-spacing: 0.04em;
-  color: #111;
-  text-transform: uppercase;
-}
-
-.ist-accent {
-  font-size: clamp(2.8rem, 7vw, 6.2rem);
-  letter-spacing: 0.1em;
-  color: rgb(220, 38, 38);
-}
-
-.ist-sub {
-  margin-top: 1.2rem;
-  font-family: 'Inter', sans-serif;
-  font-size: clamp(0.65rem, 1.05vw, 0.85rem);
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: rgba(13, 45, 82, 0.78);
-}
-
-@media (max-width: 760px) {
-  .intro-layout {
-    flex-direction: column-reverse; /* title above the avatar reads better */
-    gap: 1.2rem;
-    padding: 0 1.2rem;
-  }
-
-  .intro-side-title {
-    align-items: center;
-    text-align: center;
-  }
-
-  .ist-sub {
-    margin-top: 0.8rem;
-    letter-spacing: 0.18em;
-    line-height: 1.6;
-  }
-
-  .intro-hint { bottom: 1.4rem; }
-  .intro-hint span { letter-spacing: 0.18em; }
-  .intro-hint-arrow { height: 26px; }
-}
-
-@media (max-height: 620px) {
-  .intro-hint { bottom: 0.9rem; }
-  .intro-hint-arrow { height: 20px; }
-}
-
-/* ─── SCROLL HINT ────────────────────────────────────────────── */
+/* ─── SCROLL HINT (top of the page) ──────────────────────────── */
 .intro-hint {
   position: absolute;
-  bottom: 2.5rem;
+  top: 15rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -116,20 +51,27 @@
   font-weight: 800;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: rgba(13, 45, 82, 0.85);
+  color: rgba(196, 14, 14, 0.85);
   text-align: center;
 }
 
 .intro-hint-arrow {
   width: 2px;
   height: 36px;
-  background: linear-gradient(to bottom, rgba(13, 45, 82, 0.7), transparent);
+  background: linear-gradient(to bottom, rgba(196, 14, 14, 0.85), transparent);
   animation: intro-arrow-bounce 1.8s ease-in-out infinite;
 }
 
 @keyframes intro-arrow-bounce {
   0%, 100% { transform: translateY(0);   opacity: 0.6; }
   50%       { transform: translateY(8px); opacity: 1; }
+}
+
+/* phones: hint above the (smaller) avatar */
+@media (max-width: 760px) {
+  .intro-hint { top: 5rem; }
+  .intro-hint span { letter-spacing: 0.18em; }
+  .intro-hint-arrow { height: 26px; }
 }
 
 /* ─── OUTRO ACTIONS ──────────────────────────────────────────── */

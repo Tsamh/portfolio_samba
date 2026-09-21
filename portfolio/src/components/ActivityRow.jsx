@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Reveal from './Reveal';
+import { useBackClose } from '../hooks/useBackClose';
 import '../css/Activity.css';
 
 /**
@@ -11,10 +12,12 @@ import '../css/Activity.css';
  *
  * @param {string}   title
  * @param {string[]} desc     - paragraphs
+ * @param {string[]} bullets  - optional list, for activities that gather
+ *                              several things under one title
  * @param {string[]} images   - at least 5 (first 3 shown in the clips)
  * @param {boolean}  reverse  - swap sides + slide from the right
  */
-export default function ActivityRow({ title, desc, images, reverse = false }) {
+export default function ActivityRow({ title, desc, bullets = [], images, reverse = false }) {
   const [lightbox, setLightbox] = useState(-1);
   const [active, setActive] = useState(-1);   // hovered slice, JS-driven
   const count = images.length;
@@ -22,6 +25,8 @@ export default function ActivityRow({ title, desc, images, reverse = false }) {
 
   const prev = () => setLightbox((i) => (i - 1 + count) % count);
   const next = () => setLightbox((i) => (i + 1) % count);
+
+  useBackClose(lightbox >= 0, () => setLightbox(-1));
 
   /* keyboard navigation while the lightbox is open */
   useEffect(() => {
@@ -42,6 +47,11 @@ export default function ActivityRow({ title, desc, images, reverse = false }) {
           <div className="activity-text">
             <h2>{title}</h2>
             {desc.map((p) => <p key={p}>{p}</p>)}
+            {bullets.length > 0 && (
+              <ul className="activity-bullets">
+                {bullets.map((b) => <li key={b}>{b}</li>)}
+              </ul>
+            )}
           </div>
 
           {/* creative hover container (assets/ref effect) —
@@ -60,13 +70,15 @@ export default function ActivityRow({ title, desc, images, reverse = false }) {
                 <div
                   key={i}
                   className={`clip clip${i + 1}${active === i ? ' active' : ''}`}
-                  style={{ backgroundImage: `url(${src})` }}
+                  /* quoted: file names with spaces or parentheses, such as
+                     "integration (2).jpeg", would break an unquoted url() */
+                  style={{ backgroundImage: `url("${src}")` }}
                   onMouseEnter={() => setActive(i)}
                   onFocus={() => setActive(i)}
                   onClick={() => setLightbox(i)}
                   role="button"
                   tabIndex={0}
-                  aria-label={`${title} — photo ${i + 1}`}
+                  aria-label={`${title}, photo ${i + 1}`}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
@@ -111,7 +123,7 @@ export default function ActivityRow({ title, desc, images, reverse = false }) {
               <motion.img
                 key={lightbox}
                 src={images[lightbox]}
-                alt={`${title} — photo ${lightbox + 1}`}
+                alt={`${title}, photo ${lightbox + 1}`}
                 className="lb-image"
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}

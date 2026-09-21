@@ -1,8 +1,13 @@
 /* ─── NAV LIST ───────────────────────────────────────────────── */
+/* The tilted page is scaled to 0.62 and lifted by 6vh (App.css), so its top
+   edge sits at ~13vh.
+   The list starts there, just right of the page. It is anchored by its LEFT
+   edge: anchored by the right edge, a long label grew leftwards and ran over
+   the page. */
 .nav-list {
   position: fixed;
-  top: 40%;
-  right: 10vw;
+  top: calc(13vh - 10px);   /* 10px = the links' own padding */
+  left: 56vw;
   list-style: none;
   font-family: sans-serif;
   z-index: 99;
@@ -33,4 +38,44 @@
   opacity: 0.8;
   color: red;
   transform: translateX(-20px);
+}
+
+/* phones: the page is lifted (App.css), and there is no room on the side,
+   so the longest label loses its second half */
+@media (max-width: 760px) {
+  /* the tilted page ends around 55vw: start the list right after it */
+  .nav-list { top: calc(10vh - 10px); left: 58vw; right: auto; }
+  .nav-link { font-size: 17px; letter-spacing: 1px; }
+  .nav-extra { display: none; }
+}
+
+/* current page: red, framed only at the top-right and bottom-left corners */
+.nav-link.active {
+  position: relative;
+  width: fit-content;
+  color: var(--accent);
+}
+
+.nav-link.active::before,
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 0 solid var(--accent);
+  pointer-events: none;
+}
+
+.nav-link.active::before {
+  top: 0;
+  right: 0;
+  border-top-width: 2px;
+  border-right-width: 2px;
+}
+
+.nav-link.active::after {
+  bottom: 0;
+  left: 0;
+  border-bottom-width: 2px;
+  border-left-width: 2px;
 }

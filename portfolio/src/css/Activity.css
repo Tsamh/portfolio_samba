@@ -33,6 +33,34 @@
   margin-bottom: 1rem;
 }
 
+/* activities that gather several things under one title */
+.activity-bullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.2rem;
+}
+
+.activity-bullets li {
+  position: relative;
+  padding-left: 1.3rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  font-weight: 300;
+  color: var(--text-soft);
+}
+
+.activity-bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 8px;
+  height: 2px;
+  background: var(--accent);
+}
+
 .activity-text p {
   font-size: 0.95rem;
   line-height: 1.8;

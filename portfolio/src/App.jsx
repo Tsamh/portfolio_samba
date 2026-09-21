@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import Intro          from './components/Intro';
+import { useCallback, useEffect, useState } from 'react';
+import Loader         from './components/Loader';
 import Navbar         from './components/Navbar';
 import NavList        from './components/NavList';
 import QuotesPanel    from './components/QuotesPanel';
@@ -8,6 +8,9 @@ import ThemeToggle    from './components/ThemeToggle';
 import Terminal       from './components/Terminal';
 import Outro          from './components/Outro';
 import GestureNav     from './components/GestureNav';
+import EggToast       from './components/EggToast';
+import PageProgress   from './components/PageProgress';
+import LostPage       from './components/LostPage';
 import Home           from './pages/Home';
 import Projects       from './pages/Projects';
 import Extra          from './pages/Extra';
@@ -21,9 +24,14 @@ const PAGES = [<Home />, <Projects />, <Extra />, <Random />, <Contact />];
 const CONTACT_INDEX = 4;
 
 export default function App() {
-  const [introComplete, setIntroComplete] = useState(false);
+  const [loaded, setLoaded]               = useState(false); // site visible
+  const [loaderGone, setLoaderGone]       = useState(false); // smoke finished
   const [terminalOpen, setTerminalOpen]   = useState(false);
   const [outroOpen, setOutroOpen]         = useState(false);
+  const [lost, setLost]                   = useState(false);   // the 404 page
+
+  const handleReveal = useCallback(() => setLoaded(true), []);
+  const handleLoaderDone = useCallback(() => setLoaderGone(true), []);
 
   /* ── theme (light by default) ── */
   const [theme, setTheme] = useState(
@@ -35,43 +43,58 @@ export default function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  /* 404: the /404 address, any unknown hash (ex: /#/nowhere), or the
+     terminal's `404` command */
+  useEffect(() => {
+    const check = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '');
+      const path = window.location.pathname.replace(/\/+$/, '');
+      setLost(hash.length > 0 || path.endsWith('/404'));
+    };
+    check();
+    const open = () => {
+      window.location.hash = '/404';
+      setLost(true);
+    };
+    window.addEventListener('hashchange', check);
+    window.addEventListener('portfolio:lost', open);
+    return () => {
+      window.removeEventListener('hashchange', check);
+      window.removeEventListener('portfolio:lost', open);
+    };
+  }, []);
+
+  const leaveLost = useCallback(() => {
+    const path = window.location.pathname.replace(/\/404\/?$/, '/');
+    history.replaceState(null, '', path + window.location.search);
+    setLost(false);
+  }, []);
+
   /* outro can also be opened by the black void section (Contact page) */
   useEffect(() => {
     const open = () => {
-      if (introComplete) setOutroOpen(true);
+      if (loaded) setOutroOpen(true);
     };
     window.addEventListener('portfolio:outro', open);
     return () => window.removeEventListener('portfolio:outro', open);
-  }, [introComplete]);
-
-  /* keyboard shortcut: Ctrl + Alt + T toggles the terminal */
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.ctrlKey && e.altKey && (e.key === 't' || e.key === 'T')) {
-        e.preventDefault();
-        setTerminalOpen((o) => !o);
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [loaded]);
 
   const {
     menuOpen, activePage, sliding, scrollDir,
     scrollRefs,
     openMenu, closeMenu, goTo, handleWheel,
+    handleTouchStart, handleTouchMove, handleTouchEnd,
   } = usePortfolio(PAGES.length, () => setOutroOpen(true));
 
   return (
     <>
-      {/* ── PORTFOLIO (always in DOM — renders under the intro) ── */}
-      <div style={{ width: '100%', height: '100%', visibility: introComplete ? 'visible' : 'hidden' }}>
+      {/* ── PORTFOLIO (always in DOM — renders under the loader) ── */}
+      <div style={{ width: '100%', height: '100%', visibility: loaded ? 'visible' : 'hidden' }}>
 
         <Navbar
           menuOpen={menuOpen}
           onToggle={() => (menuOpen ? closeMenu() : openMenu())}
           onLogoClick={() => goTo(0)}
-          onTerminal={() => setTerminalOpen(true)}
           themeToggle={
             <ThemeToggle
               theme={theme}
@@ -83,9 +106,16 @@ export default function App() {
 
         {menuOpen && <div className="menu-close-overlay" onClick={closeMenu} />}
 
-        <NavList show={menuOpen} onSelect={goTo} />
+        <NavList show={menuOpen} active={activePage} onSelect={goTo} />
 
         <QuotesPanel visible={menuOpen} />
+
+        <PageProgress
+          active={activePage}
+          total={PAGES.length}
+          scrollRefs={scrollRefs}
+          hidden={menuOpen}
+        />
 
         <div
           className={`page-container${menuOpen ? ' active' : ''}`}
@@ -105,6 +135,9 @@ export default function App() {
                 ref={(el) => (scrollRefs.current[i] = el)}
                 className="page-scroll"
                 onWheel={(e) => handleWheel(e, i)}
+                onTouchStart={(e) => handleTouchStart(e, i)}
+                onTouchMove={(e) => handleTouchMove(e, i)}
+                onTouchEnd={handleTouchEnd}
               >
                 {page}
               </div>
@@ -113,17 +146,20 @@ export default function App() {
         </div>
       </div>
 
-      {/* ── TERMINAL overlay ── */}
-      <Terminal
-        open={terminalOpen}
-        onClose={() => setTerminalOpen(false)}
-        onNavigate={goTo}
-        theme={theme}
-        setTheme={setTheme}
-      />
+      {/* ── TERMINAL (button bottom-left + docked window) ── */}
+      {loaded && (
+        <Terminal
+          open={terminalOpen}
+          onOpen={() => setTerminalOpen(true)}
+          onClose={() => setTerminalOpen(false)}
+          onNavigate={goTo}
+          theme={theme}
+          setTheme={setTheme}
+        />
+      )}
 
       {/* ── GESTURE NAVIGATION (camera button + overlay) ── */}
-      {introComplete && <GestureNav />}
+      {loaded && <GestureNav />}
 
       {/* ── OUTRO overlay (scrolled past the last page) ── */}
       {outroOpen && (
@@ -133,10 +169,12 @@ export default function App() {
         />
       )}
 
-      {/* ── INTRO overlay (removed from DOM once complete) ── */}
-      {!introComplete && (
-        <Intro onComplete={() => setIntroComplete(true)} />
-      )}
+      {/* ── EASTER EGGS: flash notification and the lost page ── */}
+      <EggToast />
+      {lost && <LostPage onLeave={leaveLost} />}
+
+      {/* ── LOADER (removed from DOM once the site is ready) ── */}
+      {!loaderGone && <Loader onReveal={handleReveal} onComplete={handleLoaderDone} />}
     </>
   );
 }

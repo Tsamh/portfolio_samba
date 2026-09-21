@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Avatar, { HAIR_POINT } from './Avatar';
-import '../css/Intro.css';
+import { findEgg } from '../lib/eggs';
+import '../css/Outro.css';
 
 const MAX_ZOOM = 34;
 
@@ -12,9 +13,13 @@ function lerp(a, b, t) {
  * Exit overlay — mirror of the intro, fully scroll-driven.
  * We start inside the black hair; scrolling DOWN pulls us out of the
  * avatar's head, and he waves goodbye. Scrolling back UP dives back
- * in and returns to the site.
+ * in and returns to the site. Once out, the jacket pocket hides the
+ * paper easter egg (3 clicks).
  *
- * @param {function} onExit - close the outro (back to the site)
+ * On touch screens it comes out on its own as soon as it opens; a swipe
+ * down dives back in. Any swipe finishes by itself once the finger lifts.
+ *
+ * @param {function} onExit - close the outro (back to the site), on scroll
  * @param {function} onHome - close and navigate back to Home
  */
 export default function Outro({ onExit, onHome }) {
@@ -25,6 +30,7 @@ export default function Outro({ onExit, onHome }) {
   const current    = useRef(1);
   const closed     = useRef(false);
   const originSet  = useRef(false);
+  const leftHair   = useRef(false); // has the visitor started to come out yet?
   const [idle, setIdle] = useState(false); // fully out → bubble + actions
 
   const tick = useCallback(() => {
@@ -61,9 +67,14 @@ export default function Outro({ onExit, onHome }) {
     }
 
     setIdle(p < 0.03);
+    if (p < 0.03) findEgg('avatar');   // fully out: the avatar is on screen
+    if (target.current < 0.9) leftHair.current = true;
 
-    // scrolled all the way back up → dive back into the site
-    if (p > 0.985 && target.current > 0.985) {
+    // scrolled all the way back up → dive back into the site.
+    // Only after having left: the outro OPENS at p = 1, and without this
+    // guard it closed itself on its very first frame whenever no scroll was
+    // in progress — always the case on phones, where it opens from momentum.
+    if (leftHair.current && p > 0.985 && target.current > 0.985) {
       closed.current = true;
       onExit();
       return;
@@ -72,7 +83,13 @@ export default function Outro({ onExit, onHome }) {
     rafRef.current = requestAnimationFrame(tick);
   }, [onExit]);
 
-  /* scroll drives the exit — nothing is automatic */
+  /* Touch screens: come out on our own — a thumb should not have to fight
+     for it. The visitor can still swipe back down to dive in again. */
+  useEffect(() => {
+    if (window.matchMedia('(pointer: coarse)').matches) target.current = 0;
+  }, []);
+
+  /* mouse / trackpad: scroll drives the exit */
   useEffect(() => {
     rafRef.current = requestAnimationFrame(tick);
 
@@ -85,12 +102,22 @@ export default function Outro({ onExit, onHome }) {
     };
 
     let touchY = 0;
-    const onTouchStart = (e) => { touchY = e.touches[0].clientY; };
+    let touchFrom = 1;
+    const onTouchStart = (e) => {
+      touchY = e.touches[0].clientY;
+      touchFrom = target.current;
+    };
     const onTouchMove  = (e) => {
       e.preventDefault();
       const dy = touchY - e.touches[0].clientY;
       target.current = clamp01(target.current - dy * 0.005);
       touchY = e.touches[0].clientY;
+    };
+    /* snap: no need to drag the whole way on a phone */
+    const onTouchEnd = () => {
+      const moved = target.current - touchFrom;
+      if (moved < -0.02) target.current = 0;
+      else if (moved > 0.1) target.current = 1;
     };
 
     const onKey = (e) => {
@@ -104,6 +131,7 @@ export default function Outro({ onExit, onHome }) {
     window.addEventListener('wheel',      onWheel,      { passive: false });
     window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('touchmove',  onTouchMove,  { passive: false });
+    window.addEventListener('touchend',   onTouchEnd);
     window.addEventListener('keydown',    onKey);
 
     return () => {
@@ -111,6 +139,7 @@ export default function Outro({ onExit, onHome }) {
       window.removeEventListener('wheel',      onWheel);
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove',  onTouchMove);
+      window.removeEventListener('touchend',   onTouchEnd);
       window.removeEventListener('keydown',    onKey);
     };
   }, [tick, onExit]);
@@ -120,6 +149,7 @@ export default function Outro({ onExit, onHome }) {
 
       <div ref={zoomRef} className="intro-zoom">
         <Avatar
+          easterEgg
           bubble={
             idle ? (
               <>
@@ -132,17 +162,9 @@ export default function Outro({ onExit, onHome }) {
         />
       </div>
 
-      {!idle && (
-        <div className="intro-hint" style={{ opacity: 1 }}>
-          <span>Keep scrolling</span>
-          <div className="intro-hint-arrow" />
-        </div>
-      )}
-
       {idle && (
         <div className="outro-actions">
           <button className="outro-btn" onClick={onHome}>Back to start</button>
-          <button className="outro-btn ghost" onClick={() => { onExit(); }}>Return to site</button>
         </div>
       )}
     </div>

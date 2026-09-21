@@ -1,41 +1,83 @@
+import { useCallback, useState } from 'react';
 import TypingText from '../components/TypingText';
 import Reveal from '../components/Reveal';
-import AvatarScene from '../components/AvatarScene';
+import LordIcon from '../components/LordIcon';
+import CvPreview from '../components/CvPreview';
+import { SOCIALS } from '../lib/links';
+import { SKILLS } from '../lib/skills';
+import chibiSrc from '../assets/avatar/chibime.png';
 import '../css/pages.css';
 
 /* The former About page is now the site's Home. */
 
-const ROLES = ['IA Engineer', 'Data Engineer', 'MLOps', 'DevOps', 'Fullstack Dev'];
+/* typed in red, with a fixed "Engineer" after them */
+const ROLES = ['Data & AI', 'Software'];
 
-const SKILLS = [
-  'Python / TensorFlow / PyTorch',
-  'LLMs / RAG / LangChain',
-  'SQL / Spark / Kafka / Airflow',
-  'Docker / Kubernetes / CI-CD',
-  'AWS / Terraform / Linux',
-  'React / Node.js / TypeScript',
-];
+/* Official logos, stored in src/assets/skills/<file>.svg */
+const LOGOS = import.meta.glob('../assets/skills/*.svg', { eager: true, import: 'default' });
+const logo = (file) => LOGOS[`../assets/skills/${file}.svg`];
 
-const TIMELINE = [
-  { year: '2025–now',  role: 'AI Engineer',         place: 'Building LLM & vision systems' },
-  { year: '2024–2025', role: 'Data Engineer',        place: 'Pipelines, lakes & streaming' },
-  { year: '2023–2024', role: 'DevOps Engineer',      place: 'Cloud infra & automation' },
-  { year: '2022–2023', role: 'Fullstack Developer',  place: 'Web apps end to end' },
-];
 
-const SOCIALS = ['GitHub', 'LinkedIn', 'Kaggle'];
+/* hand-drawn red stars, spread along the About section: one next to the
+   title, one halfway down, one at the very bottom. Each one spins. */
+function Star({ className, size }) {
+  return (
+    <span className={`about-star ${className}`} style={{ width: size, height: size }}>
+      <svg viewBox="-20 -20 40 40" fill="none" stroke="var(--accent)" strokeWidth="6"
+           strokeLinecap="round" aria-hidden="true">
+        <path d="M0-16V16M-14-8 14 8M-14 8 14-8" />
+      </svg>
+    </span>
+  );
+}
 
 export default function Home() {
+  const [cvOpen, setCvOpen] = useState(false);
+  const closeCv = useCallback(() => setCvOpen(false), []);
+
   return (
     <>
       <div className="hero-section hero-about">
-        <h1 className="title">
-          <TypingText words={ROLES} />
-        </h1>
-        <p className="subtitle">From data to deployment</p>
+        <div className="hero-about-text">
+          <h1 className="title">
+            <span className="title-typed"><TypingText words={ROLES} /></span>{' '}
+            Engineer
+          </h1>
+          <p className="subtitle">Pipelines, platforms and models, end to end</p>
+
+          <button className="see-cv-btn" onClick={() => setCvOpen(true)} type="button">
+            See CV
+          </button>
+        </div>
+
+        <div className="hero-visual">
+          <img src={chibiSrc} alt="Chibi Samba" className="hero-chibi" draggable={false} />
+
+          <div className="hero-socials">
+            {SOCIALS.map(({ icon, label, href }) => (
+              <a
+                key={label}
+                href={href}
+                className="hero-link"
+                aria-label={label}
+                title={label}
+                {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                <LordIcon name={icon} size={42} />
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <section className="content-section alt">
+      <section className="content-section alt about-section">
+        {/* red stars in the empty space left of the text */}
+        <span className="about-stars" aria-hidden="true">
+          <Star className="s0" size={72} />
+          <Star className="s1" size={112} />
+          <Star className="s2" size={46} />
+        </span>
+
         <Reveal from="left">
           <div className="about-grid">
             <div className="about-text">
@@ -54,47 +96,22 @@ export default function Home() {
 
             <div className="skills-list">
               <h3>Skills</h3>
-              <ul>
-                {SKILLS.map((s) => <li key={s}>{s}</li>)}
+              <ul className="skills-logos">
+                {SKILLS.map(({ name, file }) => (
+                  <li key={name} className="skill-logo" title={name}>
+                    <span className="skill-logo-tile">
+                      <img src={logo(file)} alt="" draggable={false} />
+                    </span>
+                    <span className="skill-logo-name">{name}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
         </Reveal>
       </section>
 
-      <section className="content-section">
-        <Reveal from="right">
-          <div className="content-block centered">
-            <h2>Experience</h2>
-            <div className="timeline">
-              {TIMELINE.map(({ year, role, place }) => (
-                <div key={year} className="timeline-item">
-                  <span className="timeline-year">{year}</span>
-                  <div><strong>{role}</strong> — {place}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Reveal>
-      </section>
-
-      <section className="content-section alt">
-        <Reveal from="left">
-          <AvatarScene variant="home" />
-        </Reveal>
-      </section>
-
-      <section className="content-section">
-        <Reveal from="right">
-          <div className="contact-block">
-            <h2>Get in touch</h2>
-            <p>tsambahama@gmail.com</p>
-            <div className="social-links">
-              {SOCIALS.map((s) => <span key={s}>{s}</span>)}
-            </div>
-          </div>
-        </Reveal>
-      </section>
+      <CvPreview open={cvOpen} onClose={closeCv} />
     </>
   );
 }

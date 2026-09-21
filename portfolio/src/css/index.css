@@ -38,14 +38,18 @@
   padding: 0;
   box-sizing: border-box;
 }
-
+@font-face {
+    font-family: 'police';
+    src: url('./fonts/') format('truetype');
+} 
 html,
 body,
 #root {
-  width: 100%;
+  width: 100%; 
   height: 100%;
+  font-family: 'police', sans-serif;
 }
-
+ 
 body {
   display: flex;
   justify-content: center;
@@ -68,6 +72,35 @@ body,
     background-color 0.45s ease,
     color 0.45s ease,
     border-color 0.45s ease;
+}
+
+/* ─── TEXT SELECTION ─────────────────────────────────────────── */
+/* Both rules are needed: ::-moz-selection must live in its own block,
+   Firefox drops the whole declaration if it is grouped with ::selection. */
+::selection {
+  background: var(--accent);
+  color: #fff;
+  text-shadow: none;
+}
+
+::-moz-selection {
+  background: var(--accent);
+  color: #fff;
+  text-shadow: none;
+}
+
+/* On the always-black surfaces (terminal, lightbox) an inverted
+   selection reads better: red text instead of a red block. */
+.terminal-window ::selection,
+.lightbox ::selection {
+  background: rgba(220, 38, 38, 0.28);
+  color: var(--accent);
+}
+
+.terminal-window ::-moz-selection,
+.lightbox ::-moz-selection {
+  background: rgba(220, 38, 38, 0.28);
+  color: var(--accent);
 }
 
 /* ─── PAGE TRANSITION ANIMATION ─────────────────────────────── */

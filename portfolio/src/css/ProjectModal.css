@@ -1,0 +1,174 @@
+/* ─── PROJECT DETAILS MODAL ──────────────────────────────────── */
+.pm-root {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.pm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  animation: pm-fade 0.4s ease both;
+}
+
+.pm-backdrop.closing { animation: pm-fade-out 0.38s ease both; }
+
+@keyframes pm-fade     { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pm-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* not full screen: a centred card, the page stays visible around it */
+.pm-panel {
+  position: relative;
+  width: min(900px, 100%);
+  max-height: min(86vh, 640px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 14px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  transform-origin: top left;
+  will-change: transform;
+}
+
+.pm-media {
+  align-self: start;
+  padding: 18px 0 18px 18px;
+}
+
+.pm-media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;   /* same ratio as the orbit cards: uniform zoom */
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.pm-body {
+  position: relative;
+  padding: 26px 26px 24px;
+  overflow-y: auto;
+  animation: pm-content-in 0.35s ease 0.28s both;
+}
+
+.pm-panel.closing .pm-body { animation: pm-content-out 0.16s ease both; }
+
+@keyframes pm-content-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes pm-content-out {
+  to { opacity: 0; }
+}
+
+.pm-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease, transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.pm-close:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: rotate(90deg);
+}
+
+.pm-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  letter-spacing: 0.03em;
+  line-height: 1;
+  padding-right: 40px;
+}
+
+.pm-summary {
+  margin: 0.5rem 0 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.pm-text {
+  margin-bottom: 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text-soft);
+}
+
+.pm-stack {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1.1rem 0 1.3rem;
+}
+
+.pm-stack li {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text-soft);
+}
+
+.pm-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.pm-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 1rem 0.45rem 0.7rem;
+  border: 1.5px solid var(--text);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1.4, 0.36, 1),
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+.pm-link:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.22);
+}
+
+/* phones: image on top, text below */
+@media (max-width: 700px) {
+  .pm-panel {
+    grid-template-columns: 1fr;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .pm-media { padding: 14px 14px 0; }
+  .pm-body { padding: 18px 18px 20px; overflow: visible; }
+}

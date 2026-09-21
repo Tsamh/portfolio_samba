@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import avatarSrc from '../assets/avatar/normal.png';
+import { findEgg } from '../lib/eggs';
 import '../css/Avatar.css';
 
 /* ── Calibration (percent of the image box, normal.png 964×1240) ── */
@@ -115,7 +116,11 @@ export default function Avatar({ easterEgg = false, bubble = null }) {
 
   const onPocketClick = (e) => {
     e.stopPropagation();
-    setPaperStage((s) => (s >= 3 ? 0 : s + 1)); // 4th click tucks it back
+    setPaperStage((s) => {
+      const next = s >= 3 ? 0 : s + 1;          // 4th click tucks it back
+      if (next === 3) findEgg('pocket');        // the note is readable now
+      return next;
+    });
   };
 
   return (

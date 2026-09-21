@@ -47,38 +47,97 @@ export function usePortfolio(totalPages = 4, onEndReached) {
   }, [activePage, closeMenu]);
 
   /* ── scroll navigation ────────────────────────────────────── */
+  function edges(el) {
+    return {
+      atBottom: el.scrollTop + el.clientHeight >= el.scrollHeight - 2,
+      atTop:    el.scrollTop <= 0,
+    };
+  }
+
+  /* Leaves the page when it is already pinned against the edge the
+     visitor keeps pushing on. Returns true when a navigation happened. */
+  function leavePage(pageIndex, goingDown, { atTop, atBottom }) {
+    if (goingDown && atBottom && pageIndex < TOTAL_PAGES - 1) {
+      _scrollTo(pageIndex + 1, 'down');
+      return true;
+    }
+    if (goingDown && atBottom && pageIndex === TOTAL_PAGES - 1 && onEndReached) {
+      // past the very last page → exit animation
+      cooling.current = true;
+      setTimeout(() => { cooling.current = false; }, 1500);
+      onEndReached();
+      return true;
+    }
+    if (!goingDown && atTop && pageIndex > 0) {
+      _scrollTo(pageIndex - 1, 'up');
+      return true;
+    }
+    return false;
+  }
+
   const handleWheel = useCallback((e, pageIndex) => {
     if (cooling.current || menuOpen) return;
 
     const el = scrollRefs.current[pageIndex];
     if (!el) return;
 
-    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
-    const atTop    = el.scrollTop <= 0;
-    const goingDown = e.deltaY > 0;
+    if (leavePage(pageIndex, e.deltaY > 0, edges(el))) e.preventDefault();
+  }, [menuOpen, onEndReached]); // eslint-disable-line
 
-    if (goingDown && atBottom && pageIndex < TOTAL_PAGES - 1) {
-      e.preventDefault();
-      _scrollTo(pageIndex + 1, 'down');
-    } else if (goingDown && atBottom && pageIndex === TOTAL_PAGES - 1 && onEndReached) {
-      // past the very last page → exit animation
-      e.preventDefault();
-      cooling.current = true;
-      setTimeout(() => { cooling.current = false; }, 1500);
-      onEndReached();
-    } else if (!goingDown && atTop && pageIndex > 0) {
-      e.preventDefault();
-      _scrollTo(pageIndex - 1, 'up');
+  /* ── touch navigation (phones have no wheel) ──────────────────
+     A wheel keeps firing while the page is already pinned at its edge, which
+     is what flips the page on a desktop in one go. A finger has to do the
+     same: we count how far it keeps pulling once the page can no longer
+     scroll, and change page during the gesture instead of waiting for the
+     finger to lift and a second swipe to start. */
+  const OVERSCROLL = 48;   // px of pull past the edge before leaving
+  const touch = useRef(null);
+
+  const handleTouchStart = useCallback((e, pageIndex) => {
+    const el = scrollRefs.current[pageIndex];
+    if (!el || e.touches.length !== 1) return;
+    const { clientX, clientY } = e.touches[0];
+    touch.current = { x: clientX, y: clientY, pull: 0, fired: false };
+  }, []);
+
+  const handleTouchMove = useCallback((e, pageIndex) => {
+    const t = touch.current;
+    if (!t || t.fired || cooling.current || menuOpen || e.touches.length !== 1) return;
+
+    const el = scrollRefs.current[pageIndex];
+    if (!el) return;
+
+    const { clientX, clientY } = e.touches[0];
+    const dy = t.y - clientY;          // > 0 → finger up → going down the page
+    const dx = clientX - t.x;
+    t.y = clientY;
+    t.x = clientX;
+    if (Math.abs(dy) < Math.abs(dx)) return;   // horizontal swipe: not for us
+
+    const { atTop, atBottom } = edges(el);
+    if (dy > 0 && atBottom) t.pull = Math.max(0, t.pull) + dy;
+    else if (dy < 0 && atTop) t.pull = Math.min(0, t.pull) + dy;
+    else t.pull = 0;                            // still scrolling inside
+
+    if (Math.abs(t.pull) > OVERSCROLL) {
+      t.fired = leavePage(pageIndex, t.pull > 0, edges(el));
     }
   }, [menuOpen, onEndReached]); // eslint-disable-line
+
+  const handleTouchEnd = useCallback(() => {
+    touch.current = null;
+  }, []);
 
   function _scrollTo(nextIndex, dir) {
     cooling.current = true;
     setScrollDir(dir);
 
-    // reset the target page's scroll position immediately
-    if (scrollRefs.current[nextIndex]) {
-      scrollRefs.current[nextIndex].scrollTop = 0;
+    // going down starts the next page at its top; going up lands on the
+    // previous page's LAST section, the one directly above where we were.
+    // 'instant' overrides the container's smooth scroll-behavior.
+    const next = scrollRefs.current[nextIndex];
+    if (next) {
+      next.scrollTo({ top: dir === 'up' ? next.scrollHeight : 0, behavior: 'instant' });
     }
 
     // switch page on the next frame so the CSS animation class is ready
@@ -97,5 +156,6 @@ export function usePortfolio(totalPages = 4, onEndReached) {
     menuOpen, activePage, sliding, scrollDir,
     scrollRefs,
     openMenu, closeMenu, goTo, handleWheel,
+    handleTouchStart, handleTouchMove, handleTouchEnd,
   };
 }
