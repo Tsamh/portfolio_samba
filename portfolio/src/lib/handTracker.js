@@ -6,8 +6,9 @@
  * download it.
  */
 
-const WASM_PATH = '/mediapipe/wasm';
-const MODEL_PATH = '/models/hand_landmarker.task';
+/* BASE_URL is '/' locally and '/<repo>/' on GitHub Pages */
+const WASM_PATH = `${import.meta.env.BASE_URL}mediapipe/wasm`;
+const MODEL_PATH = `${import.meta.env.BASE_URL}models/hand_landmarker.task`;
 
 export async function createHandTracker() {
   const { FilesetResolver, HandLandmarker } = await import('@mediapipe/tasks-vision');

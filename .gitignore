@@ -20,3 +20,15 @@ npm-debug.log*
 
 # subagent-driven-development scratch
 .superpowers/
+
+# full-size photos kept out of the bundle (web copies live in src/assets)
+portfolio/originals/
+
+# personal photo libraries: they stay on disk, the published site shows
+# "Coming soon" for the Extra and Random pages instead
+portfolio/src/assets/extra/
+portfolio/src/assets/random/
+
+# scratch prototypes
+inprogress/
+portfolio/s.html
