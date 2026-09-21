@@ -20,17 +20,17 @@ const SITE_REPO = 'https://github.com/Tsamh/Tsamh.github.io.git';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
 
+/* No shell: on Windows it re-joins the arguments without quoting them, and a
+   commit message with a space ends up split into several arguments. */
 const run = (cmd, args, cwd, env) =>
-  execFileSync(cmd, args, {
-    cwd,
-    stdio: 'inherit',
-    shell: process.platform === 'win32',
-    env: { ...process.env, ...env },
-  });
+  execFileSync(cmd, args, { cwd, stdio: 'inherit', env: { ...process.env, ...env } });
 
 console.log('\n→ building');
 rmSync(dist, { recursive: true, force: true });
-run('npx', ['vite', 'build'], root, { VITE_SOON: '1' });
+// the binary directly rather than npx: no shell, so no platform quirks
+run(process.execPath, [resolve(root, 'node_modules/vite/bin/vite.js'), 'build'], root, {
+  VITE_SOON: '1',
+});
 
 // GitHub Pages runs Jekyll by default, which would drop anything starting
 // with an underscore; this file turns it off.
