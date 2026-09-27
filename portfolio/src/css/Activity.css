@@ -99,11 +99,14 @@
   outline: none;
 }
 
-/* The three slices tile the whole box with a small overlap — at every
-   instant of the transition the container is fully covered, so the empty
-   placeholder can never flash through. */
-.clip1 { clip-path: polygon(0 0, 46% 0, 39% 100%, 0 100%); }
-.clip2 { clip-path: polygon(19% 0, 87% 0, 64% 100%, 33% 100%); }
+/* The three slices tile the whole box edge to edge, each reaching only
+   1px under its right-hand neighbour — enough to hide the anti-aliased
+   seam, so the empty placeholder never flashes through. The overlap must
+   stay that thin: a slice shrinking back is raised above its neighbours
+   (.leaving) and drops under them at the end; any wider overlap would
+   show as a jump of the edge once the closing animation finishes. */
+.clip1 { clip-path: polygon(0 0, calc(19% + 1px) 0, calc(33% + 1px) 100%, 0 100%); }
+.clip2 { clip-path: polygon(19% 0, calc(82% + 1px) 0, calc(63% + 1px) 100%, 33% 100%); }
 .clip3 { clip-path: polygon(82% 0, 100% 0, 100% 100%, 63% 100%); }
 
 /* Only the hovered slice changes: it grows to fill the box, on top of the
@@ -112,6 +115,10 @@
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   z-index: 3;
 }
+
+/* the slice just left stays above its neighbours while it shrinks back,
+   under the newly hovered one */
+.clip.leaving { z-index: 2; }
 
 .clip:focus-visible {
   box-shadow: inset 0 0 0 2px var(--accent);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Reveal from './Reveal';
 import { useBackClose } from '../hooks/useBackClose';
@@ -20,8 +20,25 @@ import '../css/Activity.css';
 export default function ActivityRow({ title, desc, bullets = [], images, reverse = false }) {
   const [lightbox, setLightbox] = useState(-1);
   const [active, setActive] = useState(-1);   // hovered slice, JS-driven
+  const [leaving, setLeaving] = useState(-1);  // slice shrinking back
+  const leaveTimer = useRef(null);
   const count = images.length;
   const slices = images.slice(0, 3);
+
+  /* The slice that loses the hover keeps a raised layer while it shrinks:
+     dropped straight back under its neighbours, its edges would vanish
+     behind them at once instead of sliding back into place. */
+  const hover = (i) => {
+    if (i === active) return;
+    if (active >= 0) {
+      setLeaving(active);
+      clearTimeout(leaveTimer.current);
+      leaveTimer.current = setTimeout(() => setLeaving(-1), 550);
+    }
+    setActive(i);
+  };
+
+  useEffect(() => () => clearTimeout(leaveTimer.current), []);
 
   const prev = () => setLightbox((i) => (i - 1 + count) % count);
   const next = () => setLightbox((i) => (i + 1) % count);
@@ -64,17 +81,17 @@ export default function ActivityRow({ title, desc, bullets = [], images, reverse
           <div className="activity-media">
             <div
               className="clip-container"
-              onMouseLeave={() => setActive(-1)}
+              onMouseLeave={() => hover(-1)}
             >
               {slices.map((src, i) => (
                 <div
                   key={i}
-                  className={`clip clip${i + 1}${active === i ? ' active' : ''}`}
+                  className={`clip clip${i + 1}${active === i ? ' active' : ''}${leaving === i && active !== i ? ' leaving' : ''}`}
                   /* quoted: file names with spaces or parentheses, such as
                      "integration (2).jpeg", would break an unquoted url() */
                   style={{ backgroundImage: `url("${src}")` }}
-                  onMouseEnter={() => setActive(i)}
-                  onFocus={() => setActive(i)}
+                  onMouseEnter={() => hover(i)}
+                  onFocus={() => hover(i)}
                   onClick={() => setLightbox(i)}
                   role="button"
                   tabIndex={0}
