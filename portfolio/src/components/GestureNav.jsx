@@ -356,7 +356,7 @@ export default function GestureNav() {
         aria-label={status === ACTIVE ? 'Stop hand navigation' : 'Navigate with hand gestures'}
         title={status === ACTIVE ? 'Stop hand navigation' : 'Navigate with hand gestures'}
       >
-        <LordIcon name="camera" size={32} />
+        <LordIcon name="nocontact" size={36} />
       </button>
 
       {modalOpen && (

@@ -6,9 +6,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  padding: 2rem 1.5rem;
+  justify-content: flex-start;
+  padding: calc(2rem + env(safe-area-inset-top, 0px)) 1.5rem 2rem;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  cursor: default;
   text-align: center;
   background: var(--bg);
   color: var(--text);
@@ -20,11 +23,21 @@
   to   { opacity: 1; }
 }
 
-.lost-code {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(4rem, 14vw, 8rem);
-  line-height: 0.85;
-  color: var(--accent);
+/* the whole screen is the playfield: no board, the 404 itself is the wall */
+.lost-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.lost-head {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
 }
 
 .lost-title {
@@ -40,57 +53,40 @@
   color: var(--text-soft);
 }
 
-/* ── the game board ── */
-.lost-game {
-  position: relative;
-  width: min(720px, 92vw);
-  margin-top: 1.2rem;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--bg-alt);
-  overflow: hidden;
-  cursor: pointer;
-  touch-action: manipulation;
-  user-select: none;
-}
-
-.lost-canvas {
-  display: block;
-  width: 100%;
-  aspect-ratio: 3 / 1;
-}
-
-.lost-score {
+.lost-status {
   position: absolute;
-  top: 10px;
-  right: 14px;
+  left: 1.5rem;
+  bottom: calc(1.2rem + env(safe-area-inset-bottom, 0px));
   font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
-  color: var(--text);
-}
-
-.lost-score span {
-  margin-left: 0.6rem;
+  font-size: 0.78rem;
   color: var(--text-faint);
-  font-size: 0.72rem;
+  pointer-events: none;
 }
 
-.lost-over {
+.lost-status span {
+  margin-left: 0.8rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}
+
+.lost-msg {
   position: absolute;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  padding: 0.4rem 0.9rem;
-  border-radius: 6px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
+  bottom: calc(max(56px, 8vh) + 2.4rem);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 90vw;
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
+  color: var(--text-soft);
+  pointer-events: none;
+  animation: lost-in 0.35s ease;
 }
 
 .lost-btn {
-  margin-top: 1.4rem;
+  margin-top: 0.6rem;
   padding: 0.6rem 1.3rem;
   border: 1.5px solid currentColor;
   border-radius: 4px;

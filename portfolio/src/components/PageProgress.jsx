@@ -6,6 +6,8 @@ import '../css/PageProgress.css';
  * terminal button: how far down the current page you are. A shorter, dimmer
  * stub above and below says there is a page before or after (none above on
  * Home, none below on Contact).
+ * A page can mark where its content ends with `data-progress-end` (Contact's
+ * black void): the bar is full by the time that element enters the screen.
  *
  * @param {number}  active     - index of the current page
  * @param {number}  total      - number of pages
@@ -20,7 +22,13 @@ export default function PageProgress({ active, total, scrollRefs, hidden }) {
     if (!el) return;
 
     const update = () => {
-      const max = el.scrollHeight - el.clientHeight;
+      let max = el.scrollHeight - el.clientHeight;
+      const end = el.querySelector('[data-progress-end]');
+      if (end) {
+        const endTop = end.getBoundingClientRect().top
+          - el.getBoundingClientRect().top + el.scrollTop;
+        max = Math.min(max, endTop - el.clientHeight);
+      }
       setRatio(max > 4 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0);
     };
 

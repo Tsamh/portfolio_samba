@@ -10,6 +10,7 @@ import Outro          from './components/Outro';
 import GestureNav     from './components/GestureNav';
 import EggToast       from './components/EggToast';
 import PageProgress   from './components/PageProgress';
+import ScrollHint     from './components/ScrollHint';
 import LostPage       from './components/LostPage';
 import Home           from './pages/Home';
 import Projects       from './pages/Projects';
@@ -115,6 +116,13 @@ export default function App() {
           total={PAGES.length}
           scrollRefs={scrollRefs}
           hidden={menuOpen}
+        />
+
+        <ScrollHint
+          active={activePage}
+          total={PAGES.length}
+          scrollRefs={scrollRefs}
+          enabled={loaderGone && !menuOpen && !outroOpen && !lost}
         />
 
         <div

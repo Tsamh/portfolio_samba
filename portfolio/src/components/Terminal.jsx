@@ -367,12 +367,16 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
           inert={minimized ? '' : undefined}
           onClick={() => inputRef.current?.focus()}
         >
-          {/* header: title left, window controls right.
+          {/* header: window controls left, title after them.
               Double-clicking the bar toggles maximise. */}
           <div className="terminal-header" onDoubleClick={toggleMaximize}>
-            <span className="terminal-title">samba@portfolio: ~</span>
-
             <div className="terminal-controls">
+              <CtrlButton
+                kind="close"
+                tone="red"
+                label="Fermer"
+                onClick={onClose}
+              />
               <CtrlButton
                 kind="minimize"
                 tone="yellow"
@@ -385,13 +389,9 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
                 label={maximized ? 'Restaurer' : 'Agrandir'}
                 onClick={toggleMaximize}
               />
-              <CtrlButton
-                kind="close"
-                tone="red"
-                label="Fermer"
-                onClick={onClose}
-              />
             </div>
+
+            <span className="terminal-title">samba@portfolio: ~</span>
           </div>
 
           <div className="terminal-body" ref={bodyRef}>

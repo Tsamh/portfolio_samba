@@ -11,6 +11,81 @@ import '../css/Projects.css';
 
 const SPEED = 0.00012; // radians per ms — one lap every ~50 s
 
+const MAGNET_RANGE = 300; // px from a domain's edge where the cursor starts pulling it
+const MAGNET_MAX   = 38;  // px, how far a domain travels when the cursor is on it
+
+/** Domains lean towards the cursor, lightly. Each one follows at its own pace:
+    the nearest reacts first and hardest, the others trail behind line by line. */
+function useMagnet(listRef) {
+  useEffect(() => {
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!fine || reduced) return undefined;
+
+    let mouse = null;
+    let raf;
+    const state = new Map(); // li -> { x, y }
+
+    const onMove = (e) => { mouse = { x: e.clientX, y: e.clientY }; };
+    const onLeave = () => { mouse = null; };
+
+    const tick = () => {
+      raf = requestAnimationFrame(tick);
+      const list = listRef.current;
+      if (!list || !list.closest('.page')?.classList.contains('active')) return;
+
+      list.querySelectorAll(':scope > .pj-domain').forEach((li) => {
+        const cur = state.get(li) ?? { x: 0, y: 0 };
+        // measure the word itself from layout, without our own offset nor its
+        // hover shift, so the pull does not feed itself; the distance is taken
+        // from its edges, so a long word is reached from the right as easily
+        // as from the left
+        const btn = li.querySelector('button');
+        const box = li.getBoundingClientRect();
+        const r = { width: btn.offsetWidth, height: btn.offsetHeight };
+        const left = box.left - cur.x + btn.offsetLeft;
+        const top = box.top - cur.y + btn.offsetTop;
+        const cx = left + r.width / 2;
+        const cy = top + r.height / 2;
+
+        let tx = 0;
+        let ty = 0;
+        let ease = 0.06; // drifting back home
+        if (mouse) {
+          const ex = Math.max(left - mouse.x, 0, mouse.x - (left + r.width));
+          const ey = Math.max(top - mouse.y, 0, mouse.y - (top + r.height));
+          const near = Math.max(0, 1 - Math.hypot(ex, ey) / MAGNET_RANGE);
+          if (near > 0) {
+            const dx = mouse.x - cx;
+            const dy = mouse.y - cy;
+            const len = Math.hypot(dx, dy) || 1;
+            // never past the cursor itself
+            const pull = Math.min(len * 0.5, MAGNET_MAX * near * near);
+            tx = (dx / len) * pull;
+            ty = (dy / len) * pull;
+            ease = 0.04 + near * 0.14; // the closer, the quicker it answers
+          }
+        }
+
+        cur.x += (tx - cur.x) * ease;
+        cur.y += (ty - cur.y) * ease;
+        state.set(li, cur);
+        li.style.transform = `translate(${cur.x.toFixed(2)}px, ${cur.y.toFixed(2)}px)`;
+      });
+    };
+
+    window.addEventListener('mousemove', onMove, { passive: true });
+    document.addEventListener('mouseleave', onLeave);
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseleave', onLeave);
+      state.forEach((_, li) => { li.style.transform = ''; });
+    };
+  }, [listRef]);
+}
+
 /** Hand-drawn stroke behind the wordmark, one per domain.
     Redrawn on every domain change. */
 function Scribbles({ mark }) {
@@ -125,6 +200,8 @@ function Orbit({ domain, paused: frozen, onOpen }) {
 export default function Projects() {
   const [active, setActive] = useState(DOMAINS[0].id);
   const [open, setOpen] = useState(null); // slug of the project in the modal
+  const domainsRef = useRef(null);
+  useMagnet(domainsRef);
   const domain = DOMAINS.find((d) => d.id === active);
 
   /* the card the modal grows out of (and shrinks back into) */
@@ -143,7 +220,7 @@ export default function Projects() {
           Selected <span className="pj-underline">projects</span>
         </h1>
         <p className="pj-sub">
-          From raw data to shipped products. Pick a domain, then click a project for the details.
+        <strong>Pick a domain on the right side</strong>, then click a project for the details.
         </p>
       </header>
 
@@ -153,7 +230,7 @@ export default function Projects() {
         <div className="pj-picker">
           <p className="pj-pick-hint">Pick a domain</p>
 
-          <ul className="pj-domains" aria-label="Domains">
+          <ul ref={domainsRef} className="pj-domains" aria-label="Domains">
           {DOMAINS.map((d) => {
             const isActive = d.id === active;
             return (

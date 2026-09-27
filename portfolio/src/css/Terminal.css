@@ -60,10 +60,10 @@
 .terminal-header {
   display: flex;
   align-items: center;
-  gap: 8px;
   height: var(--t-header-h);
   flex: 0 0 var(--t-header-h);
-  padding: 0 12px 0 14px;
+  gap: 12px;
+  padding: 0 14px 0 12px;
   background: #161b22;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   user-select: none;
@@ -79,9 +79,9 @@
   white-space: nowrap;
 }
 
-/* ── window controls: squares, on the RIGHT ── */
+/* ── window controls: squares, on the LEFT ── */
 .terminal-controls {
-  margin-left: auto;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 7px;

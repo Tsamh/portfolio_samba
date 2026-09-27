@@ -14,7 +14,7 @@
 
 [data-theme='dark'] .loader {
   --letter: #3b3d46;
-  --letter-peak: #d3d6e2;
+  --letter-peak: #fa0303;   /* the wave runs red on the dark ground too */
 }
 
 /* the smoke canvas takes over the background colour */

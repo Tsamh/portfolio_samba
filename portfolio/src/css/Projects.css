@@ -46,7 +46,7 @@
 .pj-sub {
   margin: 1.2rem auto 0;
   max-width: 520px;
-  font-size: 0.92rem;
+  font-size: 1.50rem;
   line-height: 1.65;
   color: var(--text-soft);
 }
@@ -261,7 +261,7 @@
 }
 
 .pj-pick-hint::after {
-  content: ' 93';   /* small arrow towards the list */
+  content: ' \2193';   /* small arrow towards the list */
   letter-spacing: 0;
 }
 
