@@ -39,11 +39,30 @@ const VOLUME = 0.12;
 
 let ctx;
 
+/* Browsers keep audio muted until the visitor has clicked, tapped or
+   pressed a key on the page, and no code can lift that. An egg found
+   before any of those (the 404 page opened straight from the address
+   bar) shows its notification at once and rings on that first gesture,
+   which the page hands over as soon as it happens. */
+const GESTURES = ['pointerdown', 'keydown', 'touchstart'];
+let waiting = false;
+
 function playChime() {
-  // Before any click or key press on the page the browser keeps audio
-  // muted; a chime queued now would only sound later, out of step with
-  // the notification, so it is skipped.
-  if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
+  if (navigator.userActivation && !navigator.userActivation.hasBeenActive) {
+    if (waiting) return;
+    waiting = true;
+    const first = () => {
+      GESTURES.forEach((t) => window.removeEventListener(t, first, true));
+      waiting = false;
+      ring();
+    };
+    GESTURES.forEach((t) => window.addEventListener(t, first, true));
+    return;
+  }
+  ring();
+}
+
+function ring() {
   try {
     ctx ??= new (window.AudioContext || window.webkitAudioContext)();
     if (ctx.state === 'suspended') ctx.resume();
