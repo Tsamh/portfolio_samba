@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CV, EMAIL, GITHUB, LINKEDIN_PLAIN } from '../lib/links';
 import { SKILLS } from '../lib/skills';
-import { EGGS, EGG_TOTAL, foundEggs } from '../lib/eggs';
+import { EGGS, EGG_TOTAL, foundEggs, resetEggs } from '../lib/eggs';
 import { DOMAINS, PROJECTS } from '../lib/projects';
 import terminalIcon from '../assets/icons/wired-lineal-1326-browser-terminal-hover-blinking.gif';
 import '../css/Terminal.css';
@@ -289,6 +289,12 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
         break;
 
       case 'eggs': {
+        // not in the help list: a way to hunt them all again
+        if (arg === 'reset') {
+          resetEggs();
+          print({ text: 'easter eggs forgotten: happy hunting, again', tone: 'ok' }, '');
+          break;
+        }
         const found = foundEggs();
         print({ text: `easter eggs found: ${found.length}/${EGG_TOTAL}`, tone: 'ok' });
         // only the ones already found are named: the others stay a surprise

@@ -1,10 +1,3 @@
-/* One sound per egg: the files in assets/sounds/ start with 1, 2 and 3 */
-const SOUNDS = Object.entries(
-  import.meta.glob('../assets/sounds/*.mp3', { eager: true, import: 'default' })
-)
-  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
-  .map(([, url]) => url);
-
 /* Three easter eggs hide in the site. Finding one flashes a notification;
    what has already been found is kept in localStorage, so the same egg only
    notifies once per browser. */
@@ -36,14 +29,35 @@ function write(found) {
   }
 }
 
-/** the nth chime, quietly: this is a notification, not a concert */
-function playChime(nth) {
-  const url = SOUNDS[nth - 1];
-  if (!url) return;
+/* One short, soft chime for every egg, synthesised on the spot with the
+   Web Audio API: no sound file, and no borrowed jingle. Two sine notes a
+   fifth apart (E6 then B6), each with a quick fade-in and a short tail. */
+const NOTES = [1318.5, 1975.5];   // Hz
+const GAP = 0.07;                 // s between the two notes
+const TAIL = 0.28;                // s each note takes to fade out
+const VOLUME = 0.12;
+
+let ctx;
+
+function playChime() {
   try {
-    const audio = new Audio(url);
-    audio.volume = 0.25;
-    audio.play().catch(() => {});   // a browser may refuse to autoplay
+    ctx ??= new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    const t0 = ctx.currentTime + 0.01;
+
+    NOTES.forEach((freq, i) => {
+      const start = t0 + i * GAP;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(VOLUME, start + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + TAIL);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + TAIL + 0.02);
+    });
   } catch {
     /* no audio: the notification still shows */
   }
@@ -53,6 +67,12 @@ function playChime(nth) {
 export function foundEggs() {
   const found = read();
   return Object.keys(EGGS).filter((id) => found.has(id));
+}
+
+/** Forget every egg found in this browser (terminal: `eggs reset`). */
+export function resetEggs() {
+  write(new Set());
+  window.dispatchEvent(new Event('portfolio:eggs-reset'));
 }
 
 /**
@@ -66,7 +86,8 @@ export function findEgg(id) {
 
   found.add(id);
   write(found);
-  playChime(found.size);
+  // in the same tick as the event the notification listens to
+  playChime();
   window.dispatchEvent(
     new CustomEvent('portfolio:egg', {
       detail: { id, label: EGGS[id], count: found.size, total: EGG_TOTAL },

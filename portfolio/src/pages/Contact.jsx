@@ -184,11 +184,11 @@ export default function Contact() {
   const rootRef = useRef(null);
   const voidRef = useRef(null);
 
-  /* Entering the black void (65% visible) smoothly opens the outro —
-     no need to fight the scroll to reach the exact bottom, which is
-     especially tedious with a thumb. The void is taller than the screen
-     (100vh + --page-tail), so the ratio is kept low enough to be reached
-     even on a phone whose toolbars eat part of the viewport. */
+  /* Reaching the last screen of the black void (60% of it visible)
+     smoothly opens the outro — no need to fight the scroll to reach the
+     exact bottom, which is especially tedious with a thumb. The void is
+     much taller than the screen, so what is watched is a screen-high
+     marker at its bottom, not the void itself. */
   useEffect(() => {
     const el = voidRef.current;
     if (!el) return;
@@ -196,11 +196,11 @@ export default function Contact() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         const pageActive = el.closest('.page')?.classList.contains('active');
-        if (pageActive && entry.intersectionRatio >= 0.65) {
+        if (pageActive && entry.intersectionRatio >= 0.6) {
           window.dispatchEvent(new Event('portfolio:outro'));
         }
       },
-      { threshold: [0.65] }
+      { threshold: [0.6] }
     );
 
     observer.observe(el);
@@ -256,7 +256,6 @@ export default function Contact() {
                 style={{ '--i': i }}
                 {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               >
-                <span className="ct-row-idx">0{i + 1}</span>
                 <span className="ct-row-icon"><LordIcon name={icon} size={34} /></span>
                 <span className="ct-row-label">{label}</span>
                 <span className="ct-row-value">{value}</span>
@@ -341,7 +340,8 @@ export default function Contact() {
       </section>
 
       {/* ── Black void before leaving the head (outro) ── */}
-      <section className="void-section" ref={voidRef} data-progress-end>
+      <section className="void-section" data-progress-end>
+        <span className="void-trigger" ref={voidRef} aria-hidden="true" />
         <span className="void-hint">Keep scrolling to leave my head</span>
       </section>
     </>

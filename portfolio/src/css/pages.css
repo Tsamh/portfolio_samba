@@ -480,12 +480,24 @@
 /* ── black void before the outro (end of Contact) ── */
 .void-section {
   width: 100%;
-  height: calc(100vh + var(--page-tail, 0px));
+  /* twice the end-of-page space: the black lingers before the outro */
+  height: calc(100vh + 2 * var(--page-tail, 0px));
+  position: relative;
   background: #000;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   padding-bottom: 3rem;
+}
+
+/* the last screen of the void: seeing most of it opens the outro */
+.void-trigger {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100vh;
+  pointer-events: none;
 }
 
 .void-hint {
@@ -539,7 +551,8 @@
 
   .feature-img img { height: 220px; }
 
-  .void-section { height: 100svh; }
+  .void-section { height: calc(100svh + 2 * var(--page-tail, 0px)); }
+  .void-trigger { height: 100svh; }
 }
 
 @media (max-width: 460px) {

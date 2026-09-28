@@ -59,7 +59,11 @@ export default function QuotesPanel({ visible }) {
   useEffect(() => {
     const refresh = () => setFound(foundEggs());
     window.addEventListener('portfolio:egg', refresh);
-    return () => window.removeEventListener('portfolio:egg', refresh);
+    window.addEventListener('portfolio:eggs-reset', refresh);
+    return () => {
+      window.removeEventListener('portfolio:egg', refresh);
+      window.removeEventListener('portfolio:eggs-reset', refresh);
+    };
   }, []);
 
   useEffect(() => {
