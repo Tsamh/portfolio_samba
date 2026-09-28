@@ -28,7 +28,7 @@ export const CERTIFICATES = [
   {
     slug: 'itma-entrepreneurship',
     title: 'ITMA entrepreneurship contest',
-    issuer: 'IPTAM, Bamako',
+    issuer: 'ITMA, Bamako',
     date: '2022 / 2023',
     note: 'Merit attestation for the project taken to the student entrepreneurship contest.',
   },

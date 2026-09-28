@@ -151,3 +151,43 @@
   .sk-cat-name { font-size: 0.66rem; }
   .sk-toggle > span:last-child { min-width: 0; }
 }
+
+/* ── "view all": spread the logos sideways rather than down ──
+   The Home grid widens and hands most of its width to the skills (the
+   text column narrows to the left), and the tiles get smaller, so every
+   skill fits in a few rows instead of a long column. */
+.about-grid {
+  transition:
+    grid-template-columns 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    max-width 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    gap 0.5s ease;
+}
+
+@media (min-width: 701px) {
+  .about-grid:has(.sk-all) {
+    max-width: 1100px;
+    grid-template-columns: 0.7fr 1.5fr;
+    gap: 3rem;
+  }
+}
+
+.sk-all .skills-logos {
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+  gap: 0.8rem 0.4rem;
+}
+
+.sk-all .skill-logo { gap: 0.35rem; }
+
+.sk-all .skill-logo-tile {
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.sk-all .skill-logo-name { font-size: 0.62rem; }
+
+@media (max-width: 420px) {
+  .sk-all .skills-logos { grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); }
+  .sk-all .skill-logo-tile { width: 40px; height: 40px; padding: 7px; }
+}

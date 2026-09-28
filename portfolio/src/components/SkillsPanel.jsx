@@ -60,7 +60,8 @@ export default function SkillsPanel() {
   }, []);
 
   return (
-    <div className="skills-list">
+    /* .sk-all also widens the Home grid around it (SkillsPanel.css) */
+    <div className={`skills-list${all ? ' sk-all' : ''}`}>
       <div className="sk-head">
         <h3>Skills</h3>
         <button
@@ -69,7 +70,7 @@ export default function SkillsPanel() {
           onClick={() => setAll((v) => !v)}
           aria-pressed={all}
         >
-          <LordIcon name={all ? 'grid-bento' : 'grid-array'} size={20} />
+          <LordIcon name={all ? 'grid-bento' : 'eye'} size={20} />
           <AnimatePresence mode="wait" initial={false}>
             <motion.span
               key={all ? 'cat' : 'all'}
@@ -93,7 +94,7 @@ export default function SkillsPanel() {
         <AnimatePresence mode="wait" initial={false}>
           {all ? (
             <motion.div key="all" className="sk-view" {...VIEW}>
-              <p className="sk-count">{SKILLS.length} tools, all areas</p>
+              <p className="sk-count">{SKILLS.length} tools</p>
               <motion.ul className="skills-logos" variants={LIST} initial="initial" animate="animate">
                 {SKILLS.map((s) => <Logo key={s.name} {...s} />)}
               </motion.ul>
