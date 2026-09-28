@@ -43,7 +43,7 @@ function Logo({ name, file }) {
  * between the two views.
  */
 export default function SkillsPanel() {
-  const [all, setAll] = useState(false);
+  const [all, setAll] = useState(true);   // opens on every skill at once
   const [active, setActive] = useState(SKILL_GROUPS[0].id);
   const group = SKILL_GROUPS.find((g) => g.id === active);
 
@@ -94,7 +94,6 @@ export default function SkillsPanel() {
         <AnimatePresence mode="wait" initial={false}>
           {all ? (
             <motion.div key="all" className="sk-view" {...VIEW}>
-              <p className="sk-count">{SKILLS.length} tools</p>
               <motion.ul className="skills-logos" variants={LIST} initial="initial" animate="animate">
                 {SKILLS.map((s) => <Logo key={s.name} {...s} />)}
               </motion.ul>

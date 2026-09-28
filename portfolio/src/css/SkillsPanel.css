@@ -43,14 +43,6 @@
 
 .sk-box > div { padding: 6px; }
 
-.sk-count {
-  margin-bottom: 0.9rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
 /* ── categories: a compact 3 × 2 board ── */
 .sk-cats {
   display: grid;

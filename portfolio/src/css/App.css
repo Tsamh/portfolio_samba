@@ -105,3 +105,13 @@
   /* no pull-to-refresh / bounce: the edge swipe changes page instead */
   overscroll-behavior: contain;
 }
+
+/* Breathing room at the end of every page but the last (Contact ends on
+   its black void and the outro): reaching the last section no longer
+   drops the visitor on the next page by accident. The space is drawn
+   inside that section, so it takes its background and blends in. */
+.page:not(:last-of-type) .page-scroll > section:last-of-type::after {
+  content: '';
+  display: block;
+  height: 18vh;
+}

@@ -1,4 +1,4 @@
-import logoSrc from '../assets/s.png';
+import logoSrc from '../assets/logo_samba.png';
 import '../css/Navbar.css';
 
 /**

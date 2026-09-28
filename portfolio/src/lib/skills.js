@@ -26,6 +26,7 @@ export const SKILL_GROUPS = [
     blurb: 'Move, clean and shape data at scale, batch or streaming.',
     skills: [
       { name: 'Spark',   file: 'spark' },
+      { name: 'Scala',   file: 'scala' },
       { name: 'Kafka',   file: 'kafka' },
       { name: 'Airflow', file: 'airflow' },
       { name: 'Hadoop',  file: 'hadoop' },
