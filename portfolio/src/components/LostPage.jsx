@@ -10,8 +10,9 @@ const FONT = '"Bebas Neue", Impact, sans-serif';
  * The message itself is the game: the big 404 is made of bricks and you
  * knock it down, Breakout style, with the whole screen as the playfield.
  * @param {function} onLeave
+ * @param {boolean}  ready   - false while the loader still covers the site
  */
-export default function LostPage({ onLeave }) {
+export default function LostPage({ onLeave, ready = true }) {
   const rootRef = useRef(null);
   const canvasRef = useRef(null);
   const launchRef = useRef(() => {});
@@ -19,7 +20,26 @@ export default function LostPage({ onLeave }) {
   const [lives, setLives] = useState(LIVES);
   const [phase, setPhase] = useState('ready'); // ready | play | lost | won
 
-  useEffect(() => { findEgg('lost'); }, []);
+  /* The egg is announced once the visitor can see it and hear it. Reached
+     straight from the address bar, the page opened under the loader: the
+     notification played out behind it, and the browser muted the chime
+     because nobody had interacted with the page yet. So: wait for the
+     loader, then, if the page has had no click or key press so far, wait
+     for the first one (the game needs it anyway). */
+  useEffect(() => {
+    if (!ready) return undefined;
+    if (navigator.userActivation?.hasBeenActive ?? true) {
+      findEgg('lost');
+      return undefined;
+    }
+    const EVENTS = ['pointerdown', 'keydown', 'touchstart'];
+    const first = () => {
+      EVENTS.forEach((t) => window.removeEventListener(t, first, true));
+      findEgg('lost');
+    };
+    EVENTS.forEach((t) => window.addEventListener(t, first, true));
+    return () => EVENTS.forEach((t) => window.removeEventListener(t, first, true));
+  }, [ready]);
 
   const leave = useCallback(() => onLeave(), [onLeave]);
 

@@ -180,7 +180,7 @@ export default function App() {
 
       {/* ── EASTER EGGS: flash notification and the lost page ── */}
       <EggToast />
-      {lost && <LostPage onLeave={leaveLost} />}
+      {lost && <LostPage onLeave={leaveLost} ready={loaderGone} />}
 
       {/* ── LOADER (removed from DOM once the site is ready) ── */}
       {!loaderGone && <Loader onReveal={handleReveal} onComplete={handleLoaderDone} />}
