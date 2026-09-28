@@ -106,12 +106,15 @@
   overscroll-behavior: contain;
 }
 
-/* Breathing room at the end of every page but the last (Contact ends on
-   its black void and the outro): reaching the last section no longer
-   drops the visitor on the next page by accident. The space is drawn
-   inside that section, so it takes its background and blends in. */
+/* Breathing room at the end of every page: reaching the last section no
+   longer drops the visitor on the next page (or into the outro) by
+   accident. The space is drawn inside that section, so it takes its
+   background and blends in. On Contact that section is the black void,
+   which simply grows by the same amount (pages.css). */
+:root { --page-tail: 36vh; }
+
 .page:not(:last-of-type) .page-scroll > section:last-of-type::after {
   content: '';
   display: block;
-  height: 18vh;
+  height: var(--page-tail);
 }

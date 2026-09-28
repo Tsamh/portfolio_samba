@@ -184,9 +184,11 @@ export default function Contact() {
   const rootRef = useRef(null);
   const voidRef = useRef(null);
 
-  /* Entering the black void (60% visible) smoothly opens the outro —
+  /* Entering the black void (65% visible) smoothly opens the outro —
      no need to fight the scroll to reach the exact bottom, which is
-     especially tedious with a thumb. */
+     especially tedious with a thumb. The void is taller than the screen
+     (100vh + --page-tail), so the ratio is kept low enough to be reached
+     even on a phone whose toolbars eat part of the viewport. */
   useEffect(() => {
     const el = voidRef.current;
     if (!el) return;
@@ -194,11 +196,11 @@ export default function Contact() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         const pageActive = el.closest('.page')?.classList.contains('active');
-        if (pageActive && entry.intersectionRatio >= 0.6) {
+        if (pageActive && entry.intersectionRatio >= 0.65) {
           window.dispatchEvent(new Event('portfolio:outro'));
         }
       },
-      { threshold: [0.6] }
+      { threshold: [0.65] }
     );
 
     observer.observe(el);
