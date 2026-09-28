@@ -232,8 +232,6 @@ export default function Projects() {
         <Orbit domain={domain} paused={open !== null} onOpen={setOpen} />
 
         <div className="pj-picker">
-          <p className="pj-pick-hint">Click a domain</p>
-
           <ul ref={domainsRef} className="pj-domains" aria-label="Domains">
           {DOMAINS.map((d) => {
             const isActive = d.id === active;

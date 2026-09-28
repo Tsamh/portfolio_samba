@@ -14,7 +14,7 @@ const META = [
 /* what the sentence form lets the visitor pick, straight from the intro */
 const TOPICS = ['an AI system', 'a data platform', 'cloud infrastructure', 'a fullstack app', 'just an idea'];
 
-const MARQUEE = ["Let's make it intelligent", 'Say hello', "Don't be a stranger"];
+const MARQUEE = ["Let's make it happen", 'Say hello', "Don't be a stranger"];
 
 const clock = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'Africa/Dakar', hour: '2-digit', minute: '2-digit', second: '2-digit',

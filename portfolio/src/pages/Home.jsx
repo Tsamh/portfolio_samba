@@ -4,7 +4,7 @@ import Reveal from '../components/Reveal';
 import LordIcon from '../components/LordIcon';
 import CvPreview from '../components/CvPreview';
 import { SOCIALS } from '../lib/links';
-import { SKILLS } from '../lib/skills';
+import SkillsPanel from '../components/SkillsPanel';
 import chibiSrc from '../assets/avatar/chibime.png';
 import '../css/pages.css';
 
@@ -13,9 +13,6 @@ import '../css/pages.css';
 /* typed in red, with a fixed "Engineer" after them */
 const ROLES = ['Data & AI', 'Software'];
 
-/* Official logos, stored in src/assets/skills/<file>.svg */
-const LOGOS = import.meta.glob('../assets/skills/*.svg', { eager: true, import: 'default' });
-const logo = (file) => LOGOS[`../assets/skills/${file}.svg`];
 
 
 /* hand-drawn red stars, spread along the About section: one next to the
@@ -94,19 +91,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="skills-list">
-              <h3>Skills</h3>
-              <ul className="skills-logos">
-                {SKILLS.map(({ name, file }) => (
-                  <li key={name} className="skill-logo" title={name}>
-                    <span className="skill-logo-tile">
-                      <img src={logo(file)} alt="" draggable={false} />
-                    </span>
-                    <span className="skill-logo-name">{name}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <SkillsPanel />
           </div>
         </Reveal>
       </section>

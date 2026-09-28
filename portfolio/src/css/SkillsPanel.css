@@ -1,0 +1,153 @@
+/* ─── SKILLS PANEL (Home) ────────────────────────────────────── */
+/* Logo tiles (.skills-logos, .skill-logo…) are styled in pages.css. */
+.sk-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sk-head h3 { margin-bottom: 0; }
+
+.sk-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem 0.35rem 0.6rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease, transform 0.3s cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.sk-toggle > span:last-child { display: inline-block; min-width: 8.5em; text-align: left; }
+
+.sk-toggle:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+.sk-toggle:hover .lord-icon { transform: rotate(90deg); }
+.sk-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* the height animates, so what overflows mid-change is hidden; the
+   padding leaves room for the tiles' hover tilt */
+.sk-box {
+  overflow: hidden;
+  margin: -6px;
+}
+
+.sk-box > div { padding: 6px; }
+
+.sk-count {
+  margin-bottom: 0.9rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* ── categories: a compact 3 × 2 board ── */
+.sk-cats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 14px 14px 0 0;
+  overflow: hidden;
+}
+
+.sk-cat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 74px;
+  padding: 0.6rem 0.4rem;
+  border: none;
+  background: var(--surface);
+  color: var(--text-soft);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* the underline of the selected category grows from the middle */
+.sk-cat::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sk-cat:hover { color: var(--text); }
+.sk-cat:hover .lord-icon { transform: scale(1.12); }
+
+.sk-cat.on {
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  color: var(--text);
+}
+
+.sk-cat.on::after { transform: scaleX(1); }
+.sk-cat:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.sk-cat-icon {
+  display: flex;
+  padding: 6px;
+  border-radius: 9px;
+  background: var(--bg-alt);
+  transition: background-color 0.25s ease;
+}
+
+.sk-cat.on .sk-cat-icon { background: color-mix(in srgb, var(--accent) 16%, var(--surface)); }
+
+.sk-cat-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+}
+
+/* ── the selected category ── */
+.sk-detail {
+  padding: 1.1rem 1.1rem 1.3rem;
+  border: 1px solid var(--line);
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 60%),
+    var(--surface);
+}
+
+.sk-detail h4 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.sk-detail p {
+  margin: 0.2rem 0 1rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+@media (max-width: 420px) {
+  .sk-cat { min-height: 66px; }
+  .sk-cat-name { font-size: 0.66rem; }
+  .sk-toggle > span:last-child { min-width: 0; }
+}

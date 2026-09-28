@@ -36,3 +36,7 @@ portfolio/s.html
 # local only: technical notes and planning docs
 portfolio/NOTES-DEV.md
 portfolio/docs/
+
+# design references, kept on disk only
+portfolio/src/assets/refskills.jpg
+portfolio/src/assets/skills.png

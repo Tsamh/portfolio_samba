@@ -251,20 +251,6 @@
 /* ─── DOMAINS ────────────────────────────────────────────────── */
 /* the list does not look like a control on its own: a hint and a dash in
    front of every entry say it can be clicked */
-.pj-pick-hint {
-  margin-bottom: 1.2rem;
-  font-family: 'Courier New', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
-.pj-pick-hint::after {
-  content: ' \2193';   /* small arrow towards the list */
-  letter-spacing: 0;
-}
-
 .pj-domains {
   list-style: none;
   display: flex;
@@ -374,7 +360,6 @@
   }
 
   .pj-picker { order: -1; display: flex; flex-direction: column; align-items: center; }
-  .pj-pick-hint { margin-bottom: 0.7rem; font-size: 0.64rem; }
   .pj-domain button::before { width: 10px; margin-right: 8px; }
 
   /* domains first, as a compact centred list */

@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import '../css/ScrollHint.css';
 
 const SHOW_MS = 2800;
+const AFTER_HOVER_MS = 1200;   // lingers a little once the pointer leaves
 
-function Hint({ edge, shown, onClick }) {
+function Hint({ edge, shown, onClick, onHold, onRelease }) {
   const arrow = (
     <svg className="scroll-hint-arrow" viewBox="0 0 24 24" width="16" height="16"
          fill="none" stroke="currentColor" strokeWidth="1.8"
@@ -16,6 +17,10 @@ function Hint({ edge, shown, onClick }) {
       type="button"
       className={`scroll-hint ${edge}${shown ? ' on' : ''}`}
       onClick={onClick}
+      onMouseEnter={onHold}
+      onMouseLeave={onRelease}
+      onFocus={onHold}
+      onBlur={onRelease}
       tabIndex={shown ? 0 : -1}
       aria-hidden={!shown}
       aria-label={edge === 'top' ? 'Go to the previous page' : 'Go to the next page'}
@@ -33,7 +38,8 @@ function Hint({ edge, shown, onClick }) {
  * – at the top, pointing up, when there is a page above (never on Home);
  * – at the bottom, pointing down, when there is a page below.
  * Never on the last page: its black void says it already.
- * While it shows, clicking it goes straight to that page.
+ * While it shows, clicking it goes straight to that page, and it stays up
+ * as long as the pointer rests on it.
  *
  * @param {number}  active     - index of the current page
  * @param {number}  total      - number of pages
@@ -90,10 +96,29 @@ export default function ScrollHint({ active, total, scrollRefs, enabled, onNavig
     };
   }, [active, total, scrollRefs, enabled]);
 
+  /* hovering holds the hint on screen; leaving restarts a short timer */
+  const hold = (key) => clearTimeout(timers.current[key]);
+  const release = (set, key) => {
+    clearTimeout(timers.current[key]);
+    timers.current[key] = setTimeout(() => set(false), AFTER_HOVER_MS);
+  };
+
   return (
     <>
-      <Hint edge="top" shown={top} onClick={() => onNavigate(active - 1)} />
-      <Hint edge="bottom" shown={bottom} onClick={() => onNavigate(active + 1)} />
+      <Hint
+        edge="top"
+        shown={top}
+        onClick={() => onNavigate(active - 1)}
+        onHold={() => hold('top')}
+        onRelease={() => top && release(setTop, 'top')}
+      />
+      <Hint
+        edge="bottom"
+        shown={bottom}
+        onClick={() => onNavigate(active + 1)}
+        onHold={() => hold('bottom')}
+        onRelease={() => bottom && release(setBottom, 'bottom')}
+      />
     </>
   );
 }
