@@ -1,6 +1,6 @@
 # Samba Hama Traoré: portfolio
 
-**Visit it here: [tsamh.github.io/portfolio](https://tsamh.github.io/portfolio/)**
+**Visit it here: [tsamh.github.io/portfolio_samba](https://tsamh.github.io/portfolio_samba/)**
 
 A personal portfolio for a Data, Software and AI engineer. Instead of a plain
 page of links, it's built to be explored. Here's what you can do there.

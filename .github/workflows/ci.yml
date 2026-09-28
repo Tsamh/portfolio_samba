@@ -1,5 +1,5 @@
 # Tests and builds the site on every push to main, then publishes it on
-# GitHub Pages: https://tsamh.github.io/portfolio/
+# GitHub Pages: https://tsamh.github.io/portfolio_samba/
 #
 # One-time setting: Settings > Pages > Build and deployment > Source must be
 # "GitHub Actions".
@@ -40,11 +40,11 @@ jobs:
 
       # VITE_SOON keeps the Extra and Random pages as placeholders: their
       # photos are not in this repository and their write-ups stay out of the
-      # bundle. BASE_PATH: Pages serves the site from /portfolio/.
+      # bundle. BASE_PATH: Pages serves the site from /portfolio_samba/.
       - run: npm run build
         env:
           VITE_SOON: '1'
-          BASE_PATH: /portfolio/
+          BASE_PATH: /portfolio_samba/
 
       - uses: actions/upload-pages-artifact@v3
         with:
