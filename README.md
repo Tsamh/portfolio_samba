@@ -2,6 +2,9 @@
 
 **Visit it here: [tsamh.github.io/portfolio_samba](https://tsamh.github.io/portfolio_samba/)**
 
+I built my portfolio to be a time capsule and a playground for my creativity.
+Be warned: it's quite the entertainment!
+
 Instead of a plain page of links, it's built to be explored. Here's what you can do there.
 
 ## The pages
@@ -49,7 +52,7 @@ Instead of a plain page of links, it's built to be explored. Here's what you can
 The site has a few **easter eggs**. I won't say where they are. A counter keeps
 track of the ones you find, and the terminal can tell you how you're doing.
 
-A tip: don't stop at the bottom of the last page. And getting lost on this site
+A tip: don't be afraid of darkness... and getting lost on this site
 is not always a bad thing.
 
 ## Works everywhere
