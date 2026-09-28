@@ -186,6 +186,13 @@
   font-weight: 300;
 }
 
+/* Extra and Random: the photo behind needs a heavier line to read */
+.hero-social .subtitle,
+.hero-fun .subtitle {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
 /* ── typing effect (About hero) ── */
 .typing-cursor {
   display: inline-block;

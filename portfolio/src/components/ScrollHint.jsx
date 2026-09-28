@@ -3,36 +3,45 @@ import '../css/ScrollHint.css';
 
 const SHOW_MS = 2800;
 
-function Hint({ edge, shown }) {
+function Hint({ edge, shown, onClick }) {
   const arrow = (
-    <svg className="scroll-hint-arrow" viewBox="0 0 24 24" width="22" height="22"
+    <svg className="scroll-hint-arrow" viewBox="0 0 24 24" width="16" height="16"
          fill="none" stroke="currentColor" strokeWidth="1.8"
          strokeLinecap="round" strokeLinejoin="round">
       <path d={edge === 'top' ? 'M12 19V6M6 12l6-6 6 6' : 'M12 5v13M6 12l6 6 6-6'} />
     </svg>
   );
   return (
-    <div className={`scroll-hint ${edge}${shown ? ' on' : ''}`} aria-hidden="true">
+    <button
+      type="button"
+      className={`scroll-hint ${edge}${shown ? ' on' : ''}`}
+      onClick={onClick}
+      tabIndex={shown ? 0 : -1}
+      aria-hidden={!shown}
+      aria-label={edge === 'top' ? 'Go to the previous page' : 'Go to the next page'}
+    >
       {edge === 'top' && arrow}
-      <span className="scroll-hint-text">keep scrolling</span>
+      <span className="scroll-hint-text">can scroll</span>
       {edge === 'bottom' && arrow}
-    </div>
+    </button>
   );
 }
 
 /**
- * Small bouncing arrow saying "keep scrolling", shown for a moment when the
+ * Small bouncing arrow saying "can scroll", shown for a moment when the
  * visitor reaches an edge of a page that leads somewhere:
  * – at the top, pointing up, when there is a page above (never on Home);
  * – at the bottom, pointing down, when there is a page below.
  * Never on the last page: its black void says it already.
+ * While it shows, clicking it goes straight to that page.
  *
  * @param {number}  active     - index of the current page
  * @param {number}  total      - number of pages
  * @param {object}  scrollRefs - refs of every page scroller
  * @param {boolean} enabled    - false while the menu, outro or loader is up
+ * @param {function} onNavigate - goes to a page index
  */
-export default function ScrollHint({ active, total, scrollRefs, enabled }) {
+export default function ScrollHint({ active, total, scrollRefs, enabled, onNavigate }) {
   const [top, setTop] = useState(false);
   const [bottom, setBottom] = useState(false);
   const timers = useRef({});
@@ -83,8 +92,8 @@ export default function ScrollHint({ active, total, scrollRefs, enabled }) {
 
   return (
     <>
-      <Hint edge="top" shown={top} />
-      <Hint edge="bottom" shown={bottom} />
+      <Hint edge="top" shown={top} onClick={() => onNavigate(active - 1)} />
+      <Hint edge="bottom" shown={bottom} onClick={() => onNavigate(active + 1)} />
     </>
   );
 }

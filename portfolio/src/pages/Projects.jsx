@@ -220,7 +220,11 @@ export default function Projects() {
           Selected <span className="pj-underline">projects</span>
         </h1>
         <p className="pj-sub">
-        <strong>Pick a domain on the right side</strong>, then click a project for the details.
+        <strong>
+          Click a domain{' '}
+          <span className="pj-where-wide">on the right</span>
+          <span className="pj-where-narrow">just below</span>
+        </strong>, then click a project for the details.
         </p>
       </header>
 
@@ -228,7 +232,7 @@ export default function Projects() {
         <Orbit domain={domain} paused={open !== null} onOpen={setOpen} />
 
         <div className="pj-picker">
-          <p className="pj-pick-hint">Pick a domain</p>
+          <p className="pj-pick-hint">Click a domain</p>
 
           <ul ref={domainsRef} className="pj-domains" aria-label="Domains">
           {DOMAINS.map((d) => {

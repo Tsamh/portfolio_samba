@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 /**
  * Makes the browser's Back button (and the phone's back gesture) close a
@@ -10,10 +10,19 @@ import { useEffect } from 'react';
  * straight away made the cleanup call history.back(), whose popstate arrived
  * after the second push and closed the popup the instant it opened.
  *
+ * onClose is read through a ref and kept out of the effect's dependencies:
+ * callers pass an inline arrow, new on every render, and any re-render while
+ * the popup was open (a hover ending under it, a timer) re-ran the effect —
+ * its cleanup called history.back(), and that popstate closed the popup a
+ * moment after it opened.
+ *
  * @param {boolean}  open
  * @param {function} onClose
  */
 export function useBackClose(open, onClose) {
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+
   useEffect(() => {
     if (!open) return;
 
@@ -26,7 +35,7 @@ export function useBackClose(open, onClose) {
     const onPop = () => {
       if (!pushed) return;   // not our entry
       pushed = false;        // it is already gone
-      onClose();
+      closeRef.current();
     };
     window.addEventListener('popstate', onPop);
 
@@ -39,5 +48,5 @@ export function useBackClose(open, onClose) {
         history.back();
       }
     };
-  }, [open, onClose]);
+  }, [open]);
 }

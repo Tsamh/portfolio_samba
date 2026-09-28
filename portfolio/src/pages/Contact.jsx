@@ -113,21 +113,22 @@ function Field({ value, onChange, placeholder, label, ...rest }) {
     visitor's own mail app — nothing goes through a server. */
 function SentenceForm() {
   const [name, setName] = useState('');
-  const [topic, setTopic] = useState(TOPICS[0]);
+  const [topic, setTopic] = useState(TOPICS[0]);   // null: the custom bubble
+  const [custom, setCustom] = useState('');
   const [reply, setReply] = useState('');
-  const [subject, setSubject] = useState('');
-
-  // left empty, the subject is built from the picked topic
-  const defaultSubject = `Project: ${topic}`;
 
   const send = (e) => {
     e.preventDefault();
     const who = name.trim() || 'someone';
+    // the custom bubble becomes the email subject as it is typed
+    const own = topic === null && custom.trim();
+    const about = topic ?? (own || 'something else');
+    const subject = own || `Project: ${about}`;
     const body =
-      `Hi Samba,\n\nMy name is ${who} and I'd like to talk about ${topic}.\n` +
+      `Hi Samba,\n\nMy name is ${who} and I'd like to talk about ${about}.\n` +
       (reply.trim() ? `You can reach me at ${reply.trim()}.\n` : '');
     window.location.href =
-      `mailto:${EMAIL}?subject=${encodeURIComponent(subject.trim() || defaultSubject)}&body=${encodeURIComponent(body)}`;
+      `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
 
@@ -151,15 +152,22 @@ function SentenceForm() {
             {t}
           </button>
         ))}
+        <label className={`ct-topic ct-topic-custom${topic === null ? ' on' : ''}`}>
+          <span className="ct-field-size" aria-hidden="true">{custom || 'your own subject…'}</span>
+          <input
+            value={custom}
+            onChange={(e) => { setCustom(e.target.value); setTopic(null); }}
+            onFocus={() => setTopic(null)}
+            placeholder="your own subject…"
+            aria-label="Your own subject"
+            maxLength={80}
+          />
+        </label>
       </div>
       <p className="ct-form-line">
         You can reach me at{' '}
         <Field value={reply} onChange={setReply} placeholder="your email" label="Your email" autoComplete="email" type="email" />
         .
-      </p>
-      <p className="ct-form-line ct-form-subject">
-        Subject:{' '}
-        <Field value={subject} onChange={setSubject} placeholder={defaultSubject} label="Email subject (optional)" />
       </p>
       <button className="ct-send" type="submit">
         <span className="ct-roll" data-text="Send it"><span>Send it</span></span>
@@ -213,16 +221,9 @@ export default function Contact() {
 
   return (
     <>
-      {/* ── Big statement + CTA ── */}
+      {/* ── Big statement, then the channels straight away ── */}
       <section ref={rootRef} className="content-section alt ct-hero" data-reveal>
         <div className="ct-wrap">
-          <div className="ct-eyebrow">
-            <span>(05) Contact</span>
-            <span className="ct-clock">
-              Dakar <DakarTime />
-            </span>
-          </div>
-
           <h2 className="ct-title">
             <span className="ct-line">
               <span style={{ '--i': 0 }}>
@@ -241,14 +242,7 @@ export default function Contact() {
             AI systems, data platforms, cloud infrastructure or fullstack apps:
             whether you have a precise brief or just an idea, my inbox is open.
           </p>
-        </div>
-      </section>
 
-      <Marquee />
-
-      {/* ── Channels + practical info ── */}
-      <section className="content-section ct-channels" data-reveal>
-        <div className="ct-wrap">
           <p className="ct-kicker">Find me on</p>
 
           <div className="ct-rows">
@@ -271,6 +265,18 @@ export default function Contact() {
                 </svg>
               </a>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <Marquee />
+
+      {/* ── Practical info, with the live clock ── */}
+      <section className="content-section ct-info" data-reveal>
+        <div className="ct-wrap">
+          <div className="ct-eyebrow">
+            <span>Right now in Dakar</span>
+            <span className="ct-clock"><DakarTime /></span>
           </div>
 
           <div className="ct-meta">

@@ -123,6 +123,7 @@ export default function App() {
           total={PAGES.length}
           scrollRefs={scrollRefs}
           enabled={loaderGone && !menuOpen && !outroOpen && !lost}
+          onNavigate={goTo}
         />
 
         <div

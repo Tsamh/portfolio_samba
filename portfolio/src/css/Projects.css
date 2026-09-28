@@ -360,7 +360,12 @@
 }
 
 /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+/* the domain list is on the right, or above the orbit on narrow screens */
+.pj-where-narrow { display: none; }
+
 @media (max-width: 900px) {
+  .pj-where-wide { display: none; }
+  .pj-where-narrow { display: inline; }
   .pj { padding: calc(48px + 2.2rem) 1.2rem 5rem; gap: 1.6rem; }
 
   .pj-stage {
