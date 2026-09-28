@@ -20,26 +20,10 @@ export default function LostPage({ onLeave, ready = true }) {
   const [lives, setLives] = useState(LIVES);
   const [phase, setPhase] = useState('ready'); // ready | play | lost | won
 
-  /* The egg is announced once the visitor can see it and hear it. Reached
-     straight from the address bar, the page opened under the loader: the
-     notification played out behind it, and the browser muted the chime
-     because nobody had interacted with the page yet. So: wait for the
-     loader, then, if the page has had no click or key press so far, wait
-     for the first one (the game needs it anyway). */
-  useEffect(() => {
-    if (!ready) return undefined;
-    if (navigator.userActivation?.hasBeenActive ?? true) {
-      findEgg('lost');
-      return undefined;
-    }
-    const EVENTS = ['pointerdown', 'keydown', 'touchstart'];
-    const first = () => {
-      EVENTS.forEach((t) => window.removeEventListener(t, first, true));
-      findEgg('lost');
-    };
-    EVENTS.forEach((t) => window.addEventListener(t, first, true));
-    return () => EVENTS.forEach((t) => window.removeEventListener(t, first, true));
-  }, [ready]);
+  /* Announced as soon as the loader is gone: reached straight from the
+     address bar, the page opens under the loader, and the notification
+     used to play out behind it. */
+  useEffect(() => { if (ready) findEgg('lost'); }, [ready]);
 
   const leave = useCallback(() => onLeave(), [onLeave]);
 

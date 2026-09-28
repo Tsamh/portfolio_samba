@@ -40,6 +40,10 @@ const VOLUME = 0.12;
 let ctx;
 
 function playChime() {
+  // Before any click or key press on the page the browser keeps audio
+  // muted; a chime queued now would only sound later, out of step with
+  // the notification, so it is skipped.
+  if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
   try {
     ctx ??= new (window.AudioContext || window.webkitAudioContext)();
     if (ctx.state === 'suspended') ctx.resume();

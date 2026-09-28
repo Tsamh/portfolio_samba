@@ -24,6 +24,7 @@ const COMMANDS = [
   ['resume', 'open resume'],
   ['whoami', 'who are you?'],
   ['eggs', 'easter eggs found so far'],
+  ['eggs reset', 'forget them all, to hunt again'],
   ['theme <mode>', 'light | dark | toggle'],
   ['help', 'show this list'],
   ['clear', 'clear the screen'],
@@ -289,7 +290,7 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
         break;
 
       case 'eggs': {
-        // not in the help list: a way to hunt them all again
+        // a way to hunt them all again
         if (arg === 'reset') {
           resetEggs();
           print({ text: 'easter eggs forgotten: happy hunting, again', tone: 'ok' }, '');
