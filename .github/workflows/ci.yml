@@ -38,12 +38,9 @@ jobs:
       - run: npm ci
       - run: npm test
 
-      # VITE_SOON keeps the Extra and Random pages as placeholders: their
-      # photos are not in this repository and their write-ups stay out of the
-      # bundle. BASE_PATH: Pages serves the site from /portfolio_samba/.
+      # BASE_PATH: Pages serves the site from /portfolio_samba/.
       - run: npm run build
         env:
-          VITE_SOON: '1'
           BASE_PATH: /portfolio_samba/
 
       - uses: actions/upload-pages-artifact@v3

@@ -1,9 +1,9 @@
 /**
- * Automatic image loading for the Extra and Random activity pages.
+ * Automatic image loading for the Experience and Random activity pages.
  *
- * One folder per activity: src/assets/extra/<slug>/ or
+ * One folder per activity: src/assets/experience/<slug>/ or
  * src/assets/random/<slug>/. Every photo inside is picked up automatically,
- * no code change needed; files loose at the root of extra/ or random/ are
+ * no code change needed; files loose at the root of experience/ or random/ are
  * ignored.
  * - the folder name is the activity slug (separators ignored, so
  *   "graduation_25" and "graduation25" are the same activity)

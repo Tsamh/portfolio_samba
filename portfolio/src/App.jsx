@@ -14,14 +14,14 @@ import ScrollHint     from './components/ScrollHint';
 import LostPage       from './components/LostPage';
 import Home           from './pages/Home';
 import Projects       from './pages/Projects';
-import Extra          from './pages/Extra';
+import Experience     from './pages/Experience';
 import Random         from './pages/Random';
 import Contact        from './pages/Contact';
 import { usePortfolio } from './hooks/usePortfolio';
 import './css/App.css';
 
 /* Page order: Home → Projects → Experience → Random → Contact */
-const PAGES = [<Home />, <Projects />, <Extra />, <Random />, <Contact />];
+const PAGES = [<Home />, <Projects />, <Experience />, <Random />, <Contact />];
 const CONTACT_INDEX = 4;
 
 export default function App() {

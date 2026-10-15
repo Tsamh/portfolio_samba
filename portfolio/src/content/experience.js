@@ -1,14 +1,9 @@
-/* Content of the Extra page: one folder per activity in
-   src/assets/extra/<name>/, every photo picked up automatically.
-
-   The published build never imports this module: the deploy workflow sets
-   VITE_SOON=1, and vite.config.js then resolves src/content/* to an empty
-   stub. Photos and stories stay out of the bundle, and the page shows its
-   "Coming soon" placeholder instead. */
+/* Content of the Experience page: one folder per activity in
+   src/assets/experience/<name>/, every photo picked up automatically. */
 import { loadGroups, unsplash, withImages } from '../lib/activities';
 
 const GROUPS = loadGroups(
-  import.meta.glob('../assets/extra/*/*.{jpg,jpeg,png,webp,avif,gif,JPG,JPEG,PNG}', {
+  import.meta.glob('../assets/experience/*/*.{jpg,jpeg,png,webp,avif,gif,JPG,JPEG,PNG}', {
     eager: true,
     import: 'default',
   })
@@ -34,7 +29,7 @@ const DEFS = [
   
   {
     slug: 'solidarity',
-    aliases: ['don_sang', 'ndogou'], // photos in extra/don_sang/ and extra/ndogou/
+    aliases: ['don_sang', 'ndogou'], // photos in experience/don_sang/ and experience/ndogou/
     title: 'Solidarity drives',
     desc: ['Two campaigns run with the student union, both about taking care of people.'],
     bullets: [
@@ -51,7 +46,7 @@ const DEFS = [
   
   {
     slug: 'hackathon',
-    aliases: ['hackaton'], // photos in src/assets/extra/hackaton/
+    aliases: ['hackaton'], // photos in src/assets/experience/hackaton/
     title: 'Hackathons & meetups',
     desc: [
       'Regular hackathon participant and community meetup organizer: building fast, shipping faster, and celebrating every demo.',
@@ -62,7 +57,7 @@ const DEFS = [
   
   {
     slug: 'events',
-    aliases: ['saltis', 'indabax'], // photos in extra/saltis/ and extra/indabax/
+    aliases: ['saltis', 'indabax'], // photos in experience/saltis/ and experience/indabax/
     title: 'Tech events & company visits',
     desc: ['Meeting the ecosystem, on a booth, in a lecture hall or inside the companies themselves.'],
     bullets: [
@@ -79,7 +74,7 @@ const DEFS = [
   
   {
     slug: 'campus',
-    aliases: ['integration', 'parc'], // photos in extra/integration/ and extra/parc/
+    aliases: ['integration', 'parc'], // photos in experience/integration/ and experience/parc/
     title: 'Campus life',
     desc: ['The student union also exists to get everyone out of the classroom.'],
     bullets: [

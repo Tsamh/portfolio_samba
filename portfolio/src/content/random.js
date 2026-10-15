@@ -1,10 +1,5 @@
 /* Content of the Random page: one folder per activity in
-   src/assets/random/<name>/, every photo picked up automatically.
-
-   The published build never imports this module: the deploy workflow sets
-   VITE_SOON=1, and vite.config.js then resolves src/content/* to an empty
-   stub. Photos and stories stay out of the bundle, and the page shows its
-   "Coming soon" placeholder instead. */
+   src/assets/random/<name>/, every photo picked up automatically. */
 import { loadGroups, unsplash, withImages } from '../lib/activities';
 
 const GROUPS = loadGroups(

@@ -13,8 +13,8 @@ Instead of a plain page of links, it's built to be explored. Here's what you can
 | --- | --- |
 | **Home** | Who I am, my skills, and my CV. |
 | **Projects & Certificates** | My projects, sorted by domain (Data, Software, AI Engineering), then my certifications and certificates. |
-| **Extra** | Community work, events and giving back. *Coming soon.* |
-| **Random** | Random things about me. *Coming soon.* |
+| **Experience** | Community work, events and giving back. |
+| **Random** | Random things about me. |
 | **Contact** | Every way to reach me, and a short message form. |
 
 ## Getting around
