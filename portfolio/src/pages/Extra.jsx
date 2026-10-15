@@ -9,7 +9,7 @@ export default function Extra() {
   return (
     <>
       <div className="hero-section hero-social">
-        <h1 className="title">Extra</h1>
+        <h1 className="title">Experience</h1>
         <p className="subtitle">Community, events &amp; giving back</p>
       </div>
 

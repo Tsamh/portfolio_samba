@@ -97,21 +97,6 @@ const DEFS = [
       '1714537097791-be0ba0473b9c',
     ].map(unsplash),
   },
-  {
-    slug: 'origami',
-    title: 'Origami: the flapping bird',
-    desc: [
-      'I can fold the classic flapping bird, the one that actually flaps its wings when you pull the tail.',
-      'Precision folding, zero merge conflicts.',
-    ],
-    stock: [
-      '1563260797-cb5cd70254c8',
-      '1764189450619-3d6b5ffccb60',
-      '1708878641346-c33c649a923f',
-      '1684239154527-d5f022f7f20d',
-      '1586942729823-a31b812f9b98',
-    ].map(unsplash),
-  },
 ];
 
 export default withImages(DEFS, GROUPS);

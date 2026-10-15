@@ -20,7 +20,7 @@ import Contact        from './pages/Contact';
 import { usePortfolio } from './hooks/usePortfolio';
 import './css/App.css';
 
-/* Page order: Home → Projects → Extra → Random → Contact */
+/* Page order: Home → Projects → Experience → Random → Contact */
 const PAGES = [<Home />, <Projects />, <Extra />, <Random />, <Contact />];
 const CONTACT_INDEX = 4;
 

@@ -130,38 +130,6 @@ const DEFS = [
       '1616089804390-b2daa80dbf02',
     ].map(unsplash),
   },
-  
-  {
-    slug: 'techgood',
-    title: 'Tech for good',
-    desc: [
-      'Contributing to projects that use data and AI for local impact: education, health awareness and access to information.',
-      'I believe the best engineering serves the community it comes from.',
-    ],
-    stock: [
-      '1559027615-cd4628902d4a',
-      '1528901166007-3784c7dd3653',
-      '1620829813573-7c9e1877706f',
-      '1620831468075-db24ca183258',
-      '1632215861513-130b66fe97f4',
-    ].map(unsplash),
-  },
-  
-  {
-    slug: 'opensource',
-    title: 'Open source & sharing',
-    desc: [
-      'Publishing utilities, notebooks and write-ups so others can learn from what I build, and improve it.',
-      'Documentation is a love letter to the next developer. I write a lot of love letters.',
-    ],
-    stock: [
-      '1556075798-4825dfaaf498',
-      '1461749280684-dccba630e2f6',
-      '1607706189992-eae578626c86',
-      '1621839673705-6617adf9e890',
-      '1516116216624-53e697fedbea',
-    ].map(unsplash),
-  },
 ];
 
 export default withImages(DEFS, GROUPS);

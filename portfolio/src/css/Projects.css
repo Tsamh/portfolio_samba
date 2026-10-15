@@ -24,23 +24,34 @@
   color: var(--text);
 }
 
-/* green marker stroke under the last word */
+/* green marker stroke under the last word: a flat V, one arm per
+   pseudo-element, both tilted up from where they meet */
 .pj-underline {
   position: relative;
   white-space: nowrap;
 }
 
+.pj-underline::before,
 .pj-underline::after {
   content: '';
   position: absolute;
-  left: 38%;
-  right: 4%;
-  bottom: -0.08em;
+  bottom: -0.1em;
+  width: 29%;
   height: 0.09em;
   border-radius: 999px;
   background: #22b455;
-  transform: rotate(-2.5deg);
-  transform-origin: left;
+}
+
+.pj-underline::before {
+  left: 38%;
+  transform: rotate(7deg);
+  transform-origin: right center;
+}
+
+.pj-underline::after {
+  left: 66%;
+  transform: rotate(-7deg);
+  transform-origin: left center;
 }
 
 .pj-sub {

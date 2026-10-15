@@ -6,7 +6,7 @@ import { DOMAINS, PROJECTS } from '../lib/projects';
 import terminalIcon from '../assets/icons/wired-lineal-1326-browser-terminal-hover-blinking.gif';
 import '../css/Terminal.css';
 
-const PAGES = ['home', 'projects', 'extra', 'random', 'contact'];
+const PAGES = ['home', 'projects', 'experience', 'random', 'contact'];
 const PROMPT = 'samba@portfolio:~$';
 
 /* A line is a plain string, or an object the renderer understands:
@@ -199,7 +199,7 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
       }
 
       case 'home':
-      case 'extra':
+      case 'experience':
       case 'random': {
         const index = PAGES.indexOf(name);
         print({ text: `\u2192 navigating to /${name}`, tone: 'ok' }, '');

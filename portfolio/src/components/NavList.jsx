@@ -5,7 +5,7 @@ import '../css/NavList.css';
 const LABELS = [
   { label: 'Home' },
   { label: 'Projects', extra: ' & Certificates' },
-  { label: 'Extra' },
+  { label: 'Experience' },
   { label: 'Random' },
   { label: 'Contact' },
 ];

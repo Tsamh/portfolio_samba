@@ -150,7 +150,7 @@
 .hero-social {
   background-image:
     linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6)),
-    url(https://images.unsplash.com/photo-1511632765486-a01980e01a18?crop=entropy&cs=tinysrgb&fm=jpg&q=80&auto=format&fit=crop&w=1170);
+    url(https://images.unsplash.com/photo-1627897495484-229b29feb0d5?fm=jpg&q=80&auto=format&fit=crop&w=1600);
 }
 
 /* Random: colourful consoles and figures, like the page itself */
@@ -186,7 +186,7 @@
   font-weight: 300;
 }
 
-/* Extra and Random: the photo behind needs a heavier line to read */
+/* Experience and Random: the photo behind needs a heavier line to read */
 .hero-social .subtitle,
 .hero-fun .subtitle {
   font-weight: 600;
