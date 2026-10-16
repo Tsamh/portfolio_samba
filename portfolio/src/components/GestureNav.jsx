@@ -257,6 +257,13 @@ export default function GestureNav() {
     else close();
   }, [status, close]);
 
+  /* the "See" button of the hand gesture project opens the intro from afar */
+  useEffect(() => {
+    const onOpen = () => setStatus((s) => (s === IDLE ? INTRO : s));
+    window.addEventListener('portfolio:gestures', onOpen);
+    return () => window.removeEventListener('portfolio:gestures', onOpen);
+  }, []);
+
   useBackClose(modalOpen, close);
 
   /* Move focus into the dialog on open and hand it back on close, so someone

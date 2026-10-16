@@ -80,7 +80,7 @@ const RAW = {
     stack: ['Python', 'BeautifulSoup', 'Streamlit', 'pandas'],
     github: gh('Scrapy'),
     live: 'https://scrapy-by-sams.streamlit.app/',
-    image: stock('1543466835-00a7907e9de1'),
+    photo: 'Streamlit_animals',
   },
   expatdakar: {
     title: 'Expat-Dakar listings',
@@ -92,7 +92,7 @@ const RAW = {
     stack: ['Python', 'Streamlit', 'pandas'],
     github: gh('my-best-data-application'),
     live: 'https://my-best-data-application-sa.streamlit.app/',
-    image: stock('1558981403-c5f9899a28bc'),
+    photo: 'streamlit_moto',
   },
   nansa: {
     title: 'Nansa',
@@ -187,18 +187,9 @@ const RAW = {
       'The video never leaves the browser: no upload, no recording, and every camera track is released on exit.',
     ],
     stack: ['MediaPipe', 'Computer vision', 'JavaScript', 'WebAssembly'],
-    image: stock('1625014618427-fbc980b974f5'),
-  },
-  pimadiab: {
-    title: 'Pimadiab',
-    summary: 'Diabetes data analysis and classification in R.',
-    details: [
-      'Exploratory data analysis on a diabetes dataset: cleaning, visualisations and correlation analysis.',
-      'Classification models trained and evaluated with caret and e1071.',
-    ],
-    stack: ['R', 'caret', 'e1071'],
-    github: gh('Pimadiab_R'),
-    image: stock('1576091160399-112ba8d25d1d'),
+    photo: 'hand_gesture',
+    // no repository: the "See" button opens the feature right here
+    demo: 'gestures',
   },
 };
 
@@ -228,7 +219,7 @@ export const DOMAINS = [
     caption: 'Platforms, APIs & web apps.',
     keywords: ['Web apps', 'APIs', 'Distributed'],
     mark: 'swirl',
-    projects: ['nansa', 'cloudit', 'ditmoitout', 'ditlib', 'employees', 'factuscript', 'kabir'],
+    projects: ['nansa', 'ditmoitout', 'ditlib', 'employees', 'factuscript', 'kabir'],
   },
   {
     id: 'ai',
@@ -237,6 +228,6 @@ export const DOMAINS = [
     caption: 'Models, from training to production.',
     keywords: ['Machine learning', 'MLOps', 'GPU computing'],
     mark: 'loop',
-    projects: ['cardioflow', 'gestures', 'cloudit', 'pimadiab'],
+    projects: ['cardioflow', 'gestures', 'cloudit'],
   },
 ];

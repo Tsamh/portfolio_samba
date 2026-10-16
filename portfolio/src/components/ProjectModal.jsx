@@ -84,6 +84,13 @@ export default function ProjectModal({ project, getCardRect, onClosed }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [close]);
 
+  /* A project that lives inside this site: close the card first, then ask
+     the feature to open (GestureNav listens for `portfolio:<demo>`). */
+  const openDemo = () => {
+    close();
+    setTimeout(() => window.dispatchEvent(new Event(`portfolio:${project.demo}`)), DURATION);
+  };
+
   const stop = (e) => e.stopPropagation();
 
   /* portal: the page sits in a 3D-transformed container that would trap a
@@ -115,7 +122,7 @@ export default function ProjectModal({ project, getCardRect, onClosed }) {
             {project.stack.map((s) => <li key={s}>{s}</li>)}
           </ul>
 
-          {(project.github || project.live) && (
+          {(project.github || project.live || project.demo) && (
             <div className="pm-links">
               {project.github && (
                 <a className="pm-link" href={project.github} target="_blank" rel="noopener noreferrer">
@@ -128,6 +135,12 @@ export default function ProjectModal({ project, getCardRect, onClosed }) {
                   <LordIcon name="link" size={26} />
                   Live site
                 </a>
+              )}
+              {project.demo && (
+                <button className="pm-link primary" onClick={openDemo} type="button">
+                  <LordIcon name="eye" size={26} />
+                  See
+                </button>
               )}
             </div>
           )}
