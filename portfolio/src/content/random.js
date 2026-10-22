@@ -20,7 +20,7 @@ const DEFS = [
       'Installing operating systems on it, and getting every driver back in place.',
     ],
     stock: [
-      '1699550403361-27dee0f2a415',
+      '1654593114209-d915f46be333',
       '1721333091889-0b4fe5b2b28f',
       '1596302332910-07f3ac264d7b',
       '1712600095911-b38b10a80081',

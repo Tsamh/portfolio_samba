@@ -114,7 +114,6 @@ const DEFS = [
     title: 'Clubs & mentoring',
     desc: [
       'Running student clubs where we learn deep learning hands-on, and helping fellow students get their first certifications.',
-      'Teaching is the fastest way to learn twice, so I mentor on Python, ML fundamentals and cloud basics.',
     ],
     stock: [
       '1531482615713-2afd69097998',

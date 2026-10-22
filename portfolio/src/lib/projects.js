@@ -37,17 +37,6 @@ const RAW = {
     stack: ['Webots', 'Apache Kafka', 'MinIO', 'Apache Spark', 'Apache Airflow', 'Parquet'],
     github: gh('FAR_sMart'),
   },
-  bigdata: {
-    title: 'Big Data architecture',
-    summary: 'Real-time sales sync and a Spark data lake, in two Docker stacks.',
-    details: [
-      'Streaming: change data capture with Debezium and Redpanda (Kafka) keeps the sales of two agencies, each on its own MySQL database, in sync with a global PostgreSQL base shown on a real-time dashboard.',
-      'Batch: a Spark cluster queries a MinIO data lake of Parquet files from JupyterLab with Spark SQL, covering partitioning, shuffles, Iceberg tables and MLlib.',
-    ],
-    stack: ['Debezium', 'Redpanda', 'MySQL', 'PostgreSQL', 'Apache Spark', 'MinIO', 'Docker'],
-    github: gh('Big_Data'),
-    image: stock('1460925895917-afdab827c52f'),
-  },
   dataprocessing: {
     title: 'Data Processing',
     summary: '10 analysis notebooks and 161 charts, published as a website.',
@@ -167,7 +156,7 @@ export const DOMAINS = [
     caption: 'Pipelines, processing & analytics.',
     keywords: ['ETL', 'Spark', 'Orchestration'],
     mark: 'bars',
-    projects: ['weathair', 'farsmart', 'bigdata', 'dataprocessing', 'scrapy'],
+    projects: ['weathair', 'farsmart', 'dataprocessing', 'scrapy'],
   },
   {
     id: 'software',
