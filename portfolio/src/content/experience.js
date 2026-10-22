@@ -20,8 +20,8 @@ const DEFS = [
       'Class delegate from first to third year: the voice of the class with the teaching team, and coordination of group projects.',
     ],
     stock: [
-      '1523240795612-9a054b0db644',
-      '1531058020387-3be344556be6',
+      '1573164574511-73c773193279',
+      '1739298061740-5ed03045b280',
       '1472691681358-fdf00a4bfcfe',
       '1763462711669-263800467e26',
     ].map(unsplash),
@@ -104,22 +104,21 @@ const DEFS = [
     aliases: ['graduation25', 'graduation26'],
     title: 'Graduations',
     desc: [
-      'Cap, gown and a diploma that took a few thousand commits to earn.',
-      'The 2025 ceremony with the people who made the journey worth it, and the 2026 one right after: same energy, new milestones.',
+      'Every year we organize the graduation ceremony for the graduating class: 2025, 2026… while we wait for our own turn :)',
     ],
     stock: ['1623461487986-9400110de28e', '1541339907198-e08756dedf3f'].map(unsplash),
   },
   
   {
     slug: 'mentoring',
-    title: 'Workshops & mentoring',
+    title: 'Clubs & mentoring',
     desc: [
-      'Facilitating hands-on deep learning workshops and helping fellow students get their first certifications.',
+      'Running student clubs where we learn deep learning hands-on, and helping fellow students get their first certifications.',
       'Teaching is the fastest way to learn twice, so I mentor on Python, ML fundamentals and cloud basics.',
     ],
     stock: [
       '1531482615713-2afd69097998',
-      '1524178232363-1fb2b075b655',
+      '1655720357872-ce227e4164ba',
       '1659301254614-8d6a9d46f26a',
       '1758270704925-fa59d93119c1',
       '1616089804390-b2daa80dbf02',

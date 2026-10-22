@@ -168,6 +168,32 @@ button.pm-link {
   box-shadow: 0 6px 16px rgba(220, 38, 38, 0.22);
 }
 
+/* not a link: a dashed badge with a pulsing dot, no hover lift */
+.pm-status {
+  padding-left: 0.85rem;
+  border-style: dashed;
+  cursor: default;
+}
+
+.pm-status::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pm-pulse 1.6s ease-in-out infinite;
+}
+
+.pm-status:hover {
+  transform: none;
+  border-color: var(--text);
+  box-shadow: none;
+}
+
+@keyframes pm-pulse {
+  50% { opacity: 0.3; }
+}
+
 /* phones: image on top, text below */
 @media (max-width: 700px) {
   .pm-panel {

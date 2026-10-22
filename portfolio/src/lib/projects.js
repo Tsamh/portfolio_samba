@@ -48,17 +48,6 @@ const RAW = {
     github: gh('Big_Data'),
     image: stock('1460925895917-afdab827c52f'),
   },
-  sparkgineering: {
-    title: 'Sparkgineering',
-    summary: 'PySpark analysis of 8,536 San Francisco Airbnb listings.',
-    details: [
-      '19 analysis questions answered with the PySpark DataFrame API only: loading and cleaning, aggregations per neighbourhood, pivot tables and window functions (rank, dense_rank, row_number).',
-      'The Inside Airbnb export covers 48 neighbourhoods and 4 room types. The work ships both as a command-line script and as an identical notebook.',
-    ],
-    stack: ['PySpark', 'Python', 'Jupyter'],
-    github: gh('sparkgineering'),
-    image: stock('1449844908441-8829872d2607'),
-  },
   dataprocessing: {
     title: 'Data Processing',
     summary: '10 analysis notebooks and 161 charts, published as a website.',
@@ -81,18 +70,6 @@ const RAW = {
     github: gh('Scrapy'),
     live: 'https://scrapy-by-sams.streamlit.app/',
     photo: 'Streamlit_animals',
-  },
-  expatdakar: {
-    title: 'Expat-Dakar listings',
-    summary: 'Streamlit app for scraped motorcycle and scooter listings.',
-    details: [
-      'Scrapes motorcycle and scooter listings from Expat-Dakar, then displays them in a Streamlit app where they can be browsed and downloaded.',
-      'The data is cleaned before being shown, so the export is usable as is.',
-    ],
-    stack: ['Python', 'Streamlit', 'pandas'],
-    github: gh('my-best-data-application'),
-    live: 'https://my-best-data-application-sa.streamlit.app/',
-    photo: 'streamlit_moto',
   },
   nansa: {
     title: 'Nansa',
@@ -125,28 +102,6 @@ const RAW = {
     github: gh('DITMoiTouT'),
     live: 'https://tsamh.github.io/DITMoiTouT/',
   },
-  ditlib: {
-    title: 'DITLib',
-    summary: 'Library platform built as microservices.',
-    details: [
-      'Digital library for DIT: three FastAPI microservices (books, users, loans) backed by PostgreSQL, where the loans service orchestrates the two others over REST.',
-      'A React frontend on top, everything containerised and orchestrated with Docker Compose.',
-    ],
-    stack: ['FastAPI', 'PostgreSQL', 'React', 'Docker Compose'],
-    github: gh('DITLib'),
-    image: stock('1507842217343-583bb7270b66'),
-  },
-  employees: {
-    title: 'Employee manager',
-    summary: 'Full-stack HR app shipped through a Jenkins pipeline.',
-    details: [
-      'Employee management app: a FastAPI and SQLAlchemy API on PostgreSQL, a React interface and pgAdmin, each in its own container orchestrated by Docker Compose.',
-      'Deployed through a Jenkins CI/CD pipeline, with every credential read from environment variables and never committed.',
-    ],
-    stack: ['FastAPI', 'SQLAlchemy', 'PostgreSQL', 'React', 'Docker', 'Jenkins'],
-    github: gh('gestion-employes'),
-    image: stock('1522071820081-009f0129c71c'),
-  },
   factuscript: {
     title: 'FactuScript',
     summary: 'Invoice generator that runs entirely in the browser.',
@@ -167,6 +122,8 @@ const RAW = {
     ],
     stack: ['E-commerce', 'Web'],
     photo: 'bikes',
+    // not online yet: a badge stands where the "Live site" button will go
+    status: 'In progress',
   },
   cardioflow: {
     title: 'CardioFlow',
@@ -210,7 +167,7 @@ export const DOMAINS = [
     caption: 'Pipelines, processing & analytics.',
     keywords: ['ETL', 'Spark', 'Orchestration'],
     mark: 'bars',
-    projects: ['weathair', 'farsmart', 'bigdata', 'sparkgineering', 'dataprocessing', 'scrapy', 'expatdakar'],
+    projects: ['weathair', 'farsmart', 'bigdata', 'dataprocessing', 'scrapy'],
   },
   {
     id: 'software',
@@ -219,7 +176,7 @@ export const DOMAINS = [
     caption: 'Platforms, APIs & web apps.',
     keywords: ['Web apps', 'APIs', 'Distributed'],
     mark: 'swirl',
-    projects: ['nansa', 'ditmoitout', 'ditlib', 'employees', 'factuscript', 'kabir'],
+    projects: ['nansa', 'ditmoitout', 'factuscript', 'kabir'],
   },
   {
     id: 'ai',

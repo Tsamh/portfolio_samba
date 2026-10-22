@@ -122,7 +122,7 @@ export default function ProjectModal({ project, getCardRect, onClosed }) {
             {project.stack.map((s) => <li key={s}>{s}</li>)}
           </ul>
 
-          {(project.github || project.live || project.demo) && (
+          {(project.github || project.live || project.demo || project.status) && (
             <div className="pm-links">
               {project.github && (
                 <a className="pm-link" href={project.github} target="_blank" rel="noopener noreferrer">
@@ -142,6 +142,7 @@ export default function ProjectModal({ project, getCardRect, onClosed }) {
                   See
                 </button>
               )}
+              {project.status && <span className="pm-link pm-status">{project.status}</span>}
             </div>
           )}
         </div>
