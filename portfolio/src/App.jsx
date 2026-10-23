@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Loader         from './components/Loader';
 import Navbar         from './components/Navbar';
 import NavList        from './components/NavList';
@@ -18,6 +18,7 @@ import Experience     from './pages/Experience';
 import Random         from './pages/Random';
 import Contact        from './pages/Contact';
 import { usePortfolio } from './hooks/usePortfolio';
+import { trackPage } from './lib/analytics';
 import './css/App.css';
 
 /* Page order: Home → Projects → Experience → Random → Contact */
@@ -86,6 +87,13 @@ export default function App() {
     openMenu, closeMenu, goTo, handleWheel,
     handleTouchStart, handleTouchMove, handleTouchEnd,
   } = usePortfolio(PAGES.length, () => setOutroOpen(true));
+
+  /* one page view per section change; the landing is counted by the script */
+  const firstPage = useRef(true);
+  useEffect(() => {
+    if (firstPage.current) { firstPage.current = false; return; }
+    trackPage(activePage);
+  }, [activePage]);
 
   return (
     <>
