@@ -120,14 +120,14 @@ const DEFS = [
     desc: ['The two things that get the week out of my head.'],
     bullets: [
       '"Even you can play soccer ?!" is the kind of sentence I hear every time. Yes, I do not look like it, and I am not bad at it.',
-      'Anime nights are sacred, from classics to seasonal releases. Yes, the kanji learning and this are absolutely connected.',
+      'Anime nights are sacred, from classics to seasonal releases.',
     ],
     fr: {
       title: 'Rituels du week-end',
       desc: ['Les deux choses qui me sortent la semaine de la tête.'],
       bullets: [
         "« Toi aussi tu joues au foot ?! » : c'est le genre de phrase que j'entends à chaque fois. Oui, je n'en ai pas l'air, et je ne me débrouille pas mal.",
-        "Les soirées animés sont sacrées, des classiques aux sorties de la saison. Oui, l'apprentissage des kanji et ça sont totalement liés.",
+        'Les soirées animés sont sacrées, des classiques aux sorties de la saison.',
       ],
     },
     stock: [
