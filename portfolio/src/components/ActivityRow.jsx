@@ -15,10 +15,11 @@ import '../css/Activity.css';
  * @param {string[]} desc     - paragraphs
  * @param {string[]} bullets  - optional list, for activities that gather
  *                              several things under one title
+ * @param {string}   after    - optional line under the list, without a dash
  * @param {string[]} images   - at least 5 (first 3 shown in the clips)
  * @param {boolean}  reverse  - swap sides + slide from the right
  */
-export default function ActivityRow({ title, desc, bullets = [], images, reverse = false }) {
+export default function ActivityRow({ title, desc, bullets = [], after, images, reverse = false }) {
   const { t } = useLang();
   const [lightbox, setLightbox] = useState(-1);
   const [active, setActive] = useState(-1);   // hovered slice, JS-driven
@@ -71,6 +72,7 @@ export default function ActivityRow({ title, desc, bullets = [], images, reverse
                 {bullets.map((b, i) => <li key={i}>{b}</li>)}
               </ul>
             )}
+            {after && <p className="activity-after">{after}</p>}
           </div>
 
           {/* creative hover container (assets/ref effect) —

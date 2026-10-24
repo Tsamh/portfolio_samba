@@ -286,3 +286,6 @@
   .clip-container { aspect-ratio: 4 / 3; }
   .activity-hint { letter-spacing: 0.18em; }
 }
+
+/* a closing line under the list, without a dash */
+.activity-after { margin-top: 0.6rem; }

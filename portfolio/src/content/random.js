@@ -93,15 +93,17 @@ const DEFS = [
     desc: ['A different alphabet is just another encoding to parse.'],
     bullets: [
       'I read Arabic.',
-      'I read Japanese, without really speaking either.',
+      'I read Japanese.',
     ],
+    after: 'Without really speaking either.',
     fr: {
       title: 'Autres alphabets',
       desc: ["Un autre alphabet, ce n'est qu'un autre encodage à décoder."],
       bullets: [
         "Je lis l'arabe.",
-        'Je lis le japonais, sans vraiment les parler.',
+        'Je lis le japonais.',
       ],
+      after: 'Sans vraiment les parler.',
     },
     stock: [
       '1646229227468-ba6eb534d368',
