@@ -374,6 +374,26 @@ a:focus-visible .ct-roll::after {
   margin: 0.8rem 0 1rem;
 }
 
+/* French: the bubbles flow right after "j'aimerais vous parler" and wrap
+   with the text, instead of starting a row of their own */
+.ct-form-inline > .ct-form-line:first-child { display: inline; }
+
+.ct-form-inline .ct-topics {
+  display: inline;
+  margin: 0;
+}
+
+.ct-form-inline .ct-topic {
+  display: inline-block;
+  margin: 0.25rem 0.3rem;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+.ct-form-inline .ct-topic-custom { display: inline-grid; }
+
+.ct-form-inline .ct-topics + .ct-form-line { margin-top: 0.6rem; }
+
 .ct-topic {
   padding: 0.5rem 1.1rem;
   border: 1.5px solid var(--line);

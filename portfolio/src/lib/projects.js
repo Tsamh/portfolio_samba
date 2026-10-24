@@ -267,6 +267,7 @@ export const DOMAINS = [
     fr: {
       label: 'Ingénierie IA',
       word: 'IA',
+      mark: 'loop-left',   // the I is on the left in "IA"
       caption: "Des modèles, de l'entraînement à la production.",
       keywords: ['Machine learning', 'MLOps', 'Calcul GPU'],
     },

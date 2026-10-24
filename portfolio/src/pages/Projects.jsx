@@ -103,9 +103,14 @@ function Scribbles({ mark }) {
       {mark === 'swirl' && (
         <path className="s-yellow" d="M300 70c10 40-6 90-40 120-20 18-42 10-30-8 12-16 46-10 70 6" />
       )}
-      {/* AI: a red loop tightened around the I */}
-      {mark === 'loop' && (
-        <path className="s-red" d="M223 78c-12-2-20 30-20 70 0 32 7 50 17 49 10-1 16-23 16-59 0-33-5-58-14-60-6-1-11 6-14 16" />
+      {/* AI: a red loop tightened around the I. In French the word is "IA",
+          the I comes first: the same loop, mirrored onto the left half */}
+      {(mark === 'loop' || mark === 'loop-left') && (
+        <path
+          className="s-red"
+          d="M223 78c-12-2-20 30-20 70 0 32 7 50 17 49 10-1 16-23 16-59 0-33-5-58-14-60-6-1-11 6-14 16"
+          transform={mark === 'loop-left' ? 'translate(406 0) scale(-1 1)' : undefined}
+        />
       )}
     </svg>
   );

@@ -47,7 +47,7 @@ export default {
 
   cv: {
     label: 'Aperçu du CV',
-    kinds: { resume: 'ATS · EN', cv: 'Graphique · FR' },
+    kinds: { resume: 'ATS - EN', cv: 'Graphique - FR' },
     switchTo: 'Passer à la version {kind}',
     download: 'Télécharger',
     close: "Fermer l'aperçu",
@@ -106,7 +106,8 @@ export default {
     ],
     privacy: {
       title: "Pas d'espionnage, promis.",
-      text: "La vidéo ne quitte jamais votre navigateur : aucun envoi, aucun enregistrement, aucun serveur, aucun dossier secret avec votre visage. Tout tourne en local, et la caméra s'éteint dès que vous quittez. Je suis développeur, pas la NSA.",
+      text: "La vidéo ne quitte jamais votre navigateur : aucun envoi, aucun enregistrement, aucun serveur, aucun dossier secret avec votre visage. Tout tourne en local, et la caméra s'éteint dès que vous quittez.",
+      punch: 'Je suis développeur, pas la NSA.',
     },
     errors: {
       blocked: "L'accès à la caméra a été bloqué. Autorisez-le pour ce site dans les réglages du navigateur (l'icône à gauche de la barre d'adresse), puis réessayez.",

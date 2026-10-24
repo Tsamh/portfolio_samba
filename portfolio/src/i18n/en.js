@@ -50,7 +50,7 @@ export default {
   cv: {
     label: 'Resume preview',
     // the ATS resume is written in English, the designed CV in French
-    kinds: { resume: 'ATS · EN', cv: 'Graphic · FR' },
+    kinds: { resume: 'ATS - EN', cv: 'Graphic - FR' },
     switchTo: 'Switch to the {kind} version',
     download: 'Download',
     close: 'Close preview',
@@ -109,7 +109,8 @@ export default {
     ],
     privacy: {
       title: 'No spying, promise.',
-      text: "The video never leaves your browser: no upload, no recording, no server, no secret folder of your face. It all runs locally, and the camera shuts off the moment you exit. I'm a developer, not the NSA.",
+      text: "The video never leaves your browser: no upload, no recording, no server, no secret folder of your face. It all runs locally, and the camera shuts off the moment you exit.",
+      punch: "I'm a developer, not the NSA.",
     },
     errors: {
       blocked: 'Camera access was blocked. Allow it for this site in your browser settings (the icon at the left of the address bar), then try again.',

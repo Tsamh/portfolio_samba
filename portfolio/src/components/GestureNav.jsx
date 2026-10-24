@@ -386,7 +386,8 @@ export default function GestureNav() {
 
             <p className="gesture-privacy">
               <span className="gesture-privacy-icon"><GestureIcon name="lock" size={16} /></span>
-              <strong>{t('gesture.privacy.title')}</strong> {t('gesture.privacy.text')}
+              <strong>{t('gesture.privacy.title')}</strong> {t('gesture.privacy.text')}{' '}
+              <strong>{t('gesture.privacy.punch')}</strong>
             </p>
 
             {status === ERROR && <p className="gesture-error">{t(`gesture.errors.${errorMessage}`)}</p>}

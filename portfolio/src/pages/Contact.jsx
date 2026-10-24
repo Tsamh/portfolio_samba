@@ -106,7 +106,7 @@ function Field({ value, onChange, placeholder, label, ...rest }) {
 /** "Hi Samba, my name is …": a sentence to fill in, sent through the
     visitor's own mail app — nothing goes through a server. */
 function SentenceForm() {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const topics = t('contact.topics');
   const [name, setName] = useState('');
   // index in the topics, so the choice survives a language switch;
@@ -131,7 +131,9 @@ function SentenceForm() {
 
 
   return (
-    <form className="ct-form" onSubmit={send}>
+    /* in French the topics finish the sentence ("j'aimerais vous parler
+       d'un système d'IA"), so they follow it on the same line */
+    <form className={`ct-form${lang === 'fr' ? ' ct-form-inline' : ''}`} onSubmit={send}>
       <p className="ct-form-line">
         {t('contact.form.hi')}{' '}
         <Field value={name} onChange={setName} placeholder={t('contact.form.name')} label={t('contact.form.nameLabel')} autoComplete="name" />{' '}
