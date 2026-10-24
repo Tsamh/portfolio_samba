@@ -1,5 +1,6 @@
 /* Certificates and attestations. The photos live in src/assets/certificats/
-   (one <slug>.jpg per entry); AWS Educate badges have no paper to show. */
+   (one <slug>.jpg per entry); AWS Educate badges have no paper to show.
+   `fr` holds the fields that change in French. */
 
 const PHOTOS = Object.fromEntries(
   Object.entries(
@@ -17,6 +18,11 @@ export const CERTIFICATES = [
     issuer: 'Dakar Institute of Technology',
     date: 'September 2026',
     note: 'Attestation of thanks for running the Python programming workshop.',
+    fr: {
+      title: "Formateur de l'atelier Python",
+      date: 'Septembre 2026',
+      note: "Attestation de remerciement pour l'animation de l'atelier de programmation Python.",
+    },
   },
   {
     slug: 'dit-hackathon',
@@ -24,6 +30,10 @@ export const CERTIFICATES = [
     issuer: 'Dakar Institute of Technology',
     date: 'August 2026',
     note: 'Team project: a smart management platform for entrepreneurs and small businesses.',
+    fr: {
+      date: 'Août 2026',
+      note: 'Projet en équipe : une plateforme de gestion intelligente pour les entrepreneurs et les petites entreprises.',
+    },
   },
   {
     slug: 'itma-entrepreneurship',
@@ -31,6 +41,10 @@ export const CERTIFICATES = [
     issuer: 'ITMA, Bamako',
     date: '2022 / 2023',
     note: 'Merit attestation for the project taken to the student entrepreneurship contest.',
+    fr: {
+      title: "Concours d'entrepreneuriat ITMA",
+      note: "Attestation de mérite pour le projet présenté au concours d'entrepreneuriat étudiant.",
+    },
   },
   {
     slug: 'canva-training',
@@ -38,6 +52,11 @@ export const CERTIFICATES = [
     issuer: 'Club IT ITMA & Comput-Mali',
     date: 'May / June 2023',
     note: 'Training session on graphic design, from the first sketch to the finished visual.',
+    fr: {
+      title: 'Design graphique avec Canva',
+      date: 'Mai / juin 2023',
+      note: "Formation au design graphique, de la première esquisse au visuel fini.",
+    },
   },
 ].map((c) => ({ ...c, image: PHOTOS[c.slug] }));
 
@@ -69,5 +88,6 @@ export const BADGES = [
   ...b,
   issuer: 'Amazon Web Services Training and Certification',
   date: 'Issued Jul 2, 2025',
+  fr: { date: 'Délivré le 2 juillet 2025' },
   image: PHOTOS[b.slug],
 }));

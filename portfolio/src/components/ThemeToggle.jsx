@@ -1,3 +1,4 @@
+import { useLang } from '../i18n';
 import '../css/ThemeToggle.css';
 
 /**
@@ -6,12 +7,14 @@ import '../css/ThemeToggle.css';
  * @param {function} onToggle
  */
 export default function ThemeToggle({ theme, onToggle }) {
+  const { t } = useLang();
+
   return (
     <button
       className="theme-toggle"
       onClick={onToggle}
-      aria-label="Toggle theme"
-      title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+      aria-label={t('theme.toggle')}
+      title={t(theme === 'light' ? 'theme.toDark' : 'theme.toLight')}
     >
       <span className={`theme-icon${theme === 'light' ? ' visible' : ''}`}>
         {/* sun */}

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { findEgg } from '../lib/eggs';
+import { useLang } from '../i18n';
 import '../css/LostPage.css';
 
 const LIVES = 3;
@@ -13,6 +14,7 @@ const FONT = '"Bebas Neue", Impact, sans-serif';
  * @param {boolean}  ready   - false while the loader still covers the site
  */
 export default function LostPage({ onLeave, ready = true }) {
+  const { t } = useLang();
   const rootRef = useRef(null);
   const canvasRef = useRef(null);
   const launchRef = useRef(() => {});
@@ -303,10 +305,10 @@ export default function LostPage({ onLeave, ready = true }) {
   }, [leave]);
 
   const message = {
-    ready: lives === LIVES ? 'Click or press space to launch' : 'Missed. Click to launch again',
+    ready: t(lives === LIVES ? 'lost.launch' : 'lost.missed'),
     play: '',
-    lost: 'The 404 stands. Click to try again',
-    won: 'Nothing left to find. Click to rebuild it',
+    lost: t('lost.lost'),
+    won: t('lost.won'),
   }[phase];
 
   return (
@@ -315,7 +317,7 @@ export default function LostPage({ onLeave, ready = true }) {
       className="lost"
       role="dialog"
       aria-modal="true"
-      aria-label="Page not found"
+      aria-label={t('lost.label')}
       onPointerDown={(e) => {
         if (e.target.closest('button')) return;
         if (e.pointerType !== 'mouse') {
@@ -328,18 +330,15 @@ export default function LostPage({ onLeave, ready = true }) {
       <canvas ref={canvasRef} className="lost-canvas" aria-hidden="true" />
 
       <header className="lost-head">
-        <p className="lost-title">You found the lost page</p>
-        <p className="lost-text">
-          Nothing lives here, so knock the 404 down. Move with the mouse or the
-          arrow keys.
-        </p>
-        <button className="lost-btn" onClick={leave} type="button">Back to the site</button>
+        <p className="lost-title">{t('lost.title')}</p>
+        <p className="lost-text">{t('lost.text')}</p>
+        <button className="lost-btn" onClick={leave} type="button">{t('lost.back')}</button>
       </header>
 
       <p className="lost-status" aria-live="polite">
         {left !== null && (
           <>
-            {left} bricks left
+            {t('lost.left', { n: left })}
             <span>{'●'.repeat(lives)}{'○'.repeat(LIVES - lives)}</span>
           </>
         )}

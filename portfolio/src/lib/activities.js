@@ -68,6 +68,7 @@ export function withImages(defs, groups) {
         .replace(/[-_]+/g, ' ')
         .replace(/\b\w/g, (c) => c.toUpperCase()),
       desc: ['Fresh photos just landed in the folder, story coming soon.'],
+      fr: { desc: ["Des photos viennent d'arriver dans le dossier, l'histoire suit bientôt."] },
       images: [...imgs, ...pad(slug, 5 - imgs.length)],
     });
   });

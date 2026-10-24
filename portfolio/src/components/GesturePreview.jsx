@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLang } from '../i18n';
 
 /** MediaPipe's standard 21-point hand skeleton. */
 const CONNECTIONS = [
@@ -19,6 +20,7 @@ const STORAGE_KEY = 'gesture-preview-collapsed';
  * concrete: this is exactly what the page sees, and it goes nowhere.
  */
 export default function GesturePreview({ videoRef, landmarksRef }) {
+  const { t } = useLang();
   const canvasRef = useRef(null);
   const [collapsed, setCollapsed] = useState(
     () => localStorage.getItem(STORAGE_KEY) === 'true'
@@ -88,9 +90,9 @@ export default function GesturePreview({ videoRef, landmarksRef }) {
       <button
         className="gesture-preview-toggle"
         onClick={() => setCollapsed((c) => !c)}
-        aria-label={collapsed ? 'Show camera preview' : 'Hide camera preview'}
+        aria-label={t(collapsed ? 'gesture.preview.showLabel' : 'gesture.preview.hideLabel')}
       >
-        {collapsed ? 'Show camera' : 'Hide'}
+        {t(collapsed ? 'gesture.preview.show' : 'gesture.preview.hide')}
       </button>
       {!collapsed && <canvas ref={canvasRef} width={192} height={144} />}
     </div>

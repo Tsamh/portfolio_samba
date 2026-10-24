@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import avatarSrc from '../assets/avatar/normal.png';
 import { findEgg } from '../lib/eggs';
+import { useLang } from '../i18n';
 import '../css/Avatar.css';
 
 /* ── Calibration (percent of the image box, normal.png 964×1240) ── */
@@ -22,12 +23,7 @@ const PUPIL_TRAVEL = 20;
 /* pocket of the jacket (small dark rectangle, chest right) */
 const POCKET = { x: 76.5, y: 85.3, w: 11, h: 5 };
 
-const PAPER_MESSAGE = [
-  'Going through my pockets?!',
-  'Fine... here is my secret:',
-  "I still google 'how to center a div'",
-  'every single time.',
-];
+/* the note's lines are avatar.note in i18n/ */
 
 /**
  * Interactive avatar — breathing, random blinking, pupils that follow
@@ -41,6 +37,7 @@ const PAPER_MESSAGE = [
  * @param {ReactNode} bubble    - optional speech bubble content
  */
 export default function Avatar({ easterEgg = false, bubble = null }) {
+  const { t } = useLang();
   const rootRef   = useRef(null);
   const bobRef    = useRef(null);
   const pupilRefs = useRef({});
@@ -129,7 +126,7 @@ export default function Avatar({ easterEgg = false, bubble = null }) {
         <div className="avatar-box">
           <img
             src={avatarSrc}
-            alt="Samba's avatar"
+            alt={t('avatar.alt')}
             className="avatar-img"
             draggable={false}
           />
@@ -180,9 +177,9 @@ export default function Avatar({ easterEgg = false, bubble = null }) {
                   className="avatar-note"
                   style={{ left: `${POCKET.x}%`, top: `${POCKET.y}%` }}
                   onClick={onPocketClick}
-                  title="Ranger le papier"
+                  title={t('avatar.putAway')}
                 >
-                  {PAPER_MESSAGE.map((line) => <p key={line}>{line}</p>)}
+                  {t('avatar.note').map((line, i) => <p key={i}>{line}</p>)}
                 </div>
               )}
 
@@ -196,7 +193,7 @@ export default function Avatar({ easterEgg = false, bubble = null }) {
                   height: `${POCKET.h + 3}%`,
                 }}
                 onClick={onPocketClick}
-                aria-label="Jacket pocket"
+                aria-label={t('avatar.pocket')}
               />
             </>
           )}

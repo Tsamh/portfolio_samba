@@ -88,6 +88,13 @@
   gap: 1.5rem;
 }
 
+/* language and theme switches, side by side */
+.navbar-toggles {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 /* ─── RESPONSIVE ─────────────────────────────────────────────── */
 @media (max-width: 820px) {
   .navbar {

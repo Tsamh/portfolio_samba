@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import ProjectModal from '../components/ProjectModal';
 import Certificates from '../components/Certificates';
 import { DOMAINS, PROJECTS } from '../lib/projects';
+import { localize, useLang } from '../i18n';
 import '../css/Projects.css';
 
 /* Layout inspired by anubi.io (refs in src/assets/ref/):
@@ -111,6 +112,7 @@ function Scribbles({ mark }) {
 }
 
 function Orbit({ domain, paused: frozen, onOpen }) {
+  const { lang, t } = useLang();
   const boxRef = useRef(null);
   const cardRefs = useRef([]);
   const angle = useRef(0);
@@ -118,7 +120,7 @@ function Orbit({ domain, paused: frozen, onOpen }) {
   const frozenRef = useRef(frozen);
   frozenRef.current = frozen;
 
-  const projects = domain.projects.map((slug) => PROJECTS[slug]);
+  const projects = domain.projects.map((slug) => localize(PROJECTS[slug], lang));
   const count = useRef(projects.length);
   count.current = projects.length;
 
@@ -181,7 +183,7 @@ function Orbit({ domain, paused: frozen, onOpen }) {
           onFocus={hold}
           onBlur={release}
           onClick={() => onOpen(p.slug)}
-          aria-label={`${p.title}: ${p.summary} Open details`}
+          aria-label={`${p.title}: ${p.summary} ${t('projects.open')}`}
         >
           <span className="pj-card-inner">
             <img src={p.image} alt="" loading="lazy" draggable={false} />
@@ -189,7 +191,7 @@ function Orbit({ domain, paused: frozen, onOpen }) {
           <span className="pj-card-caption" aria-hidden="true">
             <strong>{p.title}</strong>
             <span className="pj-card-desc">{p.summary}</span>
-            <span className="pj-card-more">Click for details</span>
+            <span className="pj-card-more">{t('projects.more')}</span>
           </span>
         </button>
       ))}
@@ -198,11 +200,13 @@ function Orbit({ domain, paused: frozen, onOpen }) {
 }
 
 export default function Projects() {
+  const { lang, t } = useLang();
   const [active, setActive] = useState(DOMAINS[0].id);
   const [open, setOpen] = useState(null); // slug of the project in the modal
   const domainsRef = useRef(null);
   useMagnet(domainsRef);
-  const domain = DOMAINS.find((d) => d.id === active);
+  const domains = DOMAINS.map((d) => localize(d, lang));
+  const domain = domains.find((d) => d.id === active);
 
   /* the card the modal grows out of (and shrinks back into) */
   const getCardRect = useCallback(() => {
@@ -217,14 +221,14 @@ export default function Projects() {
     <section className="pj">
       <header className="pj-head">
         <h1 className="pj-title">
-          Selected <span className="pj-underline">projects</span>
+          {t('projects.title.before')} <span className="pj-underline">{t('projects.title.word')}</span>
         </h1>
         <p className="pj-sub">
         <strong>
-          Click a domain{' '}
-          <span className="pj-where-wide">on the right</span>
-          <span className="pj-where-narrow">just below</span>
-        </strong>, then click a project for the details.
+          {t('projects.sub.click')}{' '}
+          <span className="pj-where-wide">{t('projects.sub.wide')}</span>
+          <span className="pj-where-narrow">{t('projects.sub.narrow')}</span>
+        </strong>{t('projects.sub.then')}
         </p>
       </header>
 
@@ -232,8 +236,8 @@ export default function Projects() {
         <Orbit domain={domain} paused={open !== null} onOpen={setOpen} />
 
         <div className="pj-picker">
-          <ul ref={domainsRef} className="pj-domains" aria-label="Domains">
-          {DOMAINS.map((d) => {
+          <ul ref={domainsRef} className="pj-domains" aria-label={t('projects.domains')}>
+          {domains.map((d) => {
             const isActive = d.id === active;
             return (
               <li key={d.id} className={`pj-domain${isActive ? ' active' : ''}`}>
@@ -261,7 +265,7 @@ export default function Projects() {
       {open && (
         <ProjectModal
           key={open}
-          project={PROJECTS[open]}
+          project={localize(PROJECTS[open], lang)}
           getCardRect={getCardRect}
           onClosed={closeModal}
         />

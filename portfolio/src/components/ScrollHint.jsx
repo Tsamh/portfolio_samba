@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLang } from '../i18n';
 import '../css/ScrollHint.css';
 
 const SHOW_MS = 2800;
 const AFTER_HOVER_MS = 1200;   // lingers a little once the pointer leaves
 
 function Hint({ edge, shown, onClick, onHold, onRelease }) {
+  const { t } = useLang();
   const arrow = (
     <svg className="scroll-hint-arrow" viewBox="0 0 24 24" width="16" height="16"
          fill="none" stroke="currentColor" strokeWidth="1.8"
@@ -23,10 +25,10 @@ function Hint({ edge, shown, onClick, onHold, onRelease }) {
       onBlur={onRelease}
       tabIndex={shown ? 0 : -1}
       aria-hidden={!shown}
-      aria-label={edge === 'top' ? 'Go to the previous page' : 'Go to the next page'}
+      aria-label={t(edge === 'top' ? 'scrollHint.prev' : 'scrollHint.next')}
     >
       {edge === 'top' && arrow}
-      <span className="scroll-hint-text">can scroll</span>
+      <span className="scroll-hint-text">{t('scrollHint.text')}</span>
       {edge === 'bottom' && arrow}
     </button>
   );

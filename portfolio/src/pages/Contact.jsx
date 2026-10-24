@@ -1,20 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import LordIcon from '../components/LordIcon';
 import { EMAIL, SOCIALS } from '../lib/links';
+import { useLang } from '../i18n';
 import '../css/pages.css';
 import '../css/Contact.css';
 
-const META = [
-  { label: 'Location',  value: 'Dakar, Sénégal' },
-  { label: 'Timezone',  value: 'GMT (UTC+0)' },
-  { label: 'Response',  value: '< 24 hours' },
-  { label: 'Languages', value: 'FR / EN' },
-];
-
-/* what the sentence form lets the visitor pick, straight from the intro */
-const TOPICS = ['an AI system', 'a data platform', 'cloud infrastructure', 'a fullstack app', 'just an idea'];
-
-const MARQUEE = ["Let's make it happen", 'Say hello', "Don't be a stranger"];
+/* The practical info (contact.meta), the topics the sentence form lets the
+   visitor pick (contact.topics) and the marquee words live in i18n/. */
 
 const clock = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'Africa/Dakar', hour: '2-digit', minute: '2-digit', second: '2-digit',
@@ -33,6 +25,7 @@ function DakarTime() {
 /** Endless band of words; scrolling the page speeds it up and turns it
     the way the visitor scrolls. */
 function Marquee() {
+  const { t } = useLang();
   const trackRef = useRef(null);
 
   useEffect(() => {
@@ -77,7 +70,8 @@ function Marquee() {
     };
   }, []);
 
-  const run = [...MARQUEE, ...MARQUEE];
+  const words = t('contact.marquee');
+  const run = [...words, ...words];
   return (
     <div className="ct-marquee" aria-hidden="true">
       <div ref={trackRef} className="ct-marquee-track">
@@ -112,21 +106,25 @@ function Field({ value, onChange, placeholder, label, ...rest }) {
 /** "Hi Samba, my name is …": a sentence to fill in, sent through the
     visitor's own mail app — nothing goes through a server. */
 function SentenceForm() {
+  const { t } = useLang();
+  const topics = t('contact.topics');
   const [name, setName] = useState('');
-  const [topic, setTopic] = useState(TOPICS[0]);   // null: the custom bubble
+  // index in the topics, so the choice survives a language switch;
+  // null: the custom bubble
+  const [topic, setTopic] = useState(0);
   const [custom, setCustom] = useState('');
   const [reply, setReply] = useState('');
 
   const send = (e) => {
     e.preventDefault();
-    const who = name.trim() || 'someone';
+    const who = name.trim() || t('contact.mail.someone');
     // the custom bubble becomes the email subject as it is typed
     const own = topic === null && custom.trim();
-    const about = topic ?? (own || 'something else');
-    const subject = own || `Project: ${about}`;
+    const about = topic === null ? (own || t('contact.mail.other')) : topics[topic];
+    const subject = own || t('contact.mail.subject', { about });
     const body =
-      `Hi Samba,\n\nMy name is ${who} and I'd like to talk about ${about}.\n` +
-      (reply.trim() ? `You can reach me at ${reply.trim()}.\n` : '');
+      t('contact.mail.body', { who, about }) +
+      (reply.trim() ? t('contact.mail.reply', { reply: reply.trim() }) : '');
     window.location.href =
       `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
@@ -135,42 +133,42 @@ function SentenceForm() {
   return (
     <form className="ct-form" onSubmit={send}>
       <p className="ct-form-line">
-        Hi Samba, my name is{' '}
-        <Field value={name} onChange={setName} placeholder="your name" label="Your name" autoComplete="name" />{' '}
-        and I'd like to talk about
+        {t('contact.form.hi')}{' '}
+        <Field value={name} onChange={setName} placeholder={t('contact.form.name')} label={t('contact.form.nameLabel')} autoComplete="name" />{' '}
+        {t('contact.form.talk')}
       </p>
-      <div className="ct-topics" role="radiogroup" aria-label="Topic">
-        {TOPICS.map((t) => (
+      <div className="ct-topics" role="radiogroup" aria-label={t('contact.form.topic')}>
+        {topics.map((label, i) => (
           <button
-            key={t}
+            key={i}
             type="button"
             role="radio"
-            aria-checked={topic === t}
-            className={`ct-topic${topic === t ? ' on' : ''}`}
-            onClick={() => setTopic(t)}
+            aria-checked={topic === i}
+            className={`ct-topic${topic === i ? ' on' : ''}`}
+            onClick={() => setTopic(i)}
           >
-            {t}
+            {label}
           </button>
         ))}
         <label className={`ct-topic ct-topic-custom${topic === null ? ' on' : ''}`}>
-          <span className="ct-field-size" aria-hidden="true">{custom || 'your own subject…'}</span>
+          <span className="ct-field-size" aria-hidden="true">{custom || t('contact.form.own')}</span>
           <input
             value={custom}
             onChange={(e) => { setCustom(e.target.value); setTopic(null); }}
             onFocus={() => setTopic(null)}
-            placeholder="your own subject…"
-            aria-label="Your own subject"
+            placeholder={t('contact.form.own')}
+            aria-label={t('contact.form.ownLabel')}
             maxLength={80}
           />
         </label>
       </div>
       <p className="ct-form-line">
-        You can reach me at{' '}
-        <Field value={reply} onChange={setReply} placeholder="your email" label="Your email" autoComplete="email" type="email" />
+        {t('contact.form.reach')}{' '}
+        <Field value={reply} onChange={setReply} placeholder={t('contact.form.email')} label={t('contact.form.emailLabel')} autoComplete="email" type="email" />
         .
       </p>
       <button className="ct-send" type="submit">
-        <span className="ct-roll" data-text="Send it"><span>Send it</span></span>
+        <span className="ct-roll" data-text={t('contact.form.send')}><span>{t('contact.form.send')}</span></span>
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
              strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M5 19L19 5M9 5h10v10" />
@@ -181,6 +179,7 @@ function SentenceForm() {
 }
 
 export default function Contact() {
+  const { t } = useLang();
   const rootRef = useRef(null);
   const voidRef = useRef(null);
 
@@ -219,7 +218,7 @@ export default function Contact() {
     return () => observer.disconnect();
   }, []);
 
-  const bigText = "Let's work together";
+  const bigText = t('contact.big');
 
   return (
     <>
@@ -229,23 +228,20 @@ export default function Contact() {
           <h2 className="ct-title">
             <span className="ct-line">
               <span style={{ '--i': 0 }}>
-                Let's make your project{' '}
+                {t('contact.title.before')}{' '}
                 <span className="accent ct-scribble">
-                  intelligent
+                  {t('contact.title.word')}
                   <svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true">
                     <path d="M4 16c60-9 130-12 200-8 34 2 62 5 92 1" />
                   </svg>
-                </span>!
+                </span>{t('contact.title.after')}
               </span>
             </span>
           </h2>
 
-          <p className="ct-lead">
-            AI systems, data platforms, cloud infrastructure or fullstack apps:
-            whether you have a precise brief or just an idea, my inbox is open.
-          </p>
+          <p className="ct-lead">{t('contact.lead')}</p>
 
-          <p className="ct-kicker">Find me on</p>
+          <p className="ct-kicker">{t('contact.findMe')}</p>
 
           <div className="ct-rows">
             {SOCIALS.map(({ icon, label, value, href }, i) => (
@@ -276,29 +272,26 @@ export default function Contact() {
       <section className="content-section ct-info" data-reveal>
         <div className="ct-wrap">
           <div className="ct-eyebrow">
-            <span>Right now in Dakar</span>
+            <span>{t('contact.now')}</span>
             <span className="ct-clock"><DakarTime /></span>
           </div>
 
           <div className="ct-meta">
-            {META.map(({ label, value }, i) => (
-              <div key={label} className="ct-meta-item" style={{ '--i': i }}>
+            {t('contact.meta').map(({ label, value }, i) => (
+              <div key={i} className="ct-meta-item" style={{ '--i': i }}>
                 <span className="ct-meta-label">{label}</span>
                 <span className="ct-meta-value">{value}</span>
               </div>
             ))}
           </div>
-          <p className="ct-meta-note">
-            Based in Dakar, working globally. Open to remote, on-site and
-            hybrid setups.
-          </p>
+          <p className="ct-meta-note">{t('contact.note')}</p>
         </div>
       </section>
 
       {/* ── Sentence form, sent from the visitor's mail app ── */}
       <section className="content-section alt ct-write" data-reveal>
         <div className="ct-wrap">
-          <p className="ct-kicker">Or write it here</p>
+          <p className="ct-kicker">{t('contact.write')}</p>
           <SentenceForm />
         </div>
       </section>
@@ -306,7 +299,7 @@ export default function Contact() {
       {/* ── Giant closing CTA (classic portfolio footer) ── */}
       <section className="content-section ct-end" data-reveal>
         <a href={`mailto:${EMAIL}`} className="ct-big">
-          <span className="ct-big-hint">Don't be a stranger</span>
+          <span className="ct-big-hint">{t('contact.bigHint')}</span>
           <span className="ct-big-text" aria-label={bigText}>
             {bigText.split(' ').map((word, w, words) => {
               // letter index across the whole line, for the rolling delay
@@ -328,7 +321,7 @@ export default function Contact() {
                 <path id="ct-badge-path" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0" />
               </defs>
               <text>
-                <textPath href="#ct-badge-path" textLength="286" lengthAdjust="spacing">SAY HELLO ✺ SAY HELLO ✺ SAY HELLO ✺ </textPath>
+                <textPath href="#ct-badge-path" textLength="286" lengthAdjust="spacing">{t('contact.badge')}</textPath>
               </text>
             </svg>
             <svg viewBox="0 0 24 24" className="ct-badge-arrow" fill="none" stroke="currentColor"
@@ -342,7 +335,7 @@ export default function Contact() {
       {/* ── Black void before leaving the head (outro) ── */}
       <section className="void-section" data-progress-end>
         <span className="void-trigger" ref={voidRef} aria-hidden="true" />
-        <span className="void-hint">Keep scrolling to leave my head</span>
+        <span className="void-hint">{t('contact.void')}</span>
       </section>
     </>
   );

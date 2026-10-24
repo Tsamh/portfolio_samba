@@ -5,6 +5,7 @@ import NavList        from './components/NavList';
 import QuotesPanel    from './components/QuotesPanel';
 import ContactButton  from './components/ContactButton';
 import ThemeToggle    from './components/ThemeToggle';
+import LangToggle     from './components/LangToggle';
 import Terminal       from './components/Terminal';
 import Outro          from './components/Outro';
 import GestureNav     from './components/GestureNav';
@@ -105,10 +106,13 @@ export default function App() {
           onToggle={() => (menuOpen ? closeMenu() : openMenu())}
           onLogoClick={() => goTo(0)}
           themeToggle={
-            <ThemeToggle
-              theme={theme}
-              onToggle={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            />
+            <span className="navbar-toggles">
+              <LangToggle />
+              <ThemeToggle
+                theme={theme}
+                onToggle={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+              />
+            </span>
           }
           rightSlot={<ContactButton onContactPage={() => goTo(CONTACT_INDEX)} />}
         />

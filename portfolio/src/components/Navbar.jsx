@@ -1,4 +1,5 @@
 import logoSrc from '../assets/logo_samba.png';
+import { useLang } from '../i18n';
 import '../css/Navbar.css';
 
 /**
@@ -14,11 +15,13 @@ import '../css/Navbar.css';
  * @param {ReactNode} rightSlot    - right column (ContactButton)
  */
 export default function Navbar({ menuOpen, onToggle, onLogoClick, themeToggle, rightSlot }) {
+  const { t } = useLang();
+
   return (
     <nav className="navbar">
 
       {/* ── 1: logo ── */}
-      <div className="navbar-logo" onClick={onLogoClick} title="Back to Home">
+      <div className="navbar-logo" onClick={onLogoClick} title={t('navbar.home')}>
         <img src={logoSrc} alt="SAMBA" className="navbar-logo-img" />
       </div>
 
@@ -27,7 +30,7 @@ export default function Navbar({ menuOpen, onToggle, onLogoClick, themeToggle, r
         <div
           className={`toggle-btn${menuOpen ? ' open' : ''}`}
           onClick={onToggle}
-          aria-label="Toggle menu"
+          aria-label={t('navbar.menu')}
         >
           <span />
           <span />

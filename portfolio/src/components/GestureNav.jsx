@@ -5,6 +5,7 @@ import { createHandTracker } from '../lib/handTracker';
 import GesturePreview from './GesturePreview';
 import LordIcon from './LordIcon';
 import { useBackClose } from '../hooks/useBackClose';
+import { useLang } from '../i18n';
 import '../css/GestureNav.css';
 
 /* idle → intro → loading → active, with error reachable from loading */
@@ -63,31 +64,22 @@ function GestureIcon({ name, size = 26 }) {
   );
 }
 
-const GESTURES = [
-  { icon: 'hand',  title: 'Show Hand', text: 'Show your palm to move the cursor around the page' },
-  { icon: 'pinch', title: 'Quick pinch', text: 'Pinch your thumb and index finger to click on elements' },
-  { icon: 'drag',  title: 'Pinch & Drag', text: 'Pinch and drag up or down to scroll' },
-];
+/* one icon per gesture, in the order of gesture.items in i18n/ */
+const GESTURE_ICONS = ['hand', 'pinch', 'drag'];
 
+/* key of the message under gesture.errors in i18n/ */
 function describeError(err) {
-  if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') {
-    return 'Camera access was blocked. Allow it for this site in your browser settings (the icon at the left of the address bar), then try again.';
-  }
-  if (err?.name === 'NotFoundError' || err?.name === 'DevicesNotFoundError') {
-    return 'No camera found. Plug one in and try again.';
-  }
-  if (err?.name === 'NotReadableError') {
-    return 'The camera is already in use by another application. Close it and try again.';
-  }
-  if (err?.name === 'InsecureContext') {
-    return 'Camera access needs a secure connection. Open this site over https, or on localhost.';
-  }
-  return 'Hand tracking failed to start. Reload the page and try again.';
+  if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') return 'blocked';
+  if (err?.name === 'NotFoundError' || err?.name === 'DevicesNotFoundError') return 'missing';
+  if (err?.name === 'NotReadableError') return 'busy';
+  if (err?.name === 'InsecureContext') return 'insecure';
+  return 'failed';
 }
 
 export default function GestureNav() {
+  const { t } = useLang();
   const [status, setStatus] = useState(IDLE);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');   // gesture.errors key
 
   const videoRef      = useRef(null);
   const cursorRef     = useRef(null);
@@ -360,8 +352,8 @@ export default function GestureNav() {
       <button
         className={`gesture-fab${status === ACTIVE ? ' active' : ''}`}
         onClick={handleFabClick}
-        aria-label={status === ACTIVE ? 'Stop hand navigation' : 'Navigate with hand gestures'}
-        title={status === ACTIVE ? 'Stop hand navigation' : 'Navigate with hand gestures'}
+        aria-label={t(status === ACTIVE ? 'gesture.stop' : 'gesture.start')}
+        title={t(status === ACTIVE ? 'gesture.stop' : 'gesture.start')}
       >
         <LordIcon name="nocontact" size={36} />
       </button>
@@ -377,15 +369,13 @@ export default function GestureNav() {
             tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="gesture-title" id="gesture-title">Navigate with your hand</h2>
-            <p className="gesture-subtitle">
-              Point your webcam at yourself and drive the whole site without touching anything.
-            </p>
+            <h2 className="gesture-title" id="gesture-title">{t('gesture.title')}</h2>
+            <p className="gesture-subtitle">{t('gesture.subtitle')}</p>
 
             <ul className="gesture-list">
-              {GESTURES.map((g) => (
-                <li key={g.title} className="gesture-item">
-                  <span className="gesture-icon"><GestureIcon name={g.icon} /></span>
+              {t('gesture.items').map((g, i) => (
+                <li key={GESTURE_ICONS[i]} className="gesture-item">
+                  <span className="gesture-icon"><GestureIcon name={GESTURE_ICONS[i]} /></span>
                   <span>
                     <strong>{g.title}</strong>
                     <span className="gesture-desc">{g.text}</span>
@@ -396,23 +386,21 @@ export default function GestureNav() {
 
             <p className="gesture-privacy">
               <span className="gesture-privacy-icon"><GestureIcon name="lock" size={16} /></span>
-              <strong>No spying, promise.</strong> The video never leaves your browser: no
-              upload, no recording, no server, no secret folder of your face. It all runs
-              locally, and the camera shuts off the moment you exit. I'm a developer, not the NSA.
+              <strong>{t('gesture.privacy.title')}</strong> {t('gesture.privacy.text')}
             </p>
 
-            {status === ERROR && <p className="gesture-error">{errorMessage}</p>}
+            {status === ERROR && <p className="gesture-error">{t(`gesture.errors.${errorMessage}`)}</p>}
 
             <div className="gesture-actions">
               <button className="gesture-btn ghost" onClick={close}>
-                Cancel
+                {t('gesture.cancel')}
               </button>
               <button
                 className="gesture-btn primary"
                 onClick={handleEnable}
                 disabled={status === LOADING}
               >
-                {status === LOADING ? 'Loading model…' : 'Enable camera'}
+                {t(status === LOADING ? 'gesture.loading' : 'gesture.enable')}
               </button>
             </div>
           </div>

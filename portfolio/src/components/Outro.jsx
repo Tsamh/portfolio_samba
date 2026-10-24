@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Avatar, { HAIR_POINT } from './Avatar';
 import { findEgg } from '../lib/eggs';
+import { useLang } from '../i18n';
 import '../css/Outro.css';
 
 const MAX_ZOOM = 34;
@@ -23,6 +24,7 @@ function lerp(a, b, t) {
  * @param {function} onHome - close and navigate back to Home
  */
 export default function Outro({ onExit, onHome }) {
+  const { t } = useLang();
   const overlayRef = useRef(null);
   const zoomRef    = useRef(null);
   const rafRef     = useRef(null);
@@ -153,9 +155,9 @@ export default function Outro({ onExit, onHome }) {
           bubble={
             idle ? (
               <>
-                Goodbye! <span className="wave">&#9995;</span>
+                {t('outro.bye')} <span className="wave">&#9995;</span>
                 <br />
-                Thanks for visiting.
+                {t('outro.thanks')}
               </>
             ) : null
           }
@@ -164,7 +166,7 @@ export default function Outro({ onExit, onHome }) {
 
       {idle && (
         <div className="outro-actions">
-          <button className="outro-btn" onClick={onHome}>Back to start</button>
+          <button className="outro-btn" onClick={onHome}>{t('outro.home')}</button>
         </div>
       )}
     </div>

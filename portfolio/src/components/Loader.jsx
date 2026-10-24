@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createSmoke } from '../lib/smoke';
+import { useLang } from '../i18n';
 import '../css/Loader.css';
 
 /* Inspired by mattjinn.com: a lowercase serif wordmark whose letters rise in
@@ -17,6 +18,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
  * @param {function} onComplete - the loader is gone, unmount it
  */
 export default function Loader({ onReveal, onComplete }) {
+  const { t } = useLang();
   const rootRef = useRef(null);
   const canvasRef = useRef(null);
   const smokeRef = useRef(null);
@@ -70,7 +72,7 @@ export default function Loader({ onReveal, onComplete }) {
   }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div ref={rootRef} className={`loader ${phase}`} role="status" aria-label="Loading">
+    <div ref={rootRef} className={`loader ${phase}`} role="status" aria-label={t('loader')}>
       <canvas ref={canvasRef} className="loader-canvas" aria-hidden="true" />
       <div className="loader-word" aria-hidden="true">
         {WORD.split('').map((letter, i) => (

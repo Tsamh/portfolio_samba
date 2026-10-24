@@ -33,6 +33,9 @@ Instead of a plain page of links, it's built to be explored. Here's what you can
 
 - **Light or dark:** switch the theme with the sun/moon button. Your choice is
   remembered.
+- **English or French:** the EN/FR button next to it switches the whole site,
+  projects and terminal included. It starts in your browser's language and
+  remembers your choice.
 - **The CV:** preview it right on the site, choose the plain (ATS) or the
   designed version, and download it.
 - **Projects:** pick a domain, then click any project floating around it for

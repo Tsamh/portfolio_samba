@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import LordIcon from './LordIcon';
 import { SKILL_GROUPS, SKILLS } from '../lib/skills';
+import { localize, useLang } from '../i18n';
 import '../css/SkillsPanel.css';
 
 /* Official logos, stored in src/assets/skills/<file>.svg */
@@ -43,9 +44,11 @@ function Logo({ name, file }) {
  * between the two views.
  */
 export default function SkillsPanel() {
+  const { lang, t } = useLang();
   const [all, setAll] = useState(true);   // opens on every skill at once
   const [active, setActive] = useState(SKILL_GROUPS[0].id);
-  const group = SKILL_GROUPS.find((g) => g.id === active);
+  const groups = SKILL_GROUPS.map((g) => localize(g, lang));
+  const group = groups.find((g) => g.id === active);
 
   /* The box eases to the height of what it holds. Measured rather than
      animated with `layout`, which scales the box and would squash the
@@ -63,7 +66,7 @@ export default function SkillsPanel() {
     /* .sk-all also widens the Home grid around it (SkillsPanel.css) */
     <div className={`skills-list${all ? ' sk-all' : ''}`}>
       <div className="sk-head">
-        <h3>Skills</h3>
+        <h3>{t('skills.title')}</h3>
         <button
           type="button"
           className="sk-toggle"
@@ -79,7 +82,7 @@ export default function SkillsPanel() {
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
             >
-              {all ? 'By category' : 'View all'}
+              {t(all ? 'skills.byCategory' : 'skills.viewAll')}
             </motion.span>
           </AnimatePresence>
         </button>
@@ -100,8 +103,8 @@ export default function SkillsPanel() {
             </motion.div>
           ) : (
             <motion.div key="cat" className="sk-view" {...VIEW}>
-              <div className="sk-cats" role="tablist" aria-label="Skill categories">
-                {SKILL_GROUPS.map((g) => (
+              <div className="sk-cats" role="tablist" aria-label={t('skills.categories')}>
+                {groups.map((g) => (
                   <button
                     key={g.id}
                     type="button"

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import LordIcon from './LordIcon';
 import { DEFAULT_KIND, KINDS, cvDocument } from '../lib/cv';
 import { useBackClose } from '../hooks/useBackClose';
+import { useLang } from '../i18n';
 import '../css/CvPreview.css';
 
 /**
@@ -37,12 +38,14 @@ async function renderPdf(url, container, isCancelled) {
 
 /**
  * "See CV" modal: preview first, download from inside the preview.
- * Opens on the ATS version; the button left of Download switches between the
- * ATS and the designed one.
+ * Opens on the document in the site's language (ATS resume in English,
+ * designed CV in French); the button left of Download switches between the
+ * two.
  * @param {boolean}  open
  * @param {function} onClose
  */
 export default function CvPreview({ open, onClose }) {
+  const { lang, t } = useLang();
   const pagesRef = useRef(null);
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [kind, setKind] = useState(DEFAULT_KIND);      // resume | cv
@@ -50,11 +53,12 @@ export default function CvPreview({ open, onClose }) {
   const doc = cvDocument(kind);
   const other = KINDS.find((k) => k.id !== kind);
 
-  /* the ATS version every time the modal opens */
+  /* every time the modal opens, the document written in the site's
+     language: the ATS resume is in English, the designed CV in French */
   useEffect(() => {
     if (!open) return;
-    setKind(DEFAULT_KIND);
-  }, [open]);
+    setKind(lang === 'fr' ? 'cv' : DEFAULT_KIND);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!open) return;
@@ -98,7 +102,7 @@ export default function CvPreview({ open, onClose }) {
         className="cv-modal"
         role="dialog"
         aria-modal="true"
-        aria-label="Resume preview"
+        aria-label={t('cv.label')}
         onClick={(e) => e.stopPropagation()}
       >
         <header className="cv-header">
@@ -107,15 +111,15 @@ export default function CvPreview({ open, onClose }) {
               className="cv-btn"
               onClick={() => setKind(other.id)}
               type="button"
-              title={`Switch to the ${other.label} version`}
+              title={t('cv.switchTo', { kind: t(`cv.kinds.${other.id}`) })}
             >
-              {other.label}
+              {t(`cv.kinds.${other.id}`)}
             </button>
             <a className="cv-btn primary" href={doc.url} download={doc.filename}>
               <LordIcon name="arrows-down" size={22} />
-              <span className="cv-btn-label">Download</span>
+              <span className="cv-btn-label">{t('cv.download')}</span>
             </a>
-            <button className="cv-btn close" onClick={onClose} aria-label="Close preview" type="button">
+            <button className="cv-btn close" onClick={onClose} aria-label={t('cv.close')} type="button">
               ×
             </button>
           </div>
@@ -126,12 +130,8 @@ export default function CvPreview({ open, onClose }) {
           className="cv-scroll"
           onClick={(e) => { if (!e.target.closest('.cv-page')) onClose(); }}
         >
-          {status === 'loading' && <p className="cv-status">Loading preview…</p>}
-          {status === 'error' && (
-            <p className="cv-status">
-              The preview could not be displayed. You can still download the document above.
-            </p>
-          )}
+          {status === 'loading' && <p className="cv-status">{t('cv.loading')}</p>}
+          {status === 'error' && <p className="cv-status">{t('cv.error')}</p>}
           <div ref={pagesRef} className="cv-pages" />
         </div>
       </div>

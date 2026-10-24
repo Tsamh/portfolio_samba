@@ -3,16 +3,20 @@ import { createPortal } from 'react-dom';
 import { BADGES, CERTIFICATES } from '../lib/certificates';
 import LordIcon from './LordIcon';
 import { useBackClose } from '../hooks/useBackClose';
+import { localize, useLang } from '../i18n';
 import '../css/Certificates.css';
 
 /** Certificates and attestations, with a lightbox on the paper itself. */
-/* badges first, then attestations: one list for the lightbox to walk */
-const ALL = [...BADGES, ...CERTIFICATES];
-
 export default function Certificates() {
+  const { lang, t } = useLang();
+  const badges = BADGES.map((b) => localize(b, lang));
+  const certificates = CERTIFICATES.map((c) => localize(c, lang));
+  /* badges first, then attestations: one list for the lightbox to walk */
+  const all = [...badges, ...certificates];
+
   const [open, setOpen] = useState(-1);
   const close = useCallback(() => setOpen(-1), []);
-  const shown = ALL[open];
+  const shown = all[open];
 
   useBackClose(open >= 0, close);
 
@@ -26,13 +30,13 @@ export default function Certificates() {
   return (
     <section className="certs">
       <header className="certs-head">
-        <h2 className="certs-title">Certificates &amp; attestations</h2>
-        <p className="certs-sub">Training badges and the paper trail: what I was trained on, ran or entered.</p>
+        <h2 className="certs-title">{t('certs.title')}</h2>
+        <p className="certs-sub">{t('certs.sub')}</p>
       </header>
 
       {/* AWS training badges, in the shape Credly shows them */}
       <ul className="certs-badges">
-        {BADGES.map((b, i) => (
+        {badges.map((b, i) => (
           <li key={b.slug}>
             {/* the card itself enlarges the badge; the corner button is the
                 only thing that leaves for Credly */}
@@ -49,8 +53,8 @@ export default function Certificates() {
               href={b.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${b.title} on Credly`}
-              title="Open on Credly"
+              aria-label={t('certs.onCredly', { title: b.title })}
+              title={t('certs.openCredly')}
             >
               <LordIcon name="link" size={22} />
             </a>
@@ -58,12 +62,12 @@ export default function Certificates() {
         ))}
       </ul>
 
-      <h3 className="certs-subtitle">Attestations</h3>
+      <h3 className="certs-subtitle">{t('certs.attestations')}</h3>
 
       <ul className="certs-grid">
-        {CERTIFICATES.map((c, i) => (
+        {certificates.map((c, i) => (
           <li key={c.slug}>
-            <button className="cert-card" type="button" onClick={() => setOpen(BADGES.length + i)}>
+            <button className="cert-card" type="button" onClick={() => setOpen(badges.length + i)}>
               <span className="cert-media">
                 <img src={c.image} alt="" loading="lazy" draggable={false} />
               </span>
@@ -88,7 +92,7 @@ export default function Certificates() {
           aria-modal="true"
           aria-label={shown.title}
         >
-          <button className="cert-lightbox-close" onClick={close} aria-label="Close" type="button">×</button>
+          <button className="cert-lightbox-close" onClick={close} aria-label={t('certs.close')} type="button">×</button>
           <figure className="cert-figure" onClick={(e) => e.stopPropagation()}>
             <img src={shown.image} alt={shown.title} draggable={false} />
             <figcaption>

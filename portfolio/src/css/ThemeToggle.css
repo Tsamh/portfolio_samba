@@ -56,3 +56,11 @@
 }
 
 .theme-icon svg { width: 15px; height: 15px; }
+
+/* the language switch wears the same ring, with two letters inside */
+.lang-toggle .theme-icon {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}

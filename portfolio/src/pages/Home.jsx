@@ -5,14 +5,12 @@ import LordIcon from '../components/LordIcon';
 import CvPreview from '../components/CvPreview';
 import { SOCIALS } from '../lib/links';
 import SkillsPanel from '../components/SkillsPanel';
+import { useLang } from '../i18n';
 import chibiSrc from '../assets/avatar/chibime.png';
 import '../css/pages.css';
 
-/* The former About page is now the site's Home. */
-
-/* typed in red, with a fixed "Engineer" after them */
-const ROLES = ['Data & AI', 'Software'];
-
+/* The former About page is now the site's Home. The roles are typed in red
+   next to a fixed "Engineer" (home.roles and home.title in i18n/). */
 
 
 /* hand-drawn red stars, spread along the About section: one next to the
@@ -29,26 +27,30 @@ function Star({ className, size }) {
 }
 
 export default function Home() {
+  const { lang, t } = useLang();
   const [cvOpen, setCvOpen] = useState(false);
   const closeCv = useCallback(() => setCvOpen(false), []);
+  const { before, after } = t('home.title');
 
   return (
     <>
       <div className="hero-section hero-about">
         <div className="hero-about-text">
           <h1 className="title">
-            <span className="title-typed"><TypingText words={ROLES} /></span>{' '}
-            Engineer
+            {before && <>{before}{' '}</>}
+            {/* keyed by language: the typing starts over on the new words */}
+            <span className="title-typed"><TypingText key={lang} words={t('home.roles')} /></span>
+            {after && <>{' '}{after}</>}
           </h1>
-          <p className="subtitle">Pipelines, platforms and models, end to end</p>
+          <p className="subtitle">{t('home.subtitle')}</p>
 
           <button className="see-cv-btn" onClick={() => setCvOpen(true)} type="button">
-            See CV
+            {t('home.seeCv')}
           </button>
         </div>
 
         <div className="hero-visual">
-          <img src={chibiSrc} alt="Chibi Samba" className="hero-chibi" draggable={false} />
+          <img src={chibiSrc} alt={t('home.chibi')} className="hero-chibi" draggable={false} />
 
           <div className="hero-socials">
             {SOCIALS.map(({ icon, label, href }) => (
@@ -78,17 +80,8 @@ export default function Home() {
         <Reveal from="left">
           <div className="about-grid">
             <div className="about-text">
-              <h2>Hello.</h2>
-              <p>
-                I'm an engineer who lives across the whole stack of intelligence:
-                I design and train models, build the data pipelines that feed them,
-                automate the infrastructure they run on, and ship the web apps
-                people use to interact with them.
-              </p>
-              <p>
-                Based in Dakar, working globally. Available for freelance,
-                full-time, and collaborations that push what machines can do.
-              </p>
+              <h2>{t('home.hello')}</h2>
+              {t('home.about').map((p, i) => <p key={i}>{p}</p>)}
             </div>
 
             <SkillsPanel />

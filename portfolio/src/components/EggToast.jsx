@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
+import { useLang } from '../i18n';
 import '../css/EggToast.css';
 
 const VISIBLE_MS = 4000;
 
 /** Flash notification shown when an easter egg is found. */
 export default function EggToast() {
-  const [egg, setEgg] = useState(null);   // { label, count, total }
+  const { t } = useLang();
+  const [egg, setEgg] = useState(null);   // { id, label, count, total }
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
@@ -30,8 +32,8 @@ export default function EggToast() {
     <div className={`egg-toast${leaving ? ' leaving' : ''}`} role="status">
       <span className="egg-toast-count">{egg.count}/{egg.total}</span>
       <span className="egg-toast-text">
-        <strong>Easter egg found</strong>
-        <span className="egg-toast-label">{egg.label}</span>
+        <strong>{t('eggs.found')}</strong>
+        <span className="egg-toast-label">{t(`eggs.names.${egg.id}`)}</span>
       </span>
     </div>
   );

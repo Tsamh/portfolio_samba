@@ -1,0 +1,27 @@
+/* ─── LANGUAGE SWITCH ────────────────────────────────────────── */
+/* View Transition: the old words blur away, the new ones settle in */
+html.lang-switch::view-transition-old(root) {
+  animation: lang-out 0.32s ease both;
+}
+
+html.lang-switch::view-transition-new(root) {
+  animation: lang-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes lang-out {
+  to { opacity: 0; filter: blur(6px); }
+}
+
+@keyframes lang-in {
+  from { opacity: 0; filter: blur(6px); }
+}
+
+/* fallback for browsers without View Transitions */
+#root {
+  transition: opacity 0.22s ease, filter 0.22s ease;
+}
+
+html.lang-fading #root {
+  opacity: 0;
+  filter: blur(6px);
+}

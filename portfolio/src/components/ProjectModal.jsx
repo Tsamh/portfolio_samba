@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import LordIcon from './LordIcon';
 import { useBackClose } from '../hooks/useBackClose';
+import { useLang } from '../i18n';
 import '../css/ProjectModal.css';
 
 const DURATION = 520;
@@ -28,6 +29,7 @@ function fromCard(panel, image, card) {
  * @param {function} onClosed    - called once the closing animation is done
  */
 export default function ProjectModal({ project, getCardRect, onClosed }) {
+  const { t } = useLang();
   const panelRef = useRef(null);
   const imageRef = useRef(null);
   const backdropRef = useRef(null);
@@ -111,7 +113,7 @@ export default function ProjectModal({ project, getCardRect, onClosed }) {
         </div>
 
         <div className="pm-body">
-          <button className="pm-close" onClick={close} aria-label="Close" type="button">×</button>
+          <button className="pm-close" onClick={close} aria-label={t('project.close')} type="button">×</button>
 
           <h2 className="pm-title" id="pm-title">{project.title}</h2>
           <p className="pm-summary">{project.summary}</p>
@@ -127,19 +129,19 @@ export default function ProjectModal({ project, getCardRect, onClosed }) {
               {project.github && (
                 <a className="pm-link" href={project.github} target="_blank" rel="noopener noreferrer">
                   <LordIcon name="logo-github" size={26} />
-                  GitHub
+                  {t('project.github')}
                 </a>
               )}
               {project.live && (
                 <a className="pm-link primary" href={project.live} target="_blank" rel="noopener noreferrer">
                   <LordIcon name="link" size={26} />
-                  Live site
+                  {t('project.live')}
                 </a>
               )}
               {project.demo && (
                 <button className="pm-link primary" onClick={openDemo} type="button">
                   <LordIcon name="eye" size={26} />
-                  See
+                  {t('project.see')}
                 </button>
               )}
               {project.status && <span className="pm-link pm-status">{project.status}</span>}

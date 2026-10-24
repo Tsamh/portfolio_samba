@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { CV, EMAIL, GITHUB, LINKEDIN_PLAIN } from '../lib/links';
+import { EMAIL, GITHUB, LINKEDIN_PLAIN } from '../lib/links';
+import { cvDocument, DEFAULT_KIND } from '../lib/cv';
 import { SKILLS } from '../lib/skills';
-import { EGGS, EGG_TOTAL, foundEggs, resetEggs } from '../lib/eggs';
+import { EGG_TOTAL, foundEggs, resetEggs } from '../lib/eggs';
 import { DOMAINS, PROJECTS } from '../lib/projects';
+import { localize, translate, useLang } from '../i18n';
 import terminalIcon from '../assets/icons/wired-lineal-1326-browser-terminal-hover-blinking.gif';
 import '../css/Terminal.css';
 
@@ -13,34 +15,37 @@ const PROMPT = 'samba@portfolio:~$';
    { text, tone }  tone = cmd (blue) | err (red) | ok (green)
    { cmd, desc }   one row of the command list (name in yellow)
    `404` works but stays out of the list: it is an easter egg
-   { banner }      the framed title, drawn with a CSS border */
+   { banner }      the framed title, drawn with a CSS border
+   Command names stay in English, like any shell; what they print follows
+   the site's language (terminal.* in i18n/). */
 const COMMANDS = [
-  ['ls', 'list all pages'],
-  ['cd <page>', 'navigate to a page (ex: cd projects)'],
-  ['about', 'display bio and about info'],
-  ['skills', 'list technical skills'],
-  ['projects', 'list projects (--data, --software, --ai)'],
-  ['contact', 'show contact info'],
-  ['resume', 'open resume'],
-  ['whoami', 'who are you?'],
-  ['eggs', 'easter eggs found so far'],
-  ['eggs reset', 'forget them all, to hunt again'],
-  ['theme <mode>', 'light | dark | toggle'],
-  ['help', 'show this list'],
-  ['clear', 'clear the screen'],
-  ['exit', 'close the terminal'],
+  ['ls', 'ls'],
+  ['cd <page>', 'cd'],
+  ['about', 'about'],
+  ['skills', 'skills'],
+  ['projects', 'projects'],
+  ['contact', 'contact'],
+  ['resume', 'resume'],
+  ['whoami', 'whoami'],
+  ['eggs', 'eggs'],
+  ['eggs reset', 'eggsReset'],
+  ['theme <mode>', 'theme'],
+  ['lang <code>', 'lang'],
+  ['help', 'help'],
+  ['clear', 'clear'],
+  ['exit', 'exit'],
 ];
 
-const HELP = [
-  'Available commands:',
-  ...COMMANDS.map(([cmd, desc]) => ({ cmd, desc })),
+const help = (t) => [
+  t('terminal.available'),
+  ...COMMANDS.map(([cmd, key]) => ({ cmd, desc: t(`terminal.cmds.${key}`) })),
   '',
 ];
 
-const BANNER = [
+const banner = (t) => [
   { banner: 'samba.dev \u00b7 portfolio terminal' },
   '',
-  ...HELP,
+  ...help(t),
 ];
 
 /** wraps short items into padded columns */
@@ -94,7 +99,8 @@ function CtrlButton({ kind, tone, label, onClick }) {
  * @param {function} setTheme('light'|'dark')
  */
 export default function Terminal({ open, onOpen, onClose, onNavigate, theme, setTheme }) {
-  const [lines, setLines] = useState(BANNER);
+  const { lang, setLang, t } = useLang();
+  const [lines, setLines] = useState(() => banner(t));
   const [input, setInput] = useState('');
   /* kept apart so a maximised window is still maximised once restored */
   const [minimized, setMinimized] = useState(false);
@@ -108,14 +114,14 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
   useEffect(() => {
     if (open) {
       inputRef.current?.focus();
-      setLines(BANNER);
+      setLines(banner(t));
       setInput('');
       history.current = [];
       historyPos.current = -1;
       setMinimized(false);
       setMaximized(false);
     }
-  }, [open]);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     bodyRef.current?.scrollTo(0, bodyRef.current.scrollHeight);
@@ -175,7 +181,7 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
 
     switch (name) {
       case 'help':
-        print(...HELP);
+        print(...help(t));
         break;
 
       case 'ls':
@@ -189,11 +195,11 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
         const target = arg.replace(/^\//, '');
         const index = /^\d+$/.test(target) ? Number(target) : PAGES.indexOf(target);
         if (index >= 0 && index < PAGES.length) {
-          print({ text: `\u2192 navigating to /${PAGES[index]}`, tone: 'ok' }, '');
+          print({ text: t('terminal.navigating', { page: PAGES[index] }), tone: 'ok' }, '');
           onNavigate(index);
           setTimeout(onClose, 400);
         } else {
-          print({ text: `cd: no such page: ${arg || '(empty)'}, try 'ls'`, tone: 'err' }, '');
+          print({ text: t('terminal.noPage', { page: arg || t('terminal.empty') }), tone: 'err' }, '');
         }
         break;
       }
@@ -202,7 +208,7 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
       case 'experience':
       case 'random': {
         const index = PAGES.indexOf(name);
-        print({ text: `\u2192 navigating to /${name}`, tone: 'ok' }, '');
+        print({ text: t('terminal.navigating', { page: name }), tone: 'ok' }, '');
         onNavigate(index);
         setTimeout(onClose, 400);
         break;
@@ -210,19 +216,15 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
 
       case 'about':
         print(
-          'Samba Hama Traore, data engineer and fullstack developer.',
-          'Final year of a Big Data / AI degree at the Dakar Institute of',
-          'Technology, specialised in data engineering: ingestion,',
-          'transformation, modelling and pipeline orchestration.',
-          'Every project is built end to end, documented and versioned.',
+          ...t('terminal.about'),
           '',
-          { text: "type 'projects' to see what that looks like.", tone: 'ok' },
+          { text: t('terminal.aboutHint'), tone: 'ok' },
           ''
         );
         break;
 
       case 'skills':
-        print('Technical skills:', ...columns(SKILLS.map((k) => k.name)), '');
+        print(t('terminal.skills'), ...columns(SKILLS.map((k) => k.name)), '');
         break;
 
       case 'projects': {
@@ -230,14 +232,14 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
         const wanted = flag ? DOMAINS.filter((d) => d.id === flag) : DOMAINS;
 
         if (flag && wanted.length === 0) {
-          print({ text: `projects: unknown domain '${arg}' (--data, --software, --ai)`, tone: 'err' }, '');
+          print({ text: t('terminal.unknownDomain', { arg }), tone: 'err' }, '');
           break;
         }
 
         wanted.forEach((d) => {
-          print({ text: `${d.label}:`, tone: 'ok' });
+          print({ text: `${localize(d, lang).label}:`, tone: 'ok' });
           d.projects.forEach((slug) => {
-            const project = PROJECTS[slug];
+            const project = localize(PROJECTS[slug], lang);
             print(`  ${project.title.padEnd(22)} ${project.summary}`);
           });
           print('');
@@ -256,35 +258,44 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
 
       case 'resume':
       case 'cv':
-        print({ text: '\u2192 opening the resume in a new tab', tone: 'ok' }, '');
-        window.open(CV, '_blank', 'noopener');
+        print({ text: t('terminal.resume'), tone: 'ok' }, '');
+        // the document written in the site's language (French: the designed CV)
+        window.open(cvDocument(lang === 'fr' ? 'cv' : DEFAULT_KIND).url, '_blank', 'noopener');
         break;
 
       case 'theme': {
         if (arg === 'light' || arg === 'dark') {
           setTheme(arg);
-          print({ text: `theme set to ${arg}`, tone: 'ok' }, '');
+          print({ text: t('terminal.themeSet', { mode: arg }), tone: 'ok' }, '');
         } else if (arg === 'toggle' || arg === '') {
           const next = theme === 'light' ? 'dark' : 'light';
           setTheme(next);
-          print({ text: `theme set to ${next}`, tone: 'ok' }, '');
+          print({ text: t('terminal.themeSet', { mode: next }), tone: 'ok' }, '');
         } else {
-          print({ text: `theme: unknown mode '${arg}' (light | dark | toggle)`, tone: 'err' }, '');
+          print({ text: t('terminal.themeUnknown', { arg }), tone: 'err' }, '');
         }
         break;
       }
 
+      case 'lang': {
+        const next = arg === 'toggle' || arg === '' ? (lang === 'en' ? 'fr' : 'en') : arg;
+        if (next !== 'en' && next !== 'fr') {
+          print({ text: t('terminal.langUnknown', { arg }), tone: 'err' }, '');
+          break;
+        }
+        // answered in the language just picked
+        print({ text: translate('terminal.langSet', null, next), tone: 'ok' }, '');
+        setLang(next);
+        break;
+      }
+
       case 'whoami':
-        print(
-          'samba \u00b7 AI \u00b7 Data \u00b7 MLOps \u00b7 DevOps \u00b7 Fullstack engineer',
-          'Based in Dakar, building the whole pipeline of intelligence.',
-          ''
-        );
+        print(...t('terminal.whoami'), '');
         break;
 
       case '404':
       case 'lost':
-        print({ text: '\u2192 opening the lost page', tone: 'ok' }, '');
+        print({ text: t('terminal.lost'), tone: 'ok' }, '');
         window.dispatchEvent(new Event('portfolio:lost'));
         setTimeout(onClose, 400);
         break;
@@ -293,14 +304,14 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
         // a way to hunt them all again
         if (arg === 'reset') {
           resetEggs();
-          print({ text: 'easter eggs forgotten: happy hunting, again', tone: 'ok' }, '');
+          print({ text: t('terminal.eggsReset'), tone: 'ok' }, '');
           break;
         }
         const found = foundEggs();
-        print({ text: `easter eggs found: ${found.length}/${EGG_TOTAL}`, tone: 'ok' });
+        print({ text: t('terminal.eggsFound', { n: found.length, total: EGG_TOTAL }), tone: 'ok' });
         // only the ones already found are named: the others stay a surprise
-        found.forEach((id) => print(`  ${EGGS[id]}`));
-        if (found.length < EGG_TOTAL) print('  ' + '.'.repeat(3) + ' keep looking');
+        found.forEach((id) => print(`  ${t(`eggs.names.${id}`)}`));
+        if (found.length < EGG_TOTAL) print('  ' + '.'.repeat(3) + ' ' + t('terminal.keepLooking'));
         print('');
         break;
       }
@@ -315,7 +326,7 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
         break;
 
       default:
-        print({ text: `command not found: ${name}, type 'help'`, tone: 'err' }, '');
+        print({ text: t('terminal.notFound', { name }), tone: 'err' }, '');
     }
   };
 
@@ -344,7 +355,7 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
     }
   };
 
-  const fabLabel = !open ? 'Mode terminal' : minimized ? 'Rouvrir le terminal' : 'Réduire le terminal';
+  const fabLabel = t(!open ? 'terminal.fab.open' : minimized ? 'terminal.fab.restore' : 'terminal.fab.minimize');
 
   return (
     <>
@@ -381,19 +392,19 @@ export default function Terminal({ open, onOpen, onClose, onNavigate, theme, set
               <CtrlButton
                 kind="close"
                 tone="red"
-                label="Fermer"
+                label={t('terminal.ctrl.close')}
                 onClick={onClose}
               />
               <CtrlButton
                 kind="minimize"
                 tone="yellow"
-                label="Réduire"
+                label={t('terminal.ctrl.minimize')}
                 onClick={minimize}
               />
               <CtrlButton
                 kind={maximized ? 'restore' : 'maximize'}
                 tone="green"
-                label={maximized ? 'Restaurer' : 'Agrandir'}
+                label={t(maximized ? 'terminal.ctrl.restore' : 'terminal.ctrl.maximize')}
                 onClick={toggleMaximize}
               />
             </div>

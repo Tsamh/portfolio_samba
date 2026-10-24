@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Reveal from './Reveal';
 import { useBackClose } from '../hooks/useBackClose';
+import { useLang } from '../i18n';
 import '../css/Activity.css';
 
 /**
@@ -18,6 +19,7 @@ import '../css/Activity.css';
  * @param {boolean}  reverse  - swap sides + slide from the right
  */
 export default function ActivityRow({ title, desc, bullets = [], images, reverse = false }) {
+  const { t } = useLang();
   const [lightbox, setLightbox] = useState(-1);
   const [active, setActive] = useState(-1);   // hovered slice, JS-driven
   const [leaving, setLeaving] = useState(-1);  // slice shrinking back
@@ -63,10 +65,10 @@ export default function ActivityRow({ title, desc, bullets = [], images, reverse
         <div className={`activity-row${reverse ? ' reverse' : ''}`}>
           <div className="activity-text">
             <h2>{title}</h2>
-            {desc.map((p) => <p key={p}>{p}</p>)}
+            {desc.map((p, i) => <p key={i}>{p}</p>)}
             {bullets.length > 0 && (
               <ul className="activity-bullets">
-                {bullets.map((b) => <li key={b}>{b}</li>)}
+                {bullets.map((b, i) => <li key={i}>{b}</li>)}
               </ul>
             )}
           </div>
@@ -95,7 +97,7 @@ export default function ActivityRow({ title, desc, bullets = [], images, reverse
                   onClick={() => setLightbox(i)}
                   role="button"
                   tabIndex={0}
-                  aria-label={`${title}, photo ${i + 1}`}
+                  aria-label={t('activity.photo', { title, n: i + 1 })}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
@@ -105,7 +107,7 @@ export default function ActivityRow({ title, desc, bullets = [], images, reverse
                 />
               ))}
             </div>
-            <span className="activity-hint">Click to see more</span>
+            <span className="activity-hint">{t('activity.more')}</span>
           </div>
         </div>
       </Reveal>
@@ -124,7 +126,7 @@ export default function ActivityRow({ title, desc, bullets = [], images, reverse
             <button
               className="lb-arrow lb-left"
               onClick={(e) => { e.stopPropagation(); prev(); }}
-              aria-label="Previous photo"
+              aria-label={t('activity.prev')}
             >
               &#8592;
             </button>
@@ -133,14 +135,14 @@ export default function ActivityRow({ title, desc, bullets = [], images, reverse
               <button
                 className="lb-close"
                 onClick={() => setLightbox(-1)}
-                aria-label="Close"
+                aria-label={t('activity.close')}
               >
                 &#10005;
               </button>
               <motion.img
                 key={lightbox}
                 src={images[lightbox]}
-                alt={`${title}, photo ${lightbox + 1}`}
+                alt={t('activity.photo', { title, n: lightbox + 1 })}
                 className="lb-image"
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -167,7 +169,7 @@ export default function ActivityRow({ title, desc, bullets = [], images, reverse
             <button
               className="lb-arrow lb-right"
               onClick={(e) => { e.stopPropagation(); next(); }}
-              aria-label="Next photo"
+              aria-label={t('activity.next')}
             >
               &#8594;
             </button>
